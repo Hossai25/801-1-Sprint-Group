@@ -1,10 +1,31 @@
-<group name>
+801:1 Sprint Group
 
 
 1. Availability for meeting expectations
+    1.	Meetings 2-3 times a week. If time adjustments are needed, a 24 hour notice is required. 
+    Typically days would be Sunday night, Tuesdays, and another day if needed.
+    
 2. Response time to communication expectations
+    1.	A response is expected within 24 hours from the message being sent.
+    
 3. Definition of done: when is a task complete? (hint: "I'm done with that but I didn't check it in to github" is not done.)
+    1.	When the code is uploaded to github and approved by two other group members. 
+    This requires that the code is concise and passes all of its tests.
+    
 4. Scrum meeting format/frequency and distribution of documentation tasks (meeting minutes, updating task board)
+    1.	Scrum meetings 2-3 times a week. Meetings will follow the following format:
+        1.	Each individual answers the 3 questions (1. What are you working on? 2. What have you finished 
+        (specify methods and classes)? 3. Any questions for the group)
+        2.	Updating the task board
+        3.	Any other things that need to be discussed
+    2.	Tasks:
+        1.	Organizing & Starting meeting  
+        2.	Meeting minutes  
+        3.	Updating Task Board 
+        4.	Taking Meeting Notes 
+        5.	Meeting reminders 
+        *We will rotate through tasks to learn all of them
+
 5. Procedure for adopting policies (e.g. code style, code check-in steps, documentation updates)
     if you adopt such a policy during the initial meeting, put it here
 6. Procedure for handling a member who is not meeting expectations
@@ -13,3 +34,4 @@
 
 - Marvin Hossain
 - Jon Olsen
+- Anna Fronk
