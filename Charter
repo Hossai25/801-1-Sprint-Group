@@ -28,8 +28,18 @@
 
 5. Procedure for adopting policies (e.g. code style, code check-in steps, documentation updates)
     if you adopt such a policy during the initial meeting, put it here
+     1. At this point, we don’t necessarily have a set policy. That being said, we can discuss it as a group 
+     later on and if majority agree with the policy then we can put it into play. For code checks in though, 
+     2 fellow group members should approve and comment on it before it gets merged.
+     
 6. Procedure for handling a member who is not meeting expectations
     must include at least 3 actions before involving the instructor
+    
+    1.	Reach out nicely via discord.
+    2.	No response in 24 hours, reach out to them by email.
+    3.	If there is still no response, try reaching out to them on teams.
+    4.	If none of the above work, get Professor Rock involved.
+
 7. Signatures: each member must sign their name by typing their name at the bottom of the document.
 
 - Marvin Hossain
