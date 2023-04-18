@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2651db39-5c72-412a-89ba-539ac4e5dd51" name="Changes" comment="" />
+    <list default="true" id="2651db39-5c72-412a-89ba-539ac4e5dd51" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djangoproject/TAScheduler/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoproject/TAScheduler/models.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +16,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2OI5F3Bk0YxqLTrimLdK9OetNx3" />
   <component name="ProjectViewState">
@@ -41,6 +48,9 @@
       <updated>1681235148940</updated>
       <workItem from="1681235150082" duration="544000" />
       <workItem from="1681235702375" duration="121000" />
+      <workItem from="1681436539165" duration="1968000" />
+      <workItem from="1681702015245" duration="62000" />
+      <workItem from="1681836377643" duration="2610000" />
     </task>
     <servers />
   </component>
