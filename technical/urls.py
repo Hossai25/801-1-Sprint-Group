@@ -1,5 +1,5 @@
 """
-URL configuration for djangoproject project.
+URL configuration for technical project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -21,11 +21,10 @@ Including another URLconf
 #     path('admin/', admin.site.urls)
 # ]
 from django.urls import path
-from django.views.generic import TemplateView
 from django.contrib import admin
+from TAScheduler.views import LoginPage
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='loginPage.html'), name='login'),
-    path('loginPage/', TemplateView.as_view(template_name='loginPage.html'), name='login'),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+    path('', LoginPage.as_view(), name='login')
 ]
