@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>Admin Login</title>
-	<link rel="stylesheet" href="{% static 'css/admin_login.css' %}">
-</head>
-<body>
+{% extends "master.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+
+{% block content %}
 	<div class="container">
 		<h1>Admin Login</h1>
 		<form method="post">
@@ -15,8 +15,7 @@
 			<label for="password">Password:</label>
 			<input type="password" id="password" name="password" required><br><br>
 			<input type="submit" value="Login">
-			<a href="{% url 'password_reset' %}">Forgot Username or Password?</a>
+			<a href="">Forgot Username or Password?</a>
 		</form>
 	</div>
-</body>
-</html>
+{% endblock %}
