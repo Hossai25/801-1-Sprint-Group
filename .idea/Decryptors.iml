@@ -4,6 +4,7 @@
     <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
   </component>
+<<<<<<<<< Temporary merge branch 1
   <component name="TemplatesService">
     <option name="TEMPLATE_FOLDERS">
       <list>
@@ -11,4 +12,6 @@
       </list>
     </option>
   </component>
+=========
+>>>>>>>>> Temporary merge branch 2
 </module>
