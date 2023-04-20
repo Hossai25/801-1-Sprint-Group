@@ -46,7 +46,7 @@ class Dashboard(View):
 
 class Database(View):
     def get(self,request):
-        return render(request,"database.html",{})
+        return render(request, "database.html", {})
 
     def post(self,request):
         pass
