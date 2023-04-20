@@ -22,9 +22,10 @@ Including another URLconf
 # ]
 from django.urls import path
 from django.contrib import admin
-from TAScheduler.views import LoginPage
+from TAScheduler.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', LoginPage.as_view(), name='login')
+    path('', LoginPage.as_view(), name='login'),
+    path('dashboard/', Dashboard.as_view(), name='dashboard'),
 ]

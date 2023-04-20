@@ -78,7 +78,7 @@ class LoginPage(View):
             then returns a redirect to the dashboard page.
             Else returns the same as LoginPage.get.
         """
-        pass
+        return redirect('/dashboard/')
 
 class Notifications(View):
     def get(self, request):
