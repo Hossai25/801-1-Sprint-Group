@@ -68,12 +68,17 @@ class LoginPage(View):
     def get(self, request):
         """
         Get method for the login page.
-        :param request:
-        :return:
+        :param request: TODO
+        :return: TODO
         """
         return render(request, "loginPage.html", {})
 
     def post(self, request):
+        """
+        TODO
+        :param request:
+        :return:
+        """
         pass
 
 
