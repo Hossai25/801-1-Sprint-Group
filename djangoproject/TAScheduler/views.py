@@ -67,17 +67,22 @@ class EditAccount(View):
 class LoginPage(View):
     def get(self, request):
         """
-        Get method for the login page.
-        :param request: TODO
-        :return: TODO
+        Get method for the LoginPage.
+        :param request: An HttpRequest object from the loginPage template.
+        :return: A render of loginPage.html.
         """
         return render(request, "loginPage.html", {})
 
     def post(self, request):
         """
-        TODO
-        :param request:
-        :return:
+        Post method for the LoginPage.
+        :param request: An HttpRequest object from the loginPage template.
+            request.context['username'] and request.context['password'] must be
+            nonempty strings.
+        :return: If request.context['username'] and
+            request.context['password'] match a username and password in the database,
+            then returns a redirect to the dashboard page.
+            Else returns the same as LoginPage.get.
         """
         pass
 
