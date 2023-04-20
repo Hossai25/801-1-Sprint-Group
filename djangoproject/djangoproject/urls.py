@@ -22,8 +22,10 @@ Including another URLconf
 # ]
 from django.urls import path
 from django.views.generic import TemplateView
+from django.contrib import admin
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='loginPage.html'), name='login'),
     path('loginPage/', TemplateView.as_view(template_name='loginPage.html'), name='login'),
+    path('admin/', admin.site.urls)
 ]
