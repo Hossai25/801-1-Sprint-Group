@@ -63,7 +63,7 @@ class LoginPage(View):
         """
         Get method for the LoginPage.
         :param request: An HttpRequest object from the loginPage template.
-        :return: A render of loginPage.html.
+        :return: A render of the request and loginPage.html.
         """
         return render(request, "loginPage.html", {})
 
