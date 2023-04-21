@@ -39,6 +39,12 @@ class CreateLab(View):
 
 class Dashboard(View):
     def get(self,request):
+        """
+        Get method for the dashboard view.
+        :param request:
+        :return: If the user is not logged in, redirect the user to the login page.
+            Else return a render of the dashboard.
+        """
         return render(request, "dashboard.html", {})
 
     def post(self,request):
