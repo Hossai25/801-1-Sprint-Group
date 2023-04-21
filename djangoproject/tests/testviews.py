@@ -6,5 +6,3 @@ from django.test import TestCase, Client
     #Invalid Login (Keeps you at login page & error message is displayed)
     #Correct Login (check redirected to dashboard)
     #Check that username and password get
-
-
