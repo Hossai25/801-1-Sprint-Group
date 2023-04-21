@@ -41,10 +41,14 @@ class Dashboard(View):
     def get(self,request):
         """
         Get method for the dashboard view.
-        :param request:
-        :return: If the user is not logged in, redirect the user to the login page.
+        :param request: An HttpResponse object. request.session["username???"] contains the logged in account's username.
+        :return: If the user is not logged in, redirect the user to the login page. (is this right?)
             Else return a render of the dashboard.
         """
+        print(request.session)
+        if False:
+            return redirect('/')
+
         return render(request, "dashboard.html", {})
 
     def post(self,request):
