@@ -4,6 +4,17 @@ from typing import Dict
 
 
 def create_account(data: Dict[str, any]):
+    """
+    Account creation for admin
+    :param data (Dict[str, any]): a dictionary containing the data for the new account. It should have the following keys:
+        email (str): the email address of the user with a maximum length of 25 characters.
+        password (str): the password of the user with a maximum length of 25 characters.
+        account_type (str): the type of the user's account with a maximum length of 25 characters.
+        first_name (str): the first name of the user with a maximum length of 25 characters.
+        last_name (str): the last name of the user with a maximum length of 25 characters.
+    :return: new_user (UserModel): a new instance of the UserModel class representing the newly created user account if all the required fields are provided.
+        None: if any of the required fields are missing.
+    """
     if __has_required_fields(data):
         new_user = UserModel.objects.create()
         new_user.email = data.get('email')
@@ -23,11 +34,24 @@ def create_account(data: Dict[str, any]):
 
 
 def __has_required_fields(self, data: Dict[str, str]) -> bool:
+    """
+    Boolean check if all fields have an input in the dictionary
+    :param data (Dict[str, str]): a dictionary containing the data for the new account.
+    :return: True: if all the required fields are present in the data dictionary.
+        False: if any of the required fields are missing.
+    """
     required_fields = {"email", "password", "account_type", "first_name", "last_name"}
     return required_fields.issubset(data.keys())
 
 
 def valid_login(email_attempt: str, password_attempt: str):
+    """
+    Validates a user's email and password through the database
+    :param email_attempt (str): the email address of the user attempting to log in.
+        password_attempt (str): the password of the user attempting to log in.
+    :return: True: if the user with the given email and password exists in the database.
+        False: if the user with the given email and password does not exist in the database.
+    """
     user = __get_account(email_attempt)
     if user is not None and user.password == password_attempt:
         return True
@@ -36,6 +60,12 @@ def valid_login(email_attempt: str, password_attempt: str):
 
 
 def __get_account(email_attempt):
+    """
+    Retrieves user account information from the database given email address
+    :param email_attempt (str): the email address of the user attempting to log in.
+    :return: user (UserModel): an instance of the UserModel class representing the user account with the given email address if it exists in the database.
+        None: if the user with the given email address does not exist in the database.
+    """
     try:
         user = UserModel.objects.get(email=email_attempt)
         return user
