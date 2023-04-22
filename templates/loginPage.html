@@ -10,6 +10,7 @@
 		<h1>Admin Login</h1>
 		<form method="post">
 			{% csrf_token %}
+			<div>{{ login_error_message }}</div>
 			<label for="username">Username:</label>
 			<input type="text" id="username" name="username" required><br><br>
 			<label for="password">Password:</label>
