@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
+from classes import account
 
 # Create your views here.
 class Accounts(View):
@@ -39,6 +40,16 @@ class CreateLab(View):
 
 class Dashboard(View):
     def get(self,request):
+        """
+        Get method for the dashboard view.
+        :param request: An HttpResponse object. request.session["username???"] contains the logged in account's username.
+        :return: If the user is not logged in, redirect the user to the login page. (is this right?)
+            Else return a render of the dashboard.
+        """
+        print(request.session)
+        if False:
+            return redirect('/')
+
         return render(request, "dashboard.html", {})
 
     def post(self,request):
@@ -76,9 +87,16 @@ class LoginPage(View):
         :return: If request.context['username'] and
             request.context['password'] match a username and password in the database,
             then returns a redirect to the dashboard page.
-            Else returns the same as LoginPage.get.
+            Else returns the same as LoginPage.get, but with a failed login message.
         """
-        pass
+        email_attempt = request.POST["username"]
+        password_attempt = request.POST["password"]
+
+        if account.valid_login(email_attempt, password_attempt):
+            request.session["email"] = "email_attempt"
+            return redirect('/dashboard/')
+        else:
+            return render(request, "loginPage.html", {"login_error_message": "Invalid username or password."})
 
 class Notifications(View):
     def get(self, request):
