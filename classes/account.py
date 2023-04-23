@@ -22,7 +22,7 @@ def create_account(data: Dict[str, any]):
         return None
 
 
-def __has_required_fields(self, data: Dict[str, str]) -> bool:
+def __has_required_fields(data: Dict[str, any]):
     required_fields = {"email", "password", "account_type", "first_name", "last_name"}
     return required_fields.issubset(data.keys())
 
@@ -46,6 +46,15 @@ def get_user_model(email_attempt):
 def get_account(email_attempt):
     try:
         user_model = UserModel.objects.get(email=email_attempt)
+        account = Account(user_model)
+        return account
+    except UserModel.DoesNotExist:
+        return None
+
+
+def get_account_by_id(user_id):
+    try:
+        user_model = UserModel.objects.get(id=user_id)
         account = Account(user_model)
         return account
     except UserModel.DoesNotExist:
@@ -95,3 +104,6 @@ class Account:
     def set_phone_number(self, new_phone_number):
         self.private_info_model.phone_number = new_phone_number
         self.private_info_model.save()
+
+    def get_primary_key(self):
+        return self.user_model.pk
