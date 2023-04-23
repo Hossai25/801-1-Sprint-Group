@@ -4,7 +4,7 @@ from typing import Dict
 
 
 def create_account(data: Dict[str, any]):
-    if __has_required_fields(data):
+    if __has_required_fields(data) and get_user_model(data.get('email')) is not None:
         new_user = UserModel.objects.create()
         new_user.email = data.get('email')
         new_user.password = data.get('password')
@@ -28,14 +28,14 @@ def __has_required_fields(self, data: Dict[str, str]) -> bool:
 
 
 def valid_login(email_attempt: str, password_attempt: str):
-    user = __get_account(email_attempt)
+    user = get_user_model(email_attempt)
     if user is not None and user.password == password_attempt:
         return True
     else:
         return False
 
 
-def __get_account(email_attempt):
+def get_user_model(email_attempt):
     try:
         user = UserModel.objects.get(email=email_attempt)
         return user
@@ -43,8 +43,17 @@ def __get_account(email_attempt):
         return None
 
 
+def get_account(email_attempt):
+    try:
+        user_model = UserModel.objects.get(email=email_attempt)
+        account = Account(user_model)
+        return account
+    except UserModel.DoesNotExist:
+        return None
+
+
 class Account:
-    def __int__(self, user_model: Type[UserModel]):
+    def __init__(self, user_model: Type[UserModel]):
         self.user_model = user_model
         self.public_info_model = PublicInfo.objects.get(user_id=user_model.pk)
         self.private_info_model = PrivateInfo.objects.get(user_id=user_model.pk)
