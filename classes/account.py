@@ -4,19 +4,22 @@ from typing import Dict
 
 
 def create_account(data: Dict[str, any]):
-    if __has_required_fields(data) and get_user_model(data.get('email')) is not None:
-        new_user = UserModel.objects.create()
-        new_user.email = data.get('email')
-        new_user.password = data.get('password')
-        new_user.account_type = data.get('account_type')
+    if __has_required_fields(data) and get_user_model(data.get('email')) is None:
+        new_user = UserModel.objects.create(
+            email = data.get('email'),
+            password = data.get('password'),
+            account_type = data.get('account_type')
+        )
 
-        public_info = PublicInfo.objects.create()
-        public_info.user_id = new_user.pk
-        public_info.first_name = data.get('first_name')
-        public_info.last_name = data.get('last_name')
+        public_info = PublicInfo.objects.create(
+            user_id = new_user,
+            first_name = data.get('first_name'),
+            last_name = data.get('last_name')
+        )
 
-        private_info = PrivateInfo.objects.create()
-        private_info.user_id = new_user.pk
+        private_info = PrivateInfo.objects.create(
+            user_id = new_user
+        )
         return new_user
     else:
         return None
