@@ -10,7 +10,7 @@ class Accounts(View):
     def post(self,request):
         pass
 
-class Course(View):
+class Courses(View):
     def get(self,request):
         return render(request, "courses.html", {})
 
