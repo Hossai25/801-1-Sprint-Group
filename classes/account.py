@@ -45,15 +45,15 @@ def get_user_model(email_attempt):
 
 def get_account(email_attempt):
     try:
-        user = UserModel.objects.get(email=email_attempt)
-        account = Account(user)
+        user_model = UserModel.objects.get(email=email_attempt)
+        account = Account(user_model)
         return account
     except UserModel.DoesNotExist:
         return None
 
 
 class Account:
-    def __int__(self, user_model: Type[UserModel]):
+    def __init__(self, user_model: Type[UserModel]):
         self.user_model = user_model
         self.public_info_model = PublicInfo.objects.get(user_id=user_model.pk)
         self.private_info_model = PrivateInfo.objects.get(user_id=user_model.pk)
