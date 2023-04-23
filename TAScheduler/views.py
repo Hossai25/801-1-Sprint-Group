@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account, course, section
+from classes import account
 
 # Create your views here.
 class Accounts(View):
@@ -35,13 +35,15 @@ class CreateAccount(View):
         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username.
             The dictionary request.POST.dict() must contain entries with keys "email", "password",
             "account_type", "first_name", and "last_name".
-        :return: If request.POST.dict() does not contain the above fields, then return a render of the createAccount template.
-            Else return a redirect to (the dashboard?).
+        :return: If request.POST.dict() does not contain the above fields, then return a render of
+            the createAccount template. Else return a redirect to (the dashboard?).
         """
         # TODO improve error message?
+        # TODO check that the user is logged in as an admin?
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
-            return render(request, "createAccount.html", {"error_message": "Unexpected error creating the account."})
+            return render(request, "createAccount.html", {"error_message": "Error creating the account. "
+                                                                           "A user with this email may already exist."})
         return redirect('/dashboard/')
 
 class CreateCourse(View):
