@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account
+from classes import account, course, section
 
 # Create your views here.
 class Accounts(View):
@@ -19,23 +19,29 @@ class Course(View):
 
 class CreateAccount(View):
     def get(self,request):
+        # TODO
         return render(request, "createAccount.html", {})
 
     def post(self,request):
+        # TODO
         pass
 
 class CreateCourse(View):
     def get(self,request):
+        # TODO
         return render(request, "createCourse.html", {})
 
     def post(self,request):
+        # TODO
         pass
 
 class CreateLab(View):
     def get(self,request):
+        # TODO
         return render(request, "createLab.html", {})
 
     def post(self,request):
+        # TODO
         pass
 
 class Dashboard(View):
@@ -49,9 +55,14 @@ class Dashboard(View):
         if "email" not in request.session:
             return redirect('/')
 
+        user = account.get_account(request.session["email"])
+        if user is None:
+            return redirect('/')
+
         return render(request, "dashboard.html", {})
 
     def post(self,request):
+        # TODO: redirect to pressed button?
         pass
 
 class Database(View):
