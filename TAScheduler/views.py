@@ -42,12 +42,11 @@ class Dashboard(View):
     def get(self,request):
         """
         Get method for the dashboard view.
-        :param request: An HttpResponse object. request.session["username???"] contains the logged in account's username.
+        :param request: An HttpResponse object. request.session["email"] contains the logged in account's username.
         :return: If the user is not logged in, redirect the user to the login page. (is this right?)
             Else return a render of the dashboard.
         """
-        print(request.session)
-        if False:
+        if "email" not in request.session:
             return redirect('/')
 
         return render(request, "dashboard.html", {})
@@ -82,10 +81,12 @@ class LoginPage(View):
         """
         Post method for the LoginPage.
         :param request: An HttpRequest object from the loginPage template.
-            request.context['username'] and request.context['password'] must be
+            request.POST['username'] and request.POST['password'] must be
             nonempty strings.
-        :return: If request.context['username'] and
-            request.context['password'] match a username and password in the database,
+            If the login is successful, then the username will be added to
+            the dictionary request.session with key "email".
+        :return: If request.POST['username'] and
+            request.POST['password'] match a username and password in the database,
             then returns a redirect to the dashboard page.
             Else returns the same as LoginPage.get, but with a failed login message.
         """
@@ -93,7 +94,7 @@ class LoginPage(View):
         password_attempt = request.POST["password"]
 
         if account.valid_login(email_attempt, password_attempt):
-            request.session["email"] = "email_attempt"
+            request.session["email"] = email_attempt
             return redirect('/dashboard/')
         else:
             return render(request, "loginPage.html", {"login_error_message": "Invalid username or password."})
