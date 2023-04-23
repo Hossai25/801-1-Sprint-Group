@@ -19,6 +19,12 @@ class Courses(View):
 
 class CreateAccount(View):
     def get(self,request):
+        """
+        Get method for the CreateAccount view.
+        :param request: An HttpResponse object. request.session["email"] contains the logged in account's username.
+        :return: If the user is not logged in, redirect the user to the login page.
+            Else return a render of the createAccount template.
+        """
         # TODO
         return render(request, "createAccount.html", {})
 
@@ -49,7 +55,7 @@ class Dashboard(View):
         """
         Get method for the dashboard view.
         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username.
-        :return: If the user is not logged in, redirect the user to the login page. (is this right?)
+        :return: If the user is not logged in, redirect the user to the login page.
             Else return a render of the dashboard.
         """
         if "email" not in request.session:
