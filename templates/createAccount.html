@@ -6,6 +6,7 @@
 
 
 {% block content %}
+<div class="text-danger">{{ error_message }}</div>
 <form method="post">
     {% csrf_token %}
     <div class="row">
