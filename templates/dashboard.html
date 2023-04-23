@@ -10,18 +10,18 @@
         <h1>Home</h1>
         <div class="container">
             <span>
-                <button>Accounts</button>
+                <a class="btn" href="{% url 'createAccount' %}">Create Accounts</a>
             </span>
             <span>
-                <button>Courses/Labs</button>
+                <a class="btn" href="{% url 'createCourse' %}">Create Courses</a>
             </span>
             <span>
-                <button>Access Data</button>
+                <a class="btn" href="{% url 'createLab' %}">Create Labs</a>
             </span>
         </div>
         <div class="container">
             <span>
-                <button>Notifications</button>
+                <a class="btn" href="{% url 'notifications' %}">Notifications</a>
             </span>
         </div>
     </div>
