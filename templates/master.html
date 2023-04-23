@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load django_bootstrap5 %}
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="">
+    {% bootstrap_css %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'TAScheduler/styles.css' %}">
 </head>
 <header>
     <div class="container">
