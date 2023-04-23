@@ -25,12 +25,24 @@ class CreateAccount(View):
         :return: If the user is not logged in, redirect the user to the login page.
             Else return a render of the createAccount template.
         """
-        # TODO
+        # TODO check that the user is logged in as an admin?
         return render(request, "createAccount.html", {})
 
     def post(self,request):
-        # TODO
-        pass
+        """
+        Post method for the CreateAccount view. If request.POST.dict() contains the correct keys, then a new account
+            is created using the values assigned to those keys.
+        :param request: An HttpResponse object. request.session["email"] contains the logged in account's username.
+            The dictionary request.POST.dict() must contain entries with keys "email", "password",
+            "account_type", "first_name", and "last_name".
+        :return: If request.POST.dict() does not contain the above fields, then return a render of the createAccount template.
+            Else return a redirect to (the dashboard?).
+        """
+        # TODO improve error message?
+        created_account = account.create_account(request.POST.dict())
+        if created_account is None:
+            return render(request, "createAccount.html", {"error_message": "Unexpected error creating the account."})
+        return redirect('/dashboard/')
 
 class CreateCourse(View):
     def get(self,request):
@@ -61,6 +73,7 @@ class Dashboard(View):
         if "email" not in request.session:
             return redirect('/')
 
+        # I'm not sure if this next check is necessary
         user = account.get_account(request.session["email"])
         if user is None:
             return redirect('/')
