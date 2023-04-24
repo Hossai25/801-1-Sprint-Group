@@ -1,6 +1,33 @@
 import account
 import section
 from TAScheduler.models import Course as CourseModel, Lab as LabModel
+from typing import Dict
+
+
+def create_course(data: Dict[str, any], null=None):
+    if _has_required_fields(data):
+        new_course = CourseModel.objects.create(
+            course_name=data.get('course_name'),
+            instructor_id=null
+        )
+        course_id = new_course
+        return new_course
+    else:
+        return None
+
+
+def delete_course(course_id: int):
+    try:
+        course = CourseModel.objects.get(id=course_id)
+        course.delete()
+        return True
+    except CourseModel.DoesNotExist:
+        return False
+
+
+def _has_required_fields(data: Dict[str, any]):
+    required_fields = {"course_name"}
+    return required_fields.issubset(data.keys())
 
 
 def create_course(name: str):
@@ -38,6 +65,7 @@ def get_course_by_id(course_id):
 
 
 class Course:
+
     def __init__(self, course_model: CourseModel):
         self.course_model = course_model
 

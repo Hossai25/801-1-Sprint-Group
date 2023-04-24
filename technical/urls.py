@@ -14,12 +14,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-# from django.contrib import admin
-# from django.urls import path
-#
-# urlpatterns = [
-#     path('admin/', admin.site.urls)
-# ]
 from django.urls import path
 from django.contrib import admin
 from TAScheduler.views import *
@@ -28,10 +22,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LoginPage.as_view(), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
-    path('create-account/', CreateAccount.as_view(), name='createAccount'),
-    path('create-course/', CreateCourse.as_view(), name='createCourse'),
-    path('create-lab/', CreateLab.as_view(), name='createLab'),
+    path('accounts/create/', CreateAccount.as_view(), name='createAccount'),
+    path('courses/create-course/', CreateCourse.as_view(), name='createCourse'),
+    path('courses/create-lab/', CreateLab.as_view(), name='createLab'),
     path('accounts/', Accounts.as_view(), name='accounts'),
     path('courses/', Courses.as_view(), name='courses'),
     path('notifications/', Notifications.as_view(), name='notifications'),
+    path('database/', Database.as_view(), name='database'),
 ]
