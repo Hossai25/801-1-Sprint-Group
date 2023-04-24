@@ -16,10 +16,11 @@ def __has_required_fields(data: Dict[str, any]):
     required_fields = {"lab_name"}
     return required_fields.issubset(data.keys())
 
+
 class Section:
     def __init__(self, lab_model: LabModel):
         self.lab_model = lab_model
-        self.course_model = course.get_course_by_id(self.lab_model.course_id)
+        self.course_model = self.lab_model.course_id
 
     def get_course_name(self):
         return self.course_model.course_name
