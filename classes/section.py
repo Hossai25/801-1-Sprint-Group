@@ -30,6 +30,6 @@ class Section:
         ta = account.get_account_by_id(ta_id)
         return ta
 
-    def set_ta(self, ta: type[account.Account]):
+    def set_ta(self, ta: account.Account):
         self.course_model.instructor_id = ta.get_primary_key()
         self.course_model.save()
