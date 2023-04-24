@@ -1,23 +1,13 @@
-from typing import Dict
-
-from django.shortcuts import render
-
-from TAScheduler.models import Lab as LabModel, Course as CourseModel
+from TAScheduler.models import Lab as LabModel
 from classes import account, course
 
 
-def create_section(name: str, course_instance: course.Course):
-
-    new_lab = LabModel.objects.create(
-        course_id=data.get('course_id'),
-        lab_name=data.get('lab_name')
+def create_section(name: str, course_object: course.Course):
+    new_section_model = LabModel.objects.create(
+        course_id=course_object.get_primary_key(),
+        lab_name=name
     )
-    return new_course
-
-
-def _has_required_fields(data: Dict[str, any]):
-    required_fields = {"course_name", "lab_name"}
-    return required_fields.issubset(data.keys())
+    return Section(new_section_model)
 
 
 class Section:

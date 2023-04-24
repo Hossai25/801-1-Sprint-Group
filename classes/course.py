@@ -4,8 +4,8 @@ from classes import account, section
 
 def create_course(name: str):
     if get_course_model(name) is None:
-        new_course = CourseModel.objects.create(course_name=name)
-        return new_course
+        new_course_model = CourseModel.objects.create(course_name=name)
+        return Course(new_course_model)
     else:
         return None
 
@@ -65,3 +65,6 @@ class Course:
     def get_sections(self):
         section_models = LabModel.objects.filter(course_id=self.course_model)
         return [section.Section(section_model) for section_model in section_models]
+
+    def get_primary_key(self):
+        return self.course_model.pk
