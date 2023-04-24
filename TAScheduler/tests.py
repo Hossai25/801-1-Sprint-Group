@@ -57,13 +57,17 @@ class Dashboard(TestCase):
         for i in self.users:
             temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
             temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
     def test_accountsClicked(self):
-        #session = self.webpage.session
-        #session["email"] = "test1@uwm.edu"
-        #session.save()
-        #resp = self.webpage.get(reverse('dashboard'))
-        #self.assertContains(resp, '<a href="%s">Create Account</a>' % reverse('createAccount'), html=True)
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('dashboard'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Accounts</a>' % reverse('createAccount'), html=True)
+        #pass
 
     def test_coursesClicked(self):
         pass
