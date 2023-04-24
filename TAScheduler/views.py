@@ -26,7 +26,7 @@ class CreateAccount(View):
             Else return a render of the createAccount template.
         """
         # TODO check that the user is logged in as an admin?
-        return render(request, "createAccount.html", {})
+        return render(request, "createAccount.html", {"email": request.session["email"]})
 
     def post(self,request):
         """
@@ -42,9 +42,10 @@ class CreateAccount(View):
         # TODO check that the user is logged in as an admin?
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
-            return render(request, "createAccount.html", {"error_message": "Error creating the account. "
-                                                                           "A user with this email may already exist."})
-        return redirect('/dashboard/')
+            return render(request, "createAccount.html",
+                          {"email": request.session["email"],
+                           "error_message": "Error creating the account. A user with this email may already exist."})
+        return redirect('/dashboard/', {"email": request.session["email"]})
 
 class CreateCourse(View):
     def get(self,request):
@@ -78,9 +79,9 @@ class Dashboard(View):
         # I'm not sure if this next check is necessary
         user = account.get_account(request.session["email"])
         if user is None:
-            return redirect('/')
+            return redirect('/', {"email": ""})
 
-        return render(request, "dashboard.html", {})
+        return render(request, "dashboard.html", {"email": request.session["email"]})
 
     def post(self,request):
         # TODO: redirect to pressed button?
@@ -107,7 +108,7 @@ class LoginPage(View):
         :param request: An HttpRequest object from the loginPage template.
         :return: A render of the request and loginPage.html.
         """
-        return render(request, "loginPage.html", {})
+        return render(request, "loginPage.html", {"email": ""})
 
     def post(self, request):
         """
@@ -127,9 +128,10 @@ class LoginPage(View):
 
         if account.valid_login(email_attempt, password_attempt):
             request.session["email"] = email_attempt
-            return redirect('/dashboard/')
+            return redirect('/dashboard/', {"email": request.session["email"]})
         else:
-            return render(request, "loginPage.html", {"login_error_message": "Invalid username or password."})
+            return render(request, "loginPage.html",
+                          {"email": "", "login_error_message": "Invalid username or password."})
 
 class Notifications(View):
     def get(self, request):
