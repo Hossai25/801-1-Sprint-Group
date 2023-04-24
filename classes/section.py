@@ -1,7 +1,9 @@
 from typing import Dict
-import account
-import course
+
+from django.shortcuts import render
+
 from TAScheduler.models import Lab as LabModel, Course as CourseModel
+from classes import account, course
 
 
 # def create_section(data: Dict[str, any]):
@@ -42,9 +44,16 @@ def _has_required_fields(data: Dict[str, any]):
     return required_fields.issubset(data.keys())
 
 
+def course_list():
+    courses = CourseModel.objects.all()
+    course_objects = [CourseModel.objects.get(id=course_id) for course_id in courses]
+    return course_objects
+
+
+
 class Section:
     def __init__(self, course_model: type[CourseModel], lab_model: type[LabModel]):
-        self.course_model = course
+        self.course_model = CourseModel
         self.lab_model = lab_model
 
     def get_course_name(self):

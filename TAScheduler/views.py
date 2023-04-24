@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account
+
+from TAScheduler.models import Course
+from classes import account, section
 
 
 # Create your views here.
@@ -71,12 +73,23 @@ class CreateCourse(View):
 class CreateLab(View):
     def get(self, request):
         # TODO
+        # courses = Course.objects.all()
+        courses = section.course_list()
         return render(request, "createLab.html", {"email": request.session["email"],
-                                                  "account_type": request.session["account_type"]})
+                                                  "account_type": request.session["account_type"],
+                                                  'courses': courses})
 
     def post(self, request):
         # TODO
-        pass
+        course_id = request.POST.get('course')
+        # course = Course.objects.get(id=course_id)
+        created_lab = section.create_lab(request.POST.dict())
+        if created_lab is None:
+            return render(request, "createLab.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "error_message": "Class ID or TA ID does not exist"})
+        return redirect('/dashboard/', {"email": request.session["email"],
+                                        "account_type": request.session["account_type"]})
 
 
 class Dashboard(View):
