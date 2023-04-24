@@ -162,25 +162,33 @@ class CreateAccounts(TestCase):
         pass
 
     def test_checkLastNameSuccessfully(self):
-        pass
+        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertRedirects(resp, "/dashboard/")
 
     def test_checkLastNameFail(self):
         pass
 
     def test_checkEmailSuccessfully(self):
-        pass
+        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertRedirects(resp, "/dashboard/")
 
     def test_checkEmailFail(self):
         pass
 
     def test_checkPasswordSuccessfully(self):
-        pass
+        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertRedirects(resp, "/dashboard/")
 
     def test_checkPasswordFail(self):
         pass
 
     def test_checkAccountTypeSuccessfully(self):
-        pass
+        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertRedirects(resp, "/dashboard/")
 
     def test_checkAccountTypeFail(self):
         pass
