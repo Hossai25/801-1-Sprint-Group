@@ -11,14 +11,14 @@ def create_account(data: Dict[str, any]):
             account_type = data.get('account_type')
         )
 
-        public_info = PublicInfo.objects.create(
-            user_id = new_user,
-            first_name = data.get('first_name'),
-            last_name = data.get('last_name')
+        PublicInfo.objects.create(
+            user_id=new_user,
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name')
         )
 
-        private_info = PrivateInfo.objects.create(
-            user_id = new_user
+        PrivateInfo.objects.create(
+            user_id=new_user
         )
         return new_user
     else:
