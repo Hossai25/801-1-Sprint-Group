@@ -1,6 +1,6 @@
 from typing import Dict
-import account
-import course
+from classes import account
+from classes import course
 from TAScheduler.models import Lab as LabModel, Course as CourseModel
 
 

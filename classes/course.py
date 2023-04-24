@@ -1,5 +1,5 @@
-import account
-import section
+from classes import account
+from classes import section
 from TAScheduler.models import Course as CourseModel, Lab as LabModel
 
 

@@ -129,11 +129,21 @@ class Accounts(TestCase):
 
     def test_toEditAccountPage(self):
         #HASN"T BEEN IMPLEMENTED YET
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('accounts'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
+                            html=True)
 
     def test_toHomepage(self):
         #HASN"T BEEN IMPLEMENTED YET
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('accounts'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                            html=True)
 
 
 class CreateAccounts(TestCase):
