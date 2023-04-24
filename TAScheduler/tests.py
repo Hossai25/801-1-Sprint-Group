@@ -2,7 +2,7 @@ import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from TAScheduler.models import User, PublicInfo, PrivateInfo
+from TAScheduler.models import User, PublicInfo, PrivateInfo, Course
 from django import urls
 
 class Login(TestCase):
@@ -310,10 +310,12 @@ class Courses(TestCase):
 class CreateCourse(TestCase):
     webpage = None
     users = None
+    courses = None
 
     def setUp(self):
         self.webpage = Client()
-        self.users = ["test1", "test2"]
+        self.users = ["test1"]
+        self.courses = ["Course1", "Course2"]
 
         # Fill test database with users
         for i in self.users:
@@ -323,3 +325,33 @@ class CreateCourse(TestCase):
             temp2.save()
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
+            for j in self.courses:
+                Course(course_name=i, instructor_id=temp).save()
+
+    #This test checks to see after a course is created the user is redirected to the dashboard
+    def test_successfulCourseCreation(self):
+        resp = self.webpage.post("/createCourse/", {"course_name": "Course3"},
+                                 follow=True)
+        self.assertRedirects(resp, '/dashboard/')
+
+    #This test checks to see if an error appears if a duplicate course is created
+    def test_duplicateCourse(self):
+        resp = self.webpage.post("/createCourse/", {"course_name": "Course1"},
+                                 follow=True)
+        self.assertContains(resp, "Error creating the course.")
+
+    #This test checks to see if an error appears if a blank field is entered
+    def test_blankFields(self):
+        resp = self.webpage.post("/createCourse/", {"course_name": ""},
+                                 follow=True)
+        self.assertContains(resp, "Error creating the course.")
+
+    #This test checks to see if the course is successfully added to the database when it is submitted
+    def test_courseAddedToDatabase(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post("/createCourse/", {"course_name": "Course3"}, follow=True)
+        self.assertContains(resp, "Course3")
+
+

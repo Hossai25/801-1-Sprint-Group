@@ -83,7 +83,7 @@ class CreateCourse(View):
         # TODO
         if "account_type" not in request.session:
             request.session["account_type"] = ""
-        created_course = course.create_course(request.POST.dict())
+        created_course = course.create_course(request.POST["course_name"])
         if created_course is None:
             return render(request, "createCourse.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
