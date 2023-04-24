@@ -67,7 +67,6 @@ class Dashboard(TestCase):
         session.save()
         resp = self.webpage.get(reverse('dashboard'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Accounts</a>' % reverse('createAccount'), html=True)
-        #pass
 
     def test_coursesClicked(self):
         pass
