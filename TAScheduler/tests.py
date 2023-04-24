@@ -26,7 +26,7 @@ class Login(TestCase):
         for i in self.users:
             resp = self.webpage.post("/", {"username": i, "password": i},
                                      follow=True)
-        self.assertEqual(resp.context["username"], i+"@uwm.edu", "username not passed from login")
+        self.assertEqual(resp.context["email"], i+"@uwm.edu", "username not passed from login")
     def test_successfulLogin(self):
         resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "test1"},
                                  follow=True)
