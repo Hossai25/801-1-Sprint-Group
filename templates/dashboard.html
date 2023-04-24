@@ -10,17 +10,21 @@
         <h1>Home</h1>
         <div class="container">
             <span>
-                <a class="btn btn-primary" href="{% url 'createAccount' %}">Create Accounts</a>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'accounts' %}">Accounts</a>
             </span>
             <span>
-                <a class="btn btn-primary" href="{% url 'createCourse' %}">Create Courses</a>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'courses' %}">Courses/Labs</a>
             </span>
             <span>
-                <a class="btn btn-primary" href="{% url 'createLab' %}">Create Labs</a>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'database' %}">Access Data</a>
             </span>
         </div>
         <div class="container">
             <span>
+                <!-- changes to this element require acceptance tests to be updated! -->
                 <a class="btn btn-primary" href="{% url 'notifications' %}">Notifications</a>
             </span>
         </div>
