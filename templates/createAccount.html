@@ -1,0 +1,48 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Create Account
+{% endblock %}
+
+
+{% block content %}
+<div class="text-danger">{{ error_message }}</div>
+<form action="{% url 'createAccount' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <label for="first_name" class="col-sm-3 col-form-label">First Name</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="first_name" name="first_name" required>
+        </div>
+    </div>
+    <div class="row">
+        <label for="last_name" class="col-sm-3 col-form-label">Last Name</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="last_name" name="last_name" required>
+        </div>
+    </div>
+    <div class="row">
+        <label for="email" class="col-sm-3 col-form-label">Email</label>
+        <div class="col-sm-9">
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+    </div>
+    <div class="row">
+        <label for="password" class="col-sm-3 col-form-label">Password</label>
+        <div class="col-sm-9">
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+    </div>
+    <div class="row">
+        <label for="account_type" class="col-sm-3 col-form-label">Account Type</label>
+        <div class="col-sm-9">
+            <select class="form-select" id="account_type" name="account_type" required>
+                <option value="ta" selected>Teaching Assistant</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Administrator</option>
+            </select>
+        </div>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Submit">
+</form>
+{%  endblock %}

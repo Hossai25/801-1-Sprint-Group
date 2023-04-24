@@ -1,0 +1,28 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <h1>Home</h1>
+        <div class="container">
+            <span>
+                <a class="btn btn-primary" href="{% url 'createAccount' %}">Create Accounts</a>
+            </span>
+            <span>
+                <a class="btn btn-primary" href="{% url 'createCourse' %}">Create Courses</a>
+            </span>
+            <span>
+                <a class="btn btn-primary" href="{% url 'createLab' %}">Create Labs</a>
+            </span>
+        </div>
+        <div class="container">
+            <span>
+                <a class="btn btn-primary" href="{% url 'notifications' %}">Notifications</a>
+            </span>
+        </div>
+    </div>
+{%  endblock %}
