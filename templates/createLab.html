@@ -9,32 +9,25 @@
 <div class="text-danger">{{ error_message }}</div>
 <form action="{% url 'createLab' %}" method="post">
     {% csrf_token %}
-<!--    <div class="row">-->
-<!--        <label for="class_id" class="col-sm-3 col-form-label">Class ID</label>-->
-<!--        <div class="col-sm-9">-->
-<!--            <input type="text" class="form-control" id="class_id" name="class_id" required>-->
-<!--        </div>-->
-<!--    </div>-->
-    <form>
-        <label for="course_name" class="col-sm-3 col-form-label">Select a course:</label>
-        <select id="course_name" name="course_name" style="width: 600px">
+        <label for="course_id" class="col-sm-3 col-form-label">Select a course:</label>
+        <select id="course_id" name="course_id" style="width: 600px">
             {% for course in courses %}
                 <option value="{{ course.get_primary_key }}">{{ course.get_course_name }}</option>
             {% endfor %}
         </select>
-    </form>
     <div class="row">
         <label for="lab_name" class="col-sm-3 col-form-label">Lab Name</label>
         <div class="col-sm-9">
             <input type="text" class="form-control" id="lab_name" name="lab_name" required>
         </div>
     </div>
-    <div class="row">
-        <label for="ta_id" class="col-sm-3 col-form-label">TA ID</label>
-        <div class="col-sm-9">
-            <input type="text" class="form-control" id="ta_id" name="ta_id" required>
-        </div>
-    </div>
+<!--    <div class="row">-->
+<!--        <label for="ta_id" class="col-sm-3 col-form-label">TA ID (Optional) </label>-->
+<!--        <div class="col-sm-9">-->
+<!--            <input type="text" class="form-control" id="ta_id" name="ta_id" required>-->
+<!--        </div>-->
+<!--    </div>-->
     <input type="submit" class="btn btn-primary" value="Submit">
 </form>
 {%  endblock %}
+

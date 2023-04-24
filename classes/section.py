@@ -1,14 +1,20 @@
+from typing import Dict
+
 from TAScheduler.models import Lab as LabModel
 from classes import account, course
 
 
 def create_section(name: str, course_object: course.Course):
     new_section_model = LabModel.objects.create(
-        course_id=course_object.get_primary_key(),
+        course_id=course_object.course_model,
         lab_name=name
     )
     return Section(new_section_model)
 
+
+def __has_required_fields(data: Dict[str, any]):
+    required_fields = {"lab_name"}
+    return required_fields.issubset(data.keys())
 
 class Section:
     def __init__(self, lab_model: LabModel):
