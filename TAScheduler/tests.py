@@ -1,8 +1,103 @@
+import unittest
 from django.test import TestCase, Client
+from django.urls import reverse
 
-# Create your tests here.
+from TAScheduler.models import User
+from django import urls
 
-    #Check to make sure login page is pulled up correctly
-    #Invalid Login (Keeps you at login page & error message is displayed)
-    #Correct Login (check redirected to dashboard)
-    #Check that username and password get
+class Login(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        #Fill test database with users
+        for i in self.users:
+            temp = User(email=i+"@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+
+    def test_correctName(self):
+        for i in self.users:
+            resp = self.webpage.post("/", {"username": i, "password": i},
+                                     follow=True)
+        self.assertEqual(resp.context["username"], i+"@uwm.edu", "username not passed from login")
+    def test_successfulLogin(self):
+        resp = self.webpage.post("/", {"username": "test1", "password": "test1"},
+                                 follow=True)
+        self.assertRedirects(resp, "/dashboard/")
+
+    def test_noPassword(self):
+        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": ""},
+                                 follow=True)
+        self.assertContains(resp, "Invalid username or password.")
+
+    def test_wrongPassword(self):
+        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "password"}, follow=True)
+        self.assertContains(resp, "Invalid username or password.")
+
+    def test_forgotPassword(self):
+        pass
+
+class Dashboard(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+    def test_accountsClicked(self):
+        #session = self.webpage.session
+        #session["email"] = "test1@uwm.edu"
+        #session.save()
+        #resp = self.webpage.get(reverse('dashboard'))
+        #self.assertContains(resp, '<a href="%s">Create Account</a>' % reverse('createAccount'), html=True)
+        pass
+
+    def test_coursesClicked(self):
+        pass
+
+    def test_accessDataClicked(self):
+        pass
+
+    def test_notificationsClicked(self):
+        pass
+
+class Accounts(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+
+    def test_toCreateAccountPage(self):
+        pass
+
+    def test_toEditAccountPage(self):
+        pass
+
+    def test_toHomepage(self):
+        pass
+
+
+class CreateAccounts(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
