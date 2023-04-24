@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="text-danger">{{ error_message }}</div>
-<form method="post">
+<form action="{% url 'createAccount' %}" method="post">
     {% csrf_token %}
     <div class="row">
         <label for="first_name" class="col-sm-3 col-form-label">First Name</label>

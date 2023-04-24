@@ -7,7 +7,7 @@
 
 {% block content %}
     <h1>Login</h1>
-    <form method="post">
+    <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="text-danger">{{ login_error_message }}</div>
         <label for="username">Username:</label>
