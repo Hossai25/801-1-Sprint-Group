@@ -2,7 +2,7 @@ import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from TAScheduler.models import User
+from TAScheduler.models import User, PublicInfo, PrivateInfo
 from django import urls
 
 class Login(TestCase):
@@ -17,6 +17,10 @@ class Login(TestCase):
         for i in self.users:
             temp = User(email=i+"@uwm.edu", password=i, account_type="administrator")
             temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
 
     def test_correctName(self):
         for i in self.users:
@@ -24,7 +28,7 @@ class Login(TestCase):
                                      follow=True)
         self.assertEqual(resp.context["username"], i+"@uwm.edu", "username not passed from login")
     def test_successfulLogin(self):
-        resp = self.webpage.post("/", {"username": "test1", "password": "test1"},
+        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "test1"},
                                  follow=True)
         self.assertRedirects(resp, "/dashboard/")
 
