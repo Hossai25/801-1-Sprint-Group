@@ -1,6 +1,5 @@
-import account
-import section
 from TAScheduler.models import Course as CourseModel, Lab as LabModel
+from classes import account, section
 
 
 def create_course(name: str):
@@ -35,6 +34,12 @@ def get_course_by_id(course_id):
         return course
     except CourseModel.DoesNotExist:
         return None
+
+
+def course_list():
+    courses = CourseModel.objects.all()
+    course_objects = [Course(course_model) for course_model in courses]
+    return course_objects
 
 
 class Course:

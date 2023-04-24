@@ -6,37 +6,13 @@ from TAScheduler.models import Lab as LabModel, Course as CourseModel
 from classes import account, course
 
 
-# def create_section(data: Dict[str, any]):
-#     if _has_required_fields(data):
-#         new_course = LabModel.objects.create(
-#             course_id=data.get('course_id'),
-#             ta_id=data.get('ta_id'),
-#             lab_name=data.get('lab_name')
-#         )
-#         return new_course
-#     else:
-#         return None
-
-
-def create_lab(data: Dict[str, any]):
-    course_id = data.get('course_id')
-    lab_name = data.get('lab_name')
-
-    if not lab_name:
-        return None
-
-    try:
-        course = CourseModel.objects.get(id=course_id)
-    except CourseModel.DoesNotExist:
-        return None
+def create_section(name: str, course_instance: course.Course):
 
     new_lab = LabModel.objects.create(
-        lab_name=lab_name,
-        course_id=course,
-        ta_id=data.get('ta_id')
+        course_id=data.get('course_id'),
+        lab_name=data.get('lab_name')
     )
-
-    return new_lab
+    return new_course
 
 
 def _has_required_fields(data: Dict[str, any]):
@@ -44,17 +20,10 @@ def _has_required_fields(data: Dict[str, any]):
     return required_fields.issubset(data.keys())
 
 
-def course_list():
-    courses = CourseModel.objects.all()
-    course_objects = [CourseModel.objects.get(id=course_id) for course_id in courses]
-    return course_objects
-
-
-
 class Section:
-    def __init__(self, course_model: type[CourseModel], lab_model: type[LabModel]):
-        self.course_model = CourseModel
+    def __init__(self, lab_model: LabModel):
         self.lab_model = lab_model
+        self.course_model = course.get_course_by_id(self.lab_model.course_id)
 
     def get_course_name(self):
         return self.course_model.course_name

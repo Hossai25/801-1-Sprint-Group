@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from TAScheduler.models import Course
-from classes import account, section
+from classes import account, section, course
 
 
 # Create your views here.
@@ -74,15 +74,15 @@ class CreateLab(View):
     def get(self, request):
         # TODO
         # courses = Course.objects.all()
-        courses = section.course_list()
+        courses = course.course_list()
         return render(request, "createLab.html", {"email": request.session["email"],
                                                   "account_type": request.session["account_type"],
                                                   'courses': courses})
 
     def post(self, request):
         # TODO
-        course_id = request.POST.get('course')
-        # course = Course.objects.get(id=course_id)
+        # course_id = request.POST.get('course')
+        # Course.objects.get(id=course_id)
         created_lab = section.create_lab(request.POST.dict())
         if created_lab is None:
             return render(request, "createLab.html",
