@@ -66,7 +66,7 @@ def get_account_by_id(user_id):
 
 def account_list():
     accounts = UserModel.objects.all()
-    account_objects = [Account(account_model) for account_model in accounts]
+    account_objects = [Account(user_model) for user_model in accounts]
     return account_objects
 
 
