@@ -15,8 +15,10 @@ class Accounts(View):
 
 class Courses(View):
     def get(self, request):
+        courses = course.course_list()
         return render(request, "courses.html", {"email": request.session["email"],
-                                                "account_type": request.session["account_type"]})
+                                                "account_type": request.session["account_type"],
+                                                'courses': courses})
 
     def post(self, request):
         pass
