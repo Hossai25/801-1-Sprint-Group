@@ -180,7 +180,7 @@ class CreateAccounts(TestCase):
         session.save()
         resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
-        self.assertRedirects(resp, "/dashboard/")
+        self.assertRedirects(resp, "/accounts/")
 
     #This test checks if the first name has an invalid input then an error message appears
     def test_checkFirstNameFail(self):
@@ -335,7 +335,7 @@ class CreateCourse(TestCase):
         session["email"] = "test1@uwm.edu"
         session.save()
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
-        self.assertRedirects(resp, "/dashboard/")
+        self.assertRedirects(resp, "/courses/")
 
     #This test checks to see if an error appears if a duplicate course is created
     def test_duplicateCourse(self):
