@@ -222,7 +222,7 @@ class LoginPage(View):
 
         if account.valid_login(email_attempt, password_attempt):
             request.session["email"] = email_attempt
-            request.session["account_type"] = ""  # TODO: get account type from a static account method
+            request.session["account_type"] = account.get_account(email_attempt).get_account_type()  # TODO: get account type from a static account method
             return redirect('/dashboard/', {"email": request.session["email"],
                                             "account_type": request.session["account_type"]})
         else:
