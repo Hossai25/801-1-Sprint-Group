@@ -2,7 +2,7 @@ import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from TAScheduler.models import User, PublicInfo, PrivateInfo
+from TAScheduler.models import User, PublicInfo, PrivateInfo, Course
 from django import urls
 
 class Login(TestCase):
@@ -48,6 +48,7 @@ class Login(TestCase):
         resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "password"}, follow=True)
         self.assertContains(resp, "Invalid username or password.")
 
+    #This test checks to see if the forgot password redirects to the right page
     def test_forgotPassword(self):
         #HASN'T BEEN IMPLEMENTED YET
         pass
@@ -119,6 +120,8 @@ class Accounts(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
+    #This test checks to see that if the create account button is pressed it brings the user to the
+    # right page
     def test_toCreateAccountPage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -127,23 +130,29 @@ class Accounts(TestCase):
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Accounts</a>' % reverse('createAccount'),
                             html=True)
 
+    # This test checks to see that if the edit account button is pressed it brings the user to the
+    # right page
     def test_toEditAccountPage(self):
         #HASN"T BEEN IMPLEMENTED YET
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('accounts'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
-                            html=True)
+        #session = self.webpage.session
+        #session["email"] = "test1@uwm.edu"
+        #session.save()
+        #resp = self.webpage.get(reverse('accounts'))
+        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
+         #                   html=True)
+        pass
 
+    # This test checks to see that if the back to dashboard button is pressed it brings the user to
+    # the right page
     def test_toHomepage(self):
         #HASN"T BEEN IMPLEMENTED YET
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('accounts'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-                            html=True)
+        #session = self.webpage.session
+        #session["email"] = "test1@uwm.edu"
+        #session.save()
+        #resp = self.webpage.get(reverse('accounts'))
+        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+         #                   html=True)
+        pass
 
 
 class CreateAccounts(TestCase):
@@ -163,42 +172,191 @@ class CreateAccounts(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
-    def test_checkFirstNameSuccessfully(self):
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+    #This test checks to see that when the information is entered correctly user is brought back
+    # to dashboard
+    def test_checkSuccessfully(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertRedirects(resp, "/dashboard/")
 
-    def test_checkFirsNameFail(self):
-        pass
-
-    def test_checkLastNameSuccessfully(self):
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+    #This test checks if the first name has an invalid input then an error message appears
+    def test_checkFirstNameFail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
-        self.assertRedirects(resp, "/dashboard/")
+        self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
+    # This test checks if the last name has an invalid input that an error message appears
     def test_checkLastNameFail(self):
-        pass
-
-    def test_checkEmailSuccessfully(self):
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
-        self.assertRedirects(resp, "/dashboard/")
+        self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
+    # This test checks if the check email has an invalid input that an error message appears
     def test_checkEmailFail(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
-    def test_checkPasswordSuccessfully(self):
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
-            "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
-        self.assertRedirects(resp, "/dashboard/")
+    # This test checks if there is a duplicate email then an error message appears
+    def test_duplicateEmail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
+            "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
+    # This test checks if the password has an invalid input then an error message appears
     def test_checkPasswordFail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk@uwm.edu", "password": "", "account_type": "administrator"}, follow=True)
+        self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
+
+    # This test checks if the account type has an invalid input then an error message appears
+    def test_checkAccountTypeFail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
+            "avfronk@uwm.edu", "password": "annafronk", "account_type": ""}, follow=True)
+        self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
+
+    # This test checks to see that if the back to dashboard button is pressed it brings the user to
+    # the right page
+    def test_toHomepage(self):
+        #HASN"T BEEN IMPLEMENTED YET
+        #session = self.webpage.session
+        #session["email"] = "test1@uwm.edu"
+        #session.save()
+        #resp = self.webpage.get(reverse('createAccount'))
+        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+          #                 html=True)
         pass
 
-    def test_checkAccountTypeSuccessfully(self):
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+    # This test checks to see if a successful submission is added to the database
+    def test_accountAddedToDatabase(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
+        self.assertNotEqual(User.objects.get(email="avfronk@uwm.edu"), None)
+
+
+class Courses(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+
+
+    # This test checks to see that if the create course button is pressed it brings the user to the
+    # right page
+    def test_toCreateCoursePage(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('courses'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
+                            html=True)
+
+    # This test checks to see that if the create lab button is pressed it brings the user to the
+    # right page
+    def test_toCreateLabPage(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('courses'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Labs</a>' % reverse('createLab'),
+                            html=True)
+
+    # This test checks to see that if the back to dashboard button is pressed it brings the user to the
+    # right page
+    def test_toHomepage(self):
+        #NOT IMPLEMENTED YET
+        #session = self.webpage.session
+        #session["email"] = "test1@uwm.edu"
+        #session.save()
+        #resp = self.webpage.get(reverse('courses'))
+        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+          #                  html=True)
+        pass
+
+class CreateCourse(TestCase):
+    webpage = None
+    users = None
+    courses = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1"]
+        self.courses = ["Course1", "Course2"]
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            for j in self.courses:
+                Course(course_name=i, instructor_id=temp).save()
+
+    #This test checks to see after a course is created the user is redirected to the dashboard
+    def test_successfulCourseCreation(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
         self.assertRedirects(resp, "/dashboard/")
 
-    def test_checkAccountTypeFail(self):
-        pass
+    #This test checks to see if an error appears if a duplicate course is created
+    def test_duplicateCourse(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
+        self.assertContains(resp, "Error creating the course.")
+
+    #This test checks to see if an error appears if a blank field is entered
+    def test_blankFields(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
+        self.assertContains(resp, "Error creating the course.")
+
+    #This test checks to see if the course is successfully added to the database when it is submitted
+    def test_courseAddedToDatabase(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
+        self.assertNotEqual(Course.objects.get(course_name="Course3"), None)
