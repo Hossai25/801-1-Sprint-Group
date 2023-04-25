@@ -106,6 +106,8 @@ class CreateLab(View):
 
     def post(self, request):
         # TODO
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         course_id = request.POST.get('course_id')
         course_object = course.get_course_by_id(course_id)
         if course_object is None:
