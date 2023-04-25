@@ -89,18 +89,6 @@ class CreateCourse(View):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
 
-        key = ('course_name')
-        if key not in request.POST or request.POST[key] == '':
-            return render(request, "createCourse.html", {"email": request.session["email"],
-                                                         "account_type": request.session["account_type"],
-                                                         "error_message": "Error creating the course."})
-
-        created_course = course.create_course(request.POST["course_name"])
-        if created_course is None:
-            return render(request, "createCourse.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Error creating the course."})
-
         return render(request, "createCourse.html", {"email": request.session["email"],
                                                      "account_type": request.session["account_type"]})
 
@@ -112,6 +100,12 @@ class CreateCourse(View):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         created_course = course.create_course(request.POST["course_name"])
+        key = ('course_name')
+        if key not in request.POST or request.POST[key] == '':
+            return render(request, "createCourse.html", {"email": request.session["email"],
+                                                         "account_type": request.session["account_type"],
+                                                         "error_message": "Error creating the course."})
+
         if created_course is None:
             return render(request, "createCourse.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
