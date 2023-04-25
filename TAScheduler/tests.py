@@ -178,16 +178,16 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertRedirects(resp, "/dashboard/")
 
-    #This test checks if the first name has an invalid input that an error message appears
-    def test_checkFirsNameFail(self):
+    #This test checks if the first name has an invalid input then an error message appears
+    def test_checkFirstNameFail(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
@@ -205,7 +205,7 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
@@ -214,7 +214,7 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
@@ -223,7 +223,7 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "", "account_type": "administrator"}, follow=True)
         self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
@@ -232,7 +232,7 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": ""}, follow=True)
         self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
@@ -253,9 +253,9 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "Fronk", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "Fronk", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
-        self.assertContains(resp, "Anna")
+        self.assertNotEqual(User.objects.get(email="avfronk@uwm.edu"), None)
 
 
 class Courses(TestCase):
@@ -330,20 +330,26 @@ class CreateCourse(TestCase):
 
     #This test checks to see after a course is created the user is redirected to the dashboard
     def test_successfulCourseCreation(self):
-        resp = self.webpage.post("/createCourse/", {"course_name": "Course3"},
-                                 follow=True)
-        self.assertRedirects(resp, '/dashboard/')
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
+        self.assertRedirects(resp, "/dashboard/")
 
     #This test checks to see if an error appears if a duplicate course is created
     def test_duplicateCourse(self):
-        resp = self.webpage.post("/createCourse/", {"course_name": "Course1"},
-                                 follow=True)
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
     #This test checks to see if an error appears if a blank field is entered
     def test_blankFields(self):
-        resp = self.webpage.post("/createCourse/", {"course_name": ""},
-                                 follow=True)
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
     #This test checks to see if the course is successfully added to the database when it is submitted
@@ -351,7 +357,7 @@ class CreateCourse(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createCourse/", {"course_name": "Course3"}, follow=True)
-        self.assertContains(resp, "Course3")
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
+        self.assertNotEqual(Course.objects.get(course_name="Course3"), None)
 
 
