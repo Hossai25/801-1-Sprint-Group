@@ -6,6 +6,8 @@ from classes import account, section, course
 # Create your views here.
 class Accounts(View):
     def get(self, request):
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "accounts.html", {"email": request.session["email"],
                                                  "account_type": request.session["account_type"]})
 
@@ -15,10 +17,10 @@ class Accounts(View):
 
 class Courses(View):
     def get(self, request):
-        courses = course.course_list()
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "courses.html", {"email": request.session["email"],
-                                                "account_type": request.session["account_type"],
-                                                'courses': courses})
+                                                "account_type": request.session["account_type"]})
 
     def post(self, request):
         pass
@@ -34,6 +36,8 @@ class CreateAccount(View):
             Else return a render of the createAccount template.
         """
         # TODO check that the user is logged in as an admin?
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "createAccount.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"]})
 
@@ -50,6 +54,8 @@ class CreateAccount(View):
         """
         # TODO improve error message?
         # TODO check that the user is logged in as an admin?
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
             return render(request, "createAccount.html",
@@ -61,18 +67,36 @@ class CreateAccount(View):
 
 class CreateCourse(View):
     def get(self, request):
+        """
+
+        """
         # TODO
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "createCourse.html", {"email": request.session["email"],
                                                      "account_type": request.session["account_type"]})
 
     def post(self, request):
+        """
+
+        """
         # TODO
-        pass
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        created_course = course.create_course(request.POST["course_name"])
+        if created_course is None:
+            return render(request, "createCourse.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "error_message": "Error creating the course."})
+        return redirect('/courses/', {"email": request.session["email"],
+                                        "account_type": request.session["account_type"]})
 
 
 class CreateLab(View):
     def get(self, request):
         # TODO
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         courses = course.course_list()
         return render(request, "createLab.html", {"email": request.session["email"],
                                                   "account_type": request.session["account_type"],
@@ -108,6 +132,8 @@ class Dashboard(View):
         """
         if "email" not in request.session:
             return redirect('/', {"email": "", "account_type": ""})
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
 
         # I'm not sure if this next check is necessary
         user = account.get_account(request.session["email"])
@@ -123,6 +149,8 @@ class Dashboard(View):
 
 class Database(View):
     def get(self, request):
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "database.html", {"email": request.session["email"],
                                                  "account_type": request.session["account_type"]})
 
@@ -132,6 +160,8 @@ class Database(View):
 
 class EditAccount(View):
     def get(self, request):
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "editAccount.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"]})
 
@@ -146,6 +176,8 @@ class LoginPage(View):
         :param request: An HttpRequest object from the loginPage template.
         :return: A render of the request and loginPage.html.
         """
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "loginPage.html", {"email": "", "account_type": ""})
 
     def post(self, request):
@@ -161,6 +193,8 @@ class LoginPage(View):
             then returns a redirect to the dashboard page.
             Else returns the same as LoginPage.get, but with a failed login message.
         """
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         email_attempt = request.POST["username"]
         password_attempt = request.POST["password"]
 
@@ -176,6 +210,8 @@ class LoginPage(View):
 
 class Notifications(View):
     def get(self, request):
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
         return render(request, "notifications.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"]})
 

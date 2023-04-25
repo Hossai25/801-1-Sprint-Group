@@ -6,5 +6,25 @@
 
 
 {% block content %}
-
+<div class="text-danger">{{ error_message }}</div>
+<form action="{% url 'createCourse' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <label for="course_name" class="col-sm-3 col-form-label">Course Name</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="course_name" name="course_name" required>
+        </div>
+    </div>
+    <!--div class="row">
+        <label for="account_type" class="col-sm-3 col-form-label">Account Type</label>
+        <div class="col-sm-9">
+            <select class="form-select" id="account_type" name="account_type">
+                <option value="ta" selected>Teaching Assistant</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Administrator</option>
+            </select>
+        </div>
+    </div-->
+    <input type="submit" class="btn btn-primary" value="Submit">
+</form>
 {%  endblock %}
