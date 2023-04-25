@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account, course
+from classes import account, section, course
 
 
 # Create your views here.
 class Accounts(View):
     def get(self, request):
+        accounts = account.account_list()
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "accounts.html", {"email": request.session["email"],
-                                                 "account_type": request.session["account_type"]})
+                                                 "account_type": request.session["account_type"],
+                                                 'accounts': accounts})
 
     def post(self, request):
         pass
@@ -17,10 +19,12 @@ class Accounts(View):
 
 class Courses(View):
     def get(self, request):
+        courses = course.course_list()
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "courses.html", {"email": request.session["email"],
-                                                "account_type": request.session["account_type"]})
+                                                "account_type": request.session["account_type"],
+                                                'courses': courses})
 
     def post(self, request):
         pass
@@ -61,8 +65,8 @@ class CreateAccount(View):
             return render(request, "createAccount.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "error_message": "Error creating the account. A user with this email may already exist."})
-        return redirect('/dashboard/', {"email": request.session["email"],
-                                        "account_type": request.session["account_type"]})
+        return redirect('/accounts/', {"email": request.session["email"],
+                                       "account_type": request.session["account_type"]})
 
 
 class CreateCourse(View):
@@ -88,8 +92,8 @@ class CreateCourse(View):
             return render(request, "createCourse.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "error_message": "Error creating the course."})
-        return redirect('/dashboard/', {"email": request.session["email"],
-                                        "account_type": request.session["account_type"]})
+        return redirect('/courses/', {"email": request.session["email"],
+                                      "account_type": request.session["account_type"]})
 
 
 class CreateLab(View):
@@ -97,12 +101,30 @@ class CreateLab(View):
         # TODO
         if "account_type" not in request.session:
             request.session["account_type"] = ""
+        courses = course.course_list()
         return render(request, "createLab.html", {"email": request.session["email"],
-                                                  "account_type": request.session["account_type"]})
+                                                  "account_type": request.session["account_type"],
+                                                  'courses': courses})
 
     def post(self, request):
         # TODO
-        pass
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        course_id = request.POST.get('course_id')
+        course_object = course.get_course_by_id(course_id)
+        if course_object is None:
+            return render(request, "createLab.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "error_message": "Course not found."})
+        else:
+            lab_name = request.POST.get('lab_name')
+            created_lab = section.create_section(lab_name, course_object)
+        if created_lab is None:
+            return render(request, "createLab.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "error_message": "Class ID or TA ID does not exist"})
+        return redirect('/courses/', {"email": request.session["email"],
+                                      "account_type": request.session["account_type"]})
 
 
 class Dashboard(View):

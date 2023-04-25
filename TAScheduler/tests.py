@@ -275,6 +275,7 @@ class Courses(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
+
     # This test checks to see that if the create course button is pressed it brings the user to the
     # right page
     def test_toCreateCoursePage(self):
@@ -359,5 +360,3 @@ class CreateCourse(TestCase):
         session.save()
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
         self.assertNotEqual(Course.objects.get(course_name="Course3"), None)
-
-
