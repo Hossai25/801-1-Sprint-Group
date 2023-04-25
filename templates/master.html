@@ -22,4 +22,12 @@
         {% endblock %}
     </div>
 </body>
+<footer class="fixed-bottom">
+    {% if email and email != "" %}
+        <div class="container-fluid p-3">
+            <!-- changes to this element require acceptance tests to be updated! -->
+            <a class="btn btn-primary" href="{% url 'dashboard' %}">Back to Dashboard</a>
+        </div>
+    {% endif %}
+</footer>
 </html>

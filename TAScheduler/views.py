@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from classes import account, section, course
+import re
 
 
 # Create your views here.
@@ -39,7 +40,6 @@ class CreateAccount(View):
         :return: If the user is not logged in, redirect the user to the login page.
             Else return a render of the createAccount template.
         """
-        # TODO check that the user is logged in as an admin?
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "createAccount.html", {"email": request.session["email"],
@@ -56,10 +56,21 @@ class CreateAccount(View):
         :return: If request.POST.dict() does not contain the above fields, then return a render of
             the createAccount template. Else return a redirect to (the dashboard?).
         """
-        # TODO improve error message?
-        # TODO check that the user is logged in as an admin?
+        # TODO improve error messages and update acceptance tests accordingly
         if "account_type" not in request.session:
             request.session["account_type"] = ""
+
+        for key in ('email', 'password', 'account_type', 'first_name', 'last_name'):
+            if key not in request.POST or request.POST[key] == '':
+                return render(request, "createAccount.html",
+                              {"email": request.session["email"], "account_type": request.session["account_type"],
+                               "error_message": "Error creating the account. A user with this email may already exist."})
+
+        if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", request.POST['email']):
+            return render(request, "createAccount.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "error_message": "Error creating the account. A user with this email may already exist."})
+
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
             return render(request, "createAccount.html",
@@ -77,6 +88,19 @@ class CreateCourse(View):
         # TODO
         if "account_type" not in request.session:
             request.session["account_type"] = ""
+
+        key = ('course_name')
+        if key not in request.POST or request.POST[key] == '':
+            return render(request, "createCourse.html", {"email": request.session["email"],
+                                                         "account_type": request.session["account_type"],
+                                                         "error_message": "Error creating the course."})
+
+        created_course = course.create_course(request.POST["course_name"])
+        if created_course is None:
+            return render(request, "createCourse.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "error_message": "Error creating the course."})
+
         return render(request, "createCourse.html", {"email": request.session["email"],
                                                      "account_type": request.session["account_type"]})
 
