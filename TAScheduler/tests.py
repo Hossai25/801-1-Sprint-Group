@@ -343,7 +343,7 @@ class CreateCourse(TestCase):
         session["email"] = "test1@uwm.edu"
         session.save()
         # TODO: should this next line have "course_name": "" ? Changing it didn't make it pass
-        resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
+        resp = self.webpage.post(reverse("createCourse"), {"course_name": ""}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
     #This test checks to see if the course is successfully added to the database when it is submitted
