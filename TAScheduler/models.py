@@ -22,17 +22,17 @@ class PrivateInfo(models.Model):
 
 class Course(models.Model):
     course_name = models.CharField(max_length=25)
-    instructor_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    instructor_id = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
 
 
 class Lab(models.Model):
     lab_name = models.CharField(max_length=25)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    ta_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    ta_id = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
 
 
 class CourseTa(models.Model):
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     ta_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_grader = models.BooleanField(null=True)
-    number_of_labs = models.IntegerField(null=True)
+    is_grader = models.BooleanField(null=True, blank=True)
+    number_of_labs = models.IntegerField(null=True, blank=True)

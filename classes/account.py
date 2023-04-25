@@ -4,22 +4,23 @@ from typing import Dict
 
 def create_account(data: Dict[str, any]):
     if __has_required_fields(data) and get_user_model(data.get('email')) is None:
-        new_user = UserModel.objects.create(
+        new_user_model = UserModel.objects.create(
             email=data.get('email'),
             password=data.get('password'),
             account_type=data.get('account_type')
         )
 
         PublicInfo.objects.create(
-            user_id=new_user,
+            user_id=new_user_model,
             first_name=data.get('first_name'),
             last_name=data.get('last_name')
         )
 
         PrivateInfo.objects.create(
-            user_id=new_user
+            user_id=new_user_model
         )
-        return new_user
+
+        return Account(new_user_model)
     else:
         return None
 
@@ -61,6 +62,12 @@ def get_account_by_id(user_id):
         return account
     except UserModel.DoesNotExist:
         return None
+
+
+def account_list():
+    accounts = UserModel.objects.all()
+    account_objects = [Account(user_model) for user_model in accounts]
+    return account_objects
 
 
 class Account:
