@@ -1,0 +1,58 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Accounts
+{% endblock %}
+
+
+{% block content %}
+    <!-- changes to this element require acceptance tests to be updated! -->
+    <a class="btn btn-primary" href="{% url 'createAccount' %}">Create Accounts</a>
+
+    <!-- changes to this element require acceptance tests to be updated! -->
+    <a class="btn btn-primary" href="{% url 'editAccount' %}">Edit Accounts</a>
+<style>
+
+    .table-container {
+  padding-top: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: lightgray;
+}
+
+
+</style>
+
+<div class="table-container">
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for account in accounts %}
+      <tr>
+          <td>{{ account.get_email }}</td>
+          <td>{{ account.get_first_name }}</td>
+          <td>{{ account.get_last_name }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{%  endblock %}

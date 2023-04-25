@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <h1>Home</h1>
+        <div class="container">
+            <span>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'accounts' %}">Accounts</a>
+            </span>
+            <span>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'courses' %}">Courses/Labs</a>
+            </span>
+            <span>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'database' %}">Access Data</a>
+            </span>
+        </div>
+        <div class="container">
+            <span>
+                <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'notifications' %}">Notifications</a>
+            </span>
+        </div>
+    </div>
+{%  endblock %}

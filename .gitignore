@@ -1,5 +1,5 @@
 
-.DS_Store
+*.DS_Store
 
 # Created by https://www.toptal.com/developers/gitignore/api/django,pycharm+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,pycharm+all
@@ -263,3 +263,5 @@ fabric.properties
 !.idea/runConfigurations
 
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm+all
+
+.idea/misc.xml

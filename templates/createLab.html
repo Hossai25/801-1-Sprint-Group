@@ -1,0 +1,33 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Create Lab
+{% endblock %}
+
+
+{% block content %}
+<div class="text-danger">{{ error_message }}</div>
+<form action="{% url 'createLab' %}" method="post">
+    {% csrf_token %}
+        <label for="course_id" class="col-sm-3 col-form-label">Select a course:</label>
+        <select id="course_id" name="course_id" style="width: 600px">
+            {% for course in courses %}
+                <option value="{{ course.get_primary_key }}">{{ course.get_course_name }}</option>
+            {% endfor %}
+        </select>
+    <div class="row">
+        <label for="lab_name" class="col-sm-3 col-form-label">Lab Name</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="lab_name" name="lab_name" required>
+        </div>
+    </div>
+<!--    <div class="row">-->
+<!--        <label for="ta_id" class="col-sm-3 col-form-label">TA ID (Optional) </label>-->
+<!--        <div class="col-sm-9">-->
+<!--            <input type="text" class="form-control" id="ta_id" name="ta_id" required>-->
+<!--        </div>-->
+<!--    </div>-->
+    <input type="submit" class="btn btn-primary" value="Submit">
+</form>
+{%  endblock %}
+
