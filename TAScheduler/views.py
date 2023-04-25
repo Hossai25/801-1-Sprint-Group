@@ -6,10 +6,12 @@ from classes import account, section, course
 # Create your views here.
 class Accounts(View):
     def get(self, request):
+        accounts = account.account_list()
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "accounts.html", {"email": request.session["email"],
-                                                 "account_type": request.session["account_type"]})
+                                                 "account_type": request.session["account_type"],
+                                                 'accounts': accounts})
 
     def post(self, request):
         pass
@@ -64,7 +66,7 @@ class CreateAccount(View):
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "error_message": "Error creating the account. A user with this email may already exist."})
         return redirect('/accounts/', {"email": request.session["email"],
-                                      "account_type": request.session["account_type"]})
+                                       "account_type": request.session["account_type"]})
 
 
 class CreateCourse(View):
@@ -91,7 +93,7 @@ class CreateCourse(View):
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "error_message": "Error creating the course."})
         return redirect('/courses/', {"email": request.session["email"],
-                                        "account_type": request.session["account_type"]})
+                                      "account_type": request.session["account_type"]})
 
 
 class CreateLab(View):
