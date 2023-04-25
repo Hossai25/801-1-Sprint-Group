@@ -23,6 +23,7 @@ urlpatterns = [
     path('', LoginPage.as_view(), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
     path('accounts/create/', CreateAccount.as_view(), name='createAccount'),
+    path('accounts/edit/', EditAccount.as_view(), name='editAccount'),
     path('courses/create-course/', CreateCourse.as_view(), name='createCourse'),
     path('courses/create-lab/', CreateLab.as_view(), name='createLab'),
     path('accounts/', Accounts.as_view(), name='accounts'),

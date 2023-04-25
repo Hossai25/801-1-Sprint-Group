@@ -133,26 +133,22 @@ class Accounts(TestCase):
     # This test checks to see that if the edit account button is pressed it brings the user to the
     # right page
     def test_toEditAccountPage(self):
-        #HASN"T BEEN IMPLEMENTED YET
-        #session = self.webpage.session
-        #session["email"] = "test1@uwm.edu"
-        #session.save()
-        #resp = self.webpage.get(reverse('accounts'))
-        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
-         #                   html=True)
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('accounts'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
+                            html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
     # the right page
     def test_toHomepage(self):
-        #HASN"T BEEN IMPLEMENTED YET
-        #session = self.webpage.session
-        #session["email"] = "test1@uwm.edu"
-        #session.save()
-        #resp = self.webpage.get(reverse('accounts'))
-        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-         #                   html=True)
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('accounts'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                            html=True)
 
 
 class CreateAccounts(TestCase):
@@ -196,7 +192,7 @@ class CreateAccounts(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post("/createAccount/", {"first_name": "Anna", "last_name": "", "email":
+        resp = self.webpage.post(reverse("createAccount"), {"first_name": "Anna", "last_name": "", "email":
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertContains(resp, "Error creating the account. A user with this email may already exist.")
 
@@ -239,14 +235,12 @@ class CreateAccounts(TestCase):
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
     # the right page
     def test_toHomepage(self):
-        #HASN"T BEEN IMPLEMENTED YET
-        #session = self.webpage.session
-        #session["email"] = "test1@uwm.edu"
-        #session.save()
-        #resp = self.webpage.get(reverse('createAccount'))
-        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-          #                 html=True)
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('createAccount'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                           html=True)
 
     # This test checks to see if a successful submission is added to the database
     def test_accountAddedToDatabase(self):
@@ -299,14 +293,12 @@ class Courses(TestCase):
     # This test checks to see that if the back to dashboard button is pressed it brings the user to the
     # right page
     def test_toHomepage(self):
-        #NOT IMPLEMENTED YET
-        #session = self.webpage.session
-        #session["email"] = "test1@uwm.edu"
-        #session.save()
-        #resp = self.webpage.get(reverse('courses'))
-        #self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-          #                  html=True)
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('courses'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                            html=True)
 
 class CreateCourse(TestCase):
     webpage = None
@@ -350,6 +342,7 @@ class CreateCourse(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
+        # TODO: should this next line have "course_name": "" ? Changing it didn't make it pass
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
