@@ -16,25 +16,31 @@ class TestCourseMethods(TestCase):
         self.assertEqual(course_object2, None)
 
     def test_getCourseModelSuccessfully(self):
-        pass
+        course_model = CourseModel.objects.create(course_name="test")
+        self.assertEqual(course_model, course.get_course_model("test"))
 
     def test_getUnmadeCourseModel(self):
-        pass
+        self.assertEqual(course.get_course_model("test"), None)
 
     def test_getCourseSuccessfully(self):
-        pass
+        course_object = course.create_course("test")
+        self.assertEqual(course_object.get_course_name(), course.get_course("test").get_course_name())
 
     def test_getUnmadeCourse(self):
-        pass
+        self.assertEqual(None, course.get_course("test"))
 
-    def test_getCourseIDSuccessfully(self):
-        pass
+    def test_getCourseByIDSuccessfully(self):
+        course_model = CourseModel.objects.create(course_name="new name")
+        course_model_id = course_model.pk
+        course_class = course.Course(course_model)
+        self.assertEqual(course_class.get_course_name(), course.get_course_by_id(course_model_id).get_course_name())
 
-    def test_getUndeclaredClassID(self):
-        pass
+    def test_getUndeclaredClassByID(self):
+        self.assertEqual(None, course.get_course_by_id(123))
 
     def test_getEmptyCourseList(self):
-        pass
+        emptyList = course.course_list()
+        self.assertEqual(emptyList, [])
 
 
 if __name__ == '__main__':
