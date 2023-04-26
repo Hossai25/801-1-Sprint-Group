@@ -9,8 +9,8 @@ from classes.account import create_account
 class TestCreateAccount(TestCase):
 
 
-    '''tests whether the create_account function creates a new user, public info and private info object
-    correctly when provided with a valid dictionary containing all required fields.'''
+    """tests whether the create_account function creates a new user, public info and private info object
+    correctly when provided with a valid dictionary containing all required fields."""
     @patch('TAScheduler.models.User.objects.create')
     @patch('TAScheduler.models.PublicInfo.objects.create')
     @patch('TAScheduler.models.PrivateInfo.objects.create')
@@ -57,3 +57,4 @@ class TestCreateAccount(TestCase):
         result = create_account(data)
         self.assertIsNone(result)
         mock_user_create.assert_called_once_with(email='test@example.com', password='password123', account_type='T')
+
