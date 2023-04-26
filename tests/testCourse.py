@@ -38,6 +38,11 @@ class TestCourseMethods(TestCase):
     def test_getUndeclaredClassByID(self):
         self.assertEqual(None, course.get_course_by_id(123))
 
+    def test_getFullCourseList(self):
+        course1 = CourseModel.objects.create(course_name="course1")
+        course2 = CourseModel.objects.create(course_name="course2")
+        self.assertEquals(course.course_list().__len__(),2)
+
     def test_getEmptyCourseList(self):
         emptyList = course.course_list()
         self.assertEqual(emptyList, [])
