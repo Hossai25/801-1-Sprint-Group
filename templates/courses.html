@@ -11,4 +11,47 @@
 
     <!-- changes to this element require acceptance tests to be updated! -->
     <a class="btn btn-primary" href="{% url 'createLab' %}">Create Labs</a>
+
+<style>
+
+    .table-container {
+  padding-top: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: lightgray;
+}
+
+
+</style>
+
+<div class="table-container">
+<table>
+  <thead>
+    <tr>
+      <th>Course Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in courses %}
+      <tr>
+          <td>{{ course.get_course_name }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+
 {%  endblock %}
