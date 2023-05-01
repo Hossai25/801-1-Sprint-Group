@@ -5,6 +5,9 @@ from classes import account, course
 
 
 def create_section(name: str, course_object: course.Course):
+    if LabModel.objects.filter(lab_name=name).exists():
+        return None
+
     new_section_model = LabModel.objects.create(
         course_id=course_object.course_model,
         lab_name=name
@@ -12,8 +15,13 @@ def create_section(name: str, course_object: course.Course):
     return Section(new_section_model)
 
 
-def delete_section(primary_key: int):
-    pass
+def delete_section(lab_name):
+    try:
+        lab_object = LabModel.objects.get(lab_name=lab_name)
+        lab_object.delete()
+        return True
+    except LabModel.DoesNotExist:
+        return False
 
 
 def __has_required_fields(data: Dict[str, any]):
