@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from classes import account, section, course
-import re
+import re   # regular expressions for parsing strings
 
 
 # Create your views here.
@@ -21,7 +21,22 @@ class Accounts(View):
                                                  'accounts': accounts})
 
     def post(self, request):
-        pass
+        """
+        Post method for the Accounts view. If the user is an admin and request.POST contains a value for the key
+        "edit_account", then redirect to the edit page for that account. If user is an admin and request.POST contains
+         a value for the key "delete_account," then try deleting that account.
+        :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
+            and request.session["account_type"] contains the account's type.
+            request.POST may contain a value for the key "edit_account" (?) or "delete_account" (?).
+            TODO: update this after writing code
+        :return: a render of the accounts page, or a redirect to the editAccount page.
+        """
+        accounts = account.account_list()
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        return render(request, "accounts.html", {"email": request.session["email"],
+                                                 "account_type": request.session["account_type"],
+                                                 'accounts': accounts})
 
 
 class Courses(View):
