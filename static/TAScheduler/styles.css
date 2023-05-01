@@ -7,7 +7,7 @@ table.my-table {
   width: 100%;
 }
 
-.my-table th, td {
+.my-table th, .my-table td {
   border: 1px solid black;
   padding: 8px;
   text-align: left;
