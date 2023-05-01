@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from classes import account, section, course
 from django.urls import reverse
-import re   # regular expressions for parsing strings
+import re  # regular expressions for parsing strings
 
 
 class Accounts(View):
@@ -46,6 +46,11 @@ class Courses(View):
 
     def post(self, request):
         pass
+
+
+def deleteCourse(request, course_id):
+    course.delete_course(course_id)
+    return redirect("/courses/")
 
 
 class CreateAccount(View):

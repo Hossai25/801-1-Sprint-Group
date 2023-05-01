@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% load static %}
 
 {% block title %}
     Courses
@@ -17,12 +18,19 @@
   <thead>
     <tr>
       <th>Course Name</th>
+        <th>Edit/Delete</th>
     </tr>
   </thead>
   <tbody>
     {% for course in courses %}
       <tr>
           <td>{{ course.get_course_name }}</td>
+          <td>
+              <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+              <a class="btn" href="{% url 'deleteCourse' course.get_primary_key %}">
+                  <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+              </a>
+          </td>
       </tr>
     {% endfor %}
   </tbody>

@@ -31,4 +31,5 @@ urlpatterns = [
     path('notifications/', Notifications.as_view(), name='notifications'),
     path('database/', Database.as_view(), name='database'),
     path('accounts/delete/<int:user_id>', deleteAccount, name='deleteAccount'),
+    path('courses/delete/<int:course_id>', deleteCourse, name='deleteCourse'),
 ]
