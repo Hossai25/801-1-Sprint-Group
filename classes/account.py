@@ -25,6 +25,10 @@ def create_account(data: Dict[str, any]):
         return None
 
 
+def delete_account(primary_key: int):
+    pass
+
+
 def __has_required_fields(data: Dict[str, any]):
     required_fields = {"email", "password", "account_type", "first_name", "last_name"}
     return required_fields.issubset(data.keys())
