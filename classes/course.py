@@ -1,4 +1,4 @@
-from TAScheduler.models import Course as CourseModel, Lab as LabModel
+from TAScheduler.models import Course as CourseModel
 from classes import account
 
 
@@ -8,6 +8,15 @@ def create_course(name: str):
         return Course(new_course_model)
     else:
         return None
+
+
+def delete_course(course_id):
+    try:
+        course_object = CourseModel.objects.get(id=course_id)
+        course_object.delete()
+        return True
+    except CourseModel.DoesNotExist:
+        return False
 
 
 def get_course_model(name_attempt):

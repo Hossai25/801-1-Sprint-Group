@@ -25,6 +25,15 @@ def create_account(data: Dict[str, any]):
         return None
 
 
+def delete_account(user_id):
+    try:
+        user_delete = UserModel.objects.get(id=user_id)
+        user_delete.delete()
+        return True
+    except UserModel.DoesNotExist:
+        return False
+
+
 def __has_required_fields(data: Dict[str, any]):
     required_fields = {"email", "password", "account_type", "first_name", "last_name"}
     return required_fields.issubset(data.keys())

@@ -1,7 +1,7 @@
 import unittest
 from django.test import TestCase
 
-from TAScheduler.models import Course as CourseModel
+from TAScheduler.models import Course as CourseModel, Lab as LabModel
 from classes import course
 
 
@@ -41,11 +41,37 @@ class TestCourseMethods(TestCase):
     def test_getFullCourseList(self):
         course1 = CourseModel.objects.create(course_name="course1")
         course2 = CourseModel.objects.create(course_name="course2")
-        self.assertEquals(course.course_list().__len__(),2)
+        self.assertEquals(course.course_list().__len__(), 2)
 
     def test_getEmptyCourseList(self):
-        emptyList = course.course_list()
-        self.assertEqual(emptyList, [])
+        empty_list = course.course_list()
+        self.assertEqual(empty_list, [])
+
+
+class TestDeleteCourse(TestCase):
+
+    def test_courseModelRemoved(self):
+        course_model = CourseModel.objects.create(course_name="test_course")
+        course.delete_course(course_model.pk)
+        with self.assertRaises(CourseModel.DoesNotExist):
+            CourseModel.objects.get(course_name="test_course")
+
+    def test_sectionModelsRemoved(self):
+        course_model = CourseModel.objects.create(course_name="test_course")
+        LabModel.objects.create(lab_name="test_section", course_id=course_model)
+        course.delete_course(course_model.pk)
+        with self.assertRaises(LabModel.DoesNotExist):
+            LabModel.objects.get(lab_name="test_section")
+
+    def test_trueOnSuccess(self):
+        course_model = CourseModel.objects.create(course_name="test_course")
+        self.assertTrue(course.delete_course(course_model.pk))
+
+    def test_falseOnFailure(self):
+        course_model = CourseModel.objects.create(course_name="test_course")
+        primary_key = course_model.pk
+        course_model.delete()
+        self.assertFalse(course.delete_course(primary_key))
 
 
 if __name__ == '__main__':
