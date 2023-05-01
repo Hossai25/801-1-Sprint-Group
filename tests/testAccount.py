@@ -1,4 +1,4 @@
-Aimport unittest
+import unittest
 from django.test import TestCase
 from TAScheduler.models import User, PublicInfo, PrivateInfo
 from typing import Dict
