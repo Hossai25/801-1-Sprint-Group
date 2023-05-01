@@ -1,4 +1,4 @@
-from TAScheduler.models import Course as CourseModel, Lab as LabModel
+from TAScheduler.models import Course as CourseModel
 from classes import account
 
 
