@@ -12,6 +12,10 @@ def create_section(name: str, course_object: course.Course):
     return Section(new_section_model)
 
 
+def delete_section(primary_key: int):
+    pass
+
+
 def __has_required_fields(data: Dict[str, any]):
     required_fields = {"lab_name"}
     return required_fields.issubset(data.keys())
