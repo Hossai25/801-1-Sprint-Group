@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 from TAScheduler.models import User, PublicInfo, PrivateInfo
 from typing import Dict
@@ -107,3 +108,4 @@ def test_valid_login():
         mock_get_user_model.return_value = mock_user
 
         assert valid_login("test@example.com", "wrongpassword") == False
+
