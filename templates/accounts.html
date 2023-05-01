@@ -12,8 +12,7 @@
 
     <!-- changes to this element require acceptance tests to be updated! -->
     <a class="btn btn-primary" href="{% url 'editAccount' %}">Edit Accounts</a>
-<form action="{% url 'accounts' %}" method="post">
-{% csrf_token %}
+
 <div class="table-container">
 <table class="my-table">
     <thead>
@@ -32,11 +31,13 @@
                 <td>{{ account.get_last_name }}</td>
                 <td>
                     <img src="{% static 'TAScheduler/icons/edit.svg' %}">
-                    <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+                    <a class="btn" href="{% url 'deleteAccount' account.get_primary_key %}">
+                        <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+                    </a>
                 </td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
 </div>
-{%  endblock %}
+{% endblock %}
