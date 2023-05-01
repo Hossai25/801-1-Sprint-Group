@@ -5,13 +5,21 @@ from classes.section import Section, create_section, delete_section
 from classes.course import Course
 
 
-class MyTestCase(unittest.TestCase):
-    # def test_something(self):
-    # self.assertEqual(True, False)  # add assertion here
-
+class MyTestCase(TestCase):
     def test_createSectionSuccesful(self):
-        self.assertEqual(create_section("testsection"), Lab(lab_name="testsection"))
+        course1 = CourseModel.objects.create(course_name="course1")
+        self.assertIsInstance(create_section("testsection", course1), Section)
 
+    def test_createDuplicateSection(self):
+        testCourse = CourseModel.objects.create(course_name="testCourse")
+        section1 = create_section("testsection", testCourse)
+        section2 = create_section("testsection", testCourse)
+        self.assertEqual(section2, None)
+
+    def test_illegalSection(self):
+        testCourse = CourseModel.objects.create(course_name="testCourse")
+        testsection = create_section("", testCourse)
+        self.assertEqual(testsection, None)
 
 class TestDeleteSection(TestCase):
 
