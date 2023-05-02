@@ -24,7 +24,9 @@
   <tbody>
     {% for course in courses %}
       <tr>
-          <td>{{ course.get_course_name }}</td>
+          <td>
+              <a href="{% url 'displayCourse' course.get_primary_key %}">{{ course.get_course_name }}</a>
+          </td>
           <td>
               <!--a class="btn" href="\{\% url 'editCourse' \%\}"-->
                   <img src="{% static 'TAScheduler/icons/edit.svg' %}">

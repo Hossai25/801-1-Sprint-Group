@@ -226,11 +226,13 @@ class Database(View):
 
 
 class DisplayCourse(View):
-    def get(self, request):
-        pass
+    def get(self, request, course_id):
+        return render(request, "displayCourse.html",
+                      {"email": request.session["email"], "account_type": request.session["account_type"]})
 
     def post(self, request):
         pass
+
 
 class EditAccount(View):
     def get(self, request):
