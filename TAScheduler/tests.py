@@ -479,7 +479,7 @@ class DeleteAccount(TestCase):
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.deleteAccount({"email": "delete@uwm.edu", "password": "delete", "account_type": "ta"}, temp)
+        resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
         self.assertRedirects(resp, "/accounts/")
 
     def test_anyclassesconnectedstillexist(self):
@@ -512,7 +512,18 @@ class DeleteCourse(TestCase):
                 Course(course_name=i, instructor_id=temp).save()
 
     def test_successfuldeletion(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
+        self.assertRedirects(resp, "/courses/")
 
     def test_instructorstillexists(self):
         pass
