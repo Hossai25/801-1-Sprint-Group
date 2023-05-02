@@ -15,9 +15,9 @@ def create_section(name: str, course_object: course.Course):
     return Section(new_section_model)
 
 
-def delete_section(lab_name):
+def delete_section(lab_id):
     try:
-        lab_object = LabModel.objects.get(lab_name=lab_name)
+        lab_object = LabModel.objects.get(id=lab_id)
         lab_object.delete()
         return True
     except LabModel.DoesNotExist:
