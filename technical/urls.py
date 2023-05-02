@@ -32,4 +32,5 @@ urlpatterns = [
     path('database/', Database.as_view(), name='database'),
     path('accounts/delete/<int:user_id>', deleteAccount, name='deleteAccount'),
     path('courses/delete/<int:course_id>', deleteCourse, name='deleteCourse'),
+    path('courses/view/<int:course_id>', DisplayCourse.as_view(), name='displayCourse')
 ]
