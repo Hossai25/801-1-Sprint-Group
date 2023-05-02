@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from classes import account, section, course
-import re
+from django.urls import reverse
+import re  # regular expressions for parsing strings
 
 
-# Create your views here.
 class Accounts(View):
     def get(self, request):
         """
@@ -24,6 +24,11 @@ class Accounts(View):
         pass
 
 
+def deleteAccount(request, user_id):
+    account.delete_account(user_id)
+    return redirect("/accounts/")
+
+
 class Courses(View):
     def get(self, request):
         """
@@ -41,6 +46,11 @@ class Courses(View):
 
     def post(self, request):
         pass
+
+
+def deleteCourse(request, course_id):
+    course.delete_course(course_id)
+    return redirect("/courses/")
 
 
 class CreateAccount(View):

@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% load static %}
 
 {% block title %}
     Courses
@@ -12,41 +13,24 @@
     <!-- changes to this element require acceptance tests to be updated! -->
     <a class="btn btn-primary" href="{% url 'createLab' %}">Create Labs</a>
 
-<style>
-
-    .table-container {
-  padding-top: 20px;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th, td {
-  border: 1px solid black;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: lightgray;
-}
-
-
-</style>
-
 <div class="table-container">
-<table>
+<table class="my-table">
   <thead>
     <tr>
       <th>Course Name</th>
+        <th>Edit/Delete</th>
     </tr>
   </thead>
   <tbody>
     {% for course in courses %}
       <tr>
           <td>{{ course.get_course_name }}</td>
+          <td>
+              <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+              <a class="btn" href="{% url 'deleteCourse' course.get_primary_key %}">
+                  <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+              </a>
+          </td>
       </tr>
     {% endfor %}
   </tbody>
