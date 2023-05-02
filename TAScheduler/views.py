@@ -227,8 +227,11 @@ class Database(View):
 
 class DisplayCourse(View):
     def get(self, request, course_id):
+        my_course = course.get_course_by_id(course_id) # TODO: check for no course found
+        sections = [] # TODO: call method to get actual lab list
         return render(request, "displayCourse.html",
-                      {"email": request.session["email"], "account_type": request.session["account_type"]})
+                      {"email": request.session["email"], "account_type": request.session["account_type"],
+                       "course": my_course, "sections": sections})
 
     def post(self, request):
         pass
