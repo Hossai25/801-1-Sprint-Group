@@ -140,11 +140,14 @@ class CreateCourse(View):
 
 
 class CreateLab(View):
+    error_duplicate = "Section name blank or already exists."
+    error_no_course = "Course not found."
+
     def get(self, request):
         """
         TODO
-        :param request: TODO
-        :return: TODO
+        :param request:
+        :return:
         """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
@@ -156,8 +159,8 @@ class CreateLab(View):
     def post(self, request):
         """
         TODO
-        :param request: TODO
-        :return: TODO
+        :param request:
+        :return:
         """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
@@ -166,14 +169,14 @@ class CreateLab(View):
         if course_object is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Course not found."})
+                           "error_message": CreateLab.error_no_course})
         else:
             lab_name = request.POST.get('lab_name')
             created_lab = section.create_section(lab_name, course_object)
         if created_lab is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Class ID or TA ID does not exist"})
+                           "error_message": CreateLab.error_duplicate})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"]})
 
