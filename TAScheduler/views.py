@@ -225,6 +225,13 @@ class Database(View):
         pass
 
 
+class DisplayCourse(View):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
 class EditAccount(View):
     def get(self, request):
         """
