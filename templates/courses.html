@@ -11,7 +11,7 @@
     <a class="btn btn-primary" href="{% url 'createCourse' %}">Create Courses</a>
 
     <!-- changes to this element require acceptance tests to be updated! -->
-    <a class="btn btn-primary" href="{% url 'createLab' %}">Create Labs</a>
+    <!-- a class="btn btn-primary" href="{% url 'createLab' %}">Create Labs</a -->
 
 <div class="table-container">
 <table class="my-table">
@@ -26,7 +26,9 @@
       <tr>
           <td>{{ course.get_course_name }}</td>
           <td>
-              <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+              <a class="btn" href="{% url 'editCourse' %}">
+                  <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+              </a>
               <a class="btn" href="{% url 'deleteCourse' course.get_primary_key %}">
                   <img src="{% static 'TAScheduler/icons/delete.svg' %}">
               </a>
