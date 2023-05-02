@@ -173,7 +173,7 @@ class CreateLab(View):
         if created_lab is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Class ID or TA ID does not exist"})
+                           "error_message": "Section name blank or already exists."})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"]})
 
