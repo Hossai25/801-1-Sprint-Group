@@ -25,6 +25,7 @@ urlpatterns = [
     path('accounts/create/', CreateAccount.as_view(), name='createAccount'),
     path('accounts/edit/', EditAccount.as_view(), name='editAccount'),
     path('courses/create-course/', CreateCourse.as_view(), name='createCourse'),
+    # path('courses/edit/', EditCourse.as_view())
     path('courses/create-lab/', CreateLab.as_view(), name='createLab'),
     path('accounts/', Accounts.as_view(), name='accounts'),
     path('courses/', Courses.as_view(), name='courses'),
@@ -32,5 +33,5 @@ urlpatterns = [
     path('database/', Database.as_view(), name='database'),
     path('accounts/delete/<int:user_id>', deleteAccount, name='deleteAccount'),
     path('courses/delete/<int:course_id>', deleteCourse, name='deleteCourse'),
-    path('courses/view/<int:course_id>', DisplayCourse.as_view(), name='displayCourse')
+    path('courses/view/<int:course_id>', DisplayCourse.as_view(), name='displayCourse'),
 ]

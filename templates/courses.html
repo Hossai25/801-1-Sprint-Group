@@ -26,9 +26,9 @@
       <tr>
           <td>{{ course.get_course_name }}</td>
           <td>
-              <a class="btn" href="{% url 'editCourse' %}">
+              <!--a class="btn" href="\{\% url 'editCourse' \%\}"-->
                   <img src="{% static 'TAScheduler/icons/edit.svg' %}">
-              </a>
+              <!--/a-->
               <a class="btn" href="{% url 'deleteCourse' course.get_primary_key %}">
                   <img src="{% static 'TAScheduler/icons/delete.svg' %}">
               </a>
