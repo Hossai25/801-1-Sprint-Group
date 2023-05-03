@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account, section, course
+from classes import account, section, course, courseta
+from TAScheduler.models import CourseTa, User
 from django.urls import reverse
 import re  # regular expressions for parsing strings
+
+from classes.course import Course
 
 
 class Accounts(View):
@@ -226,11 +229,41 @@ class Database(View):
 
 
 class DisplayCourse(View):
-    def get(self, request):
-        pass
+    error_duplicate = "TA is already in this course"
 
-    def post(self, request):
-        pass
+    def get(self, request, course_id):
+        courseView = course.get_course_by_id(course_id)
+        course_tas = courseta.course_ta_list(course_id=course_id)
+        accounts = account.account_list()
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        return render(request, "displayCourse.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      'course': courseView,
+                                                      'course_tas': course_tas,
+                                                      'accounts': accounts})
+
+    def post(self, request, course_id):
+        course_obj = course.get_course_by_id(course_id)
+        course_tas = courseta.course_ta_list(course_id=course_id)
+        accounts = account.account_list()
+        user_id = request.POST.get('ta_id')
+        is_grader = request.POST.get('is_grader') == 'True'
+        number_of_labs = int(request.POST.get('number_of_labs'))
+        new_courseta = courseta.create_courseta(course_obj, user_id, is_grader, number_of_labs)
+        if new_courseta is None:
+            return render(request, "displayCourse.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           'course': course_obj,
+                           'course_tas': course_tas,
+                           'accounts': accounts,
+                           "error_message": DisplayCourse.error_duplicate})
+        return render(request, "displayCourse.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      'course': course_obj,
+                                                      'course_tas': course_tas,
+                                                      'accounts': accounts})
+
 
 class EditAccount(View):
     def get(self, request):
