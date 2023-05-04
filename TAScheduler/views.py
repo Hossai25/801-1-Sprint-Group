@@ -291,10 +291,7 @@ class EditAccount(View):
         edited_account = account.edit_account(user_id, request.POST.dict())
         accounts = account.account_list()
 
-        return render(request, "accounts.html", {"email": request.session["email"],
-                                                 "account_type": request.session["account_type"],
-                                                 'account': userView,
-                                                 'accounts': accounts})
+        return redirect(reverse('accounts'))
 
 
 class LoginPage(View):
