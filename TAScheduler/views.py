@@ -140,11 +140,14 @@ class CreateCourse(View):
 
 
 class CreateLab(View):
+    error_duplicate = "Section name blank or already exists."
+    error_no_course = "Course not found."
+
     def get(self, request):
         """
         TODO
-        :param request: TODO
-        :return: TODO
+        :param request:
+        :return:
         """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
@@ -156,8 +159,8 @@ class CreateLab(View):
     def post(self, request):
         """
         TODO
-        :param request: TODO
-        :return: TODO
+        :param request:
+        :return:
         """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
@@ -166,14 +169,14 @@ class CreateLab(View):
         if course_object is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Course not found."})
+                           "error_message": CreateLab.error_no_course})
         else:
             lab_name = request.POST.get('lab_name')
             created_lab = section.create_section(lab_name, course_object)
         if created_lab is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Section name blank or already exists."})
+                           "error_message": CreateLab.error_duplicate})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"]})
 
@@ -217,6 +220,18 @@ class Database(View):
             request.session["account_type"] = ""
         return render(request, "database.html", {"email": request.session["email"],
                                                  "account_type": request.session["account_type"]})
+
+    def post(self, request):
+        pass
+
+
+class DisplayCourse(View):
+    def get(self, request, course_id):
+        my_course = course.get_course_by_id(course_id) # TODO: check for no course found
+        sections = [] # TODO: call method to get actual lab list
+        return render(request, "displayCourse.html",
+                      {"email": request.session["email"], "account_type": request.session["account_type"],
+                       "course": my_course, "sections": sections})
 
     def post(self, request):
         pass
