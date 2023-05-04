@@ -66,5 +66,29 @@
 <div class="text-danger">{{ error_message }}</div>
 
 <!-- Sections and their TAs -->
+<form action="{% url 'displayCourse' course.get_primary_key %}" method="post">
+{% csrf_token %}
+<div class="table-container">
+<h1>Placeholder Title</h1>
+<table class="my-table">
+    <thead>
+        <tr>
+            <th>Section Name</th>
+            <th>TA Name</th>
+            <th>Edit/Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for section in sections %}
+        <tr>
+            <td>{{ section }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+</form>
 
 {%  endblock %}
