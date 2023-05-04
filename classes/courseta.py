@@ -26,6 +26,15 @@ def delete_courseta(courseta_id):
         return False
 
 
+def get_courseta_by_id(ta_id):
+    try:
+        courseta_model = TAModel.objects.get(id=ta_id)
+        courseta = CourseTa(courseta_model)
+        return courseta
+    except TAModel.DoesNotExist:
+        return None
+
+
 def course_ta_list(course_id):
     talist = TAModel.objects.filter(course_id=course_id)
     return talist
@@ -46,8 +55,16 @@ class CourseTa:
     def get_is_grader(self):
         return self.ta_model.is_grader
 
+    def set_is_grader(self, new_is_grader):
+        self.ta_model.is_grader = new_is_grader
+        self.ta_model.save()
+
     def get_number_of_labs(self):
         return self.ta_model.number_of_labs
+
+    def set_number_of_labs(self, new_number_of_labs):
+        self.ta_model.number_of_labs = new_number_of_labs
+        self.ta_model.save()
 
     def get_ta(self):
         ta_id = self.course_model.instructor_id
@@ -57,3 +74,6 @@ class CourseTa:
     def set_ta(self, ta: account.Account):
         self.course_model.instructor_id = ta.get_primary_key()
         self.course_model.save()
+
+    def get_primary_key(self):
+        return self.ta_model.pk
