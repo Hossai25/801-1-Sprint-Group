@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account, section, course
+from classes import account, section, course, courseta
 from django.urls import reverse
 import re  # regular expressions for parsing strings
+
+from classes.course import Course
 
 
 class Accounts(View):
@@ -27,6 +29,13 @@ class Accounts(View):
 def deleteAccount(request, user_id):
     account.delete_account(user_id)
     return redirect("/accounts/")
+
+
+def deleteCourseTa(request, course_id, courseta_id):
+    course.get_course_by_id(course_id)
+    courseta.delete_courseta(courseta_id)
+    print(courseta_id)
+    return redirect(f"/courses/view/{course_id}/")
 
 
 class Courses(View):
@@ -226,32 +235,67 @@ class Database(View):
 
 
 class DisplayCourse(View):
-    def get(self, request, course_id):
-        my_course = course.get_course_by_id(course_id)  # TODO: check for no course found
-        sections = []  # TODO: call method to get actual lab list
-        return render(request, "displayCourse.html",
-                      {"email": request.session["email"], "account_type": request.session["account_type"],
-                       "course": my_course, "sections": sections})
+    error_duplicate = "TA is already in this course"
 
-    def post(self, request):
-        pass
+    def get(self, request, course_id):
+        courseView = course.get_course_by_id(course_id)
+        course_tas = courseta.course_ta_list(course_id=course_id)
+        accounts = account.account_list()
+        sections = []  # TODO: call method to get actual lab list
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        return render(request, "displayCourse.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      'course': courseView,
+                                                      'course_tas': course_tas,
+                                                      'accounts': accounts,
+                                                      "sections": sections})
+
+    def post(self, request, course_id):
+        course_obj = course.get_course_by_id(course_id)
+        course_tas = courseta.course_ta_list(course_id=course_id)
+        accounts = account.account_list()
+        sections = []  # TODO: call method to get actual lab list
+        user_id = request.POST.get('ta_id')
+        is_grader = request.POST.get('is_grader') == 'True'
+        number_of_labs = int(request.POST.get('number_of_labs'))
+        new_courseta = courseta.create_courseta(course_obj, user_id, is_grader, number_of_labs)
+        if new_courseta is None:
+            return render(request, "displayCourse.html",
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           'course': course_obj,
+                           'course_tas': course_tas,
+                           'accounts': accounts,
+                           "error_message": DisplayCourse.error_duplicate})
+        return render(request, "displayCourse.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      'course': course_obj,
+                                                      'course_tas': course_tas,
+                                                      'accounts': accounts,
+                                                      "sections": sections})
 
 
 class EditAccount(View):
-    def get(self, request):
+    def get(self, request, user_id):
         """
         Get method for the EditAccount view.
         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
             and request.session["account_type"] contains the account's type.
         :return: a render of the editAccount page.
         """
+        userView = account.get_account_by_id(user_id)
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "editAccount.html", {"email": request.session["email"],
-                                                    "account_type": request.session["account_type"]})
+                                                    "account_type": request.session["account_type"],
+                                                    'account': userView})
 
-    def post(self, request):
-        pass
+    def post(self, request, user_id):
+        userView = account.get_account_by_id(user_id)
+        edited_account = account.edit_account(user_id, request.POST.dict())
+        accounts = account.account_list()
+
+        return redirect(reverse('accounts'))
 
 
 class LoginPage(View):
@@ -308,3 +352,7 @@ class Notifications(View):
 
     def post(self, request):
         pass
+
+
+
+

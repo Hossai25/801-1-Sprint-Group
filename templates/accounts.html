@@ -10,9 +10,6 @@
     <!-- changes to this element require acceptance tests to be updated! -->
     <a class="btn btn-primary" href="{% url 'createAccount' %}">Create Accounts</a>
 
-    <!-- changes to this element require acceptance tests to be updated! -->
-    <!-- a class="btn btn-primary" href="{% url 'editAccount' %}">Edit Accounts</a -->
-
 <div class="table-container">
 <table class="my-table">
     <thead>
@@ -20,6 +17,9 @@
             <th>Email</th>
             <th>First Name</th>
             <th>Last Name</th>
+            <th>Office Hours</th>
+            <th>Address</th>
+            <th>Phone Number</th>
             <th>Edit/Delete</th>
         </tr>
     </thead>
@@ -29,8 +29,11 @@
                 <td>{{ account.get_email }}</td>
                 <td>{{ account.get_first_name }}</td>
                 <td>{{ account.get_last_name }}</td>
+                <td>{{ account.get_office_hours }}</td>
+                <td>{{ account.get_address }}</td>
+                <td>{{ account.get_phone_number }}</td>
                 <td>
-                    <a class="btn" href="{% url 'editAccount' %}">
+                    <a class="btn" href="{% url 'editAccount' account.get_primary_key %}">
                         <img src="{% static 'TAScheduler/icons/edit.svg' %}">
                     </a>
                     <a class="btn" href="{% url 'deleteAccount' account.get_primary_key %}">
