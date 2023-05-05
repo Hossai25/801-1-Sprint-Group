@@ -9,6 +9,61 @@
 {% block content %}
 
 <!-- Course name, instructor, TA list w/ grader status and num of labs -->
+<form action="{% url 'displayCourse' course.get_primary_key %}" method="post">
+    {% csrf_token %}
+<div class="table-container">
+    <h1>{{ course.get_course_name }}</h1>
+<table class="my-table">
+    <thead>
+        <tr>
+            <th>TA name</th>
+            <th>Grader Status</th>
+            <th># of Labs</th>
+            <th>Edit/Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for course_ta in course_tas %}
+            <tr>
+                <td style="width: 500px">{{ course_ta.ta_id.publicinfo.first_name }} {{ course_ta.ta_id.publicinfo.last_name }}</td>
+                <td>{{ course_ta.is_grader }}</td>
+                <td>{{ course_ta.number_of_labs }}</td>
+                <td>
+                    <a class="btn" href="{% url 'deleteCourseTa' course_id=course.get_primary_key courseta_id=course_ta.pk %}">
+                        <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+            <tr>
+                <td style="width: 500px">
+                    <select name="ta_id" style="width: 500px">
+                        {% for account in accounts %}
+                                <option value="{{ account.get_primary_key }}">{{account.get_first_name }} {{ account.get_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" id="is_grader" name="is_grader" required>
+                        <option value="" disabled selected hidden style="color: #6c757d;">Is grader?</option>
+                        <option value="True">Yes</option>
+                        <option value="False">No</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="form-control" name="number_of_labs" placeholder="# of Labs" required min="0" max="10">
+                </td>
+                <td>
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                </td>
+            </tr>
+    </tfoot>
+</table>
+</div>
+</form>
+<div class="text-danger">{{ error_message }}</div>
 
 <!-- Sections and their TAs -->
 
