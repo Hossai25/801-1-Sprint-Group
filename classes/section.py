@@ -40,10 +40,6 @@ class Section:
     def get_lab_name(self):
         return self.lab_model.lab_name
 
-    def set_lab_name(self, new_lab_name: str):
-        self.lab_model.lab_name = new_lab_name
-        self.lab_model.save()
-
     def get_ta(self):
         ta_id = self.course_model.instructor_id
         ta = account.get_account_by_id(ta_id)

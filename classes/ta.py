@@ -1,0 +1,1 @@
+from TAScheduler.models import CourseTa as CourseTaModel
