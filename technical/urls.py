@@ -23,7 +23,7 @@ urlpatterns = [
     path('', LoginPage.as_view(), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
     path('accounts/create/', CreateAccount.as_view(), name='createAccount'),
-    path('accounts/edit/', EditAccount.as_view(), name='editAccount'),
+    path('accounts/edit/<int:user_id>', EditAccount.as_view(), name='editAccount'),
     path('courses/create-course/', CreateCourse.as_view(), name='createCourse'),
     # path('courses/edit/', EditCourse.as_view())
     path('courses/create-lab/', CreateLab.as_view(), name='createLab'),
@@ -34,4 +34,5 @@ urlpatterns = [
     path('accounts/delete/<int:user_id>', deleteAccount, name='deleteAccount'),
     path('courses/delete/<int:course_id>', deleteCourse, name='deleteCourse'),
     path('courses/view/<int:course_id>', DisplayCourse.as_view(), name='displayCourse'),
+    path('courses/view/<int:course_id>/delete/<int:courseta_id>', deleteCourseTa, name='deleteCourseTa')
 ]
