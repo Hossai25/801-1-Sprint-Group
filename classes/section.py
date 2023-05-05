@@ -29,6 +29,10 @@ def __has_required_fields(data: Dict[str, any]):
     return required_fields.issubset(data.keys())
 
 
+def section_list(course_id):
+    pass
+
+
 class Section:
     def __init__(self, lab_model: LabModel):
         self.lab_model = lab_model
@@ -39,12 +43,3 @@ class Section:
 
     def get_lab_name(self):
         return self.lab_model.lab_name
-
-    def get_ta(self):
-        ta_id = self.course_model.instructor_id
-        ta = account.get_account_by_id(ta_id)
-        return ta
-
-    def set_ta(self, ta: account.Account):
-        self.course_model.instructor_id = ta.get_primary_key()
-        self.course_model.save()
