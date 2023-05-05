@@ -1,9 +1,13 @@
 import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
+from TAScheduler.models import Course as CourseModel
 
-from TAScheduler.models import User, PublicInfo, PrivateInfo, Course
+from TAScheduler.models import User, PublicInfo, PrivateInfo, Course, Lab
 from django import urls
+
+from classes.section import create_section
+
 
 class Login(TestCase):
     webpage = None
@@ -342,7 +346,6 @@ class CreateCourse(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        # TODO: should this next line have "course_name": "" ? Changing it didn't make it pass
         resp = self.webpage.post(reverse("createCourse"), {"course_name": ""}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
@@ -353,3 +356,178 @@ class CreateCourse(TestCase):
         session.save()
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
         self.assertNotEqual(Course.objects.get(course_name="Course3"), None)
+
+class CreateSection(TestCase):
+    webpage = None
+    users = None
+    courses = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1"]
+        self.courses = ["Course1", "Course2"]
+
+        # Fill test database with users
+        for i in self.users:
+            #Instructor
+            temp = User(email=i + "@uwm.edu", password=i, account_type="instructor")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+
+            #TA
+            tatemp= User(email=i + "ta@uwm.edu", password=i, account_type="ta")
+            tatemp.save()
+            tatemp2 = PublicInfo(user_id=tatemp, first_name=i, last_name=i)
+            tatemp2.save()
+            tatemp3 = PrivateInfo(user_id=tatemp)
+            tatemp3.save()
+            for j in self.courses:
+                tempCourse = Course(course_name=j, instructor_id=temp).save()
+                Lab(lab_name=j+" Section", course_id=tempCourse, ta_id=tatemp)
+
+    def test_successfulSectionCreation(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="instructor@uwm.edu", password="instructor", account_type="instructor")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse("createLab"), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"}, follow=True)
+        self.assertRedirects(resp, "/courses/")
+
+    def test_duplicateSection(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="ta@uwm.edu", password="ta", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        testlab = Lab.objects.create(lab_name= "testsection", course_id= testcourse , ta_id= temp)
+        resp = self.webpage.post(reverse('createLab'), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "testsection"}, follow=True)
+        self.assertContains(resp, "Section name blank or already exists.")
+
+    def test_blankSectionFields(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="ta@uwm.edu", password="ta", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse('createLab'), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": ""}, follow=True)
+        self.assertContains(resp, "Section name blank or already exists.")
+
+    def test_noCourseForSection(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.post(reverse("createLab"), {"course_id": 000, "course_object": "", "lab_name": "New Section"}, follow=True)
+        self.assertContains(resp, "Course not found.")
+
+    def test_sectionAddedToDatabase(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="instructor@uwm.edu", password="instructor", account_type="instructor")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse("createLab"), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"}, follow=True)
+        self.assertNotEqual(Lab.objects.get(lab_name="New Section"), None)
+
+class DeleteAccount(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+
+    def test_successfuldeletion(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
+        self.assertRedirects(resp, "/accounts/")
+
+    def test_anyclassesconnectedstillexist(self):
+        pass
+
+    def test_tacantdeleteaccount(self):
+        pass
+
+    def test_instructorcantdeleteaccount(self):
+        pass
+class DeleteCourse(TestCase):
+    webpage = None
+    users = None
+    courses = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1"]
+        self.courses = ["Course1", "Course2"]
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            for j in self.courses:
+                Course(course_name=i, instructor_id=temp).save()
+
+    def test_successfuldeletion(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
+        self.assertRedirects(resp, "/courses/")
+
+    def test_instructorstillexists(self):
+        pass
+
+    def test_tastillexists(self):
+        pass
+

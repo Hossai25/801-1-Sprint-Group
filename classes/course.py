@@ -1,5 +1,5 @@
-from TAScheduler.models import Course as CourseModel, Lab as LabModel
-from classes import account, section
+from TAScheduler.models import Course as CourseModel
+from classes import account
 
 
 def create_course(name: str):
@@ -8,6 +8,15 @@ def create_course(name: str):
         return Course(new_course_model)
     else:
         return None
+
+
+def delete_course(course_id):
+    try:
+        course_object = CourseModel.objects.get(id=course_id)
+        course_object.delete()
+        return True
+    except CourseModel.DoesNotExist:
+        return False
 
 
 def get_course_model(name_attempt):
@@ -61,10 +70,6 @@ class Course:
     def set_instructor(self, instructor: type[account.Account]):
         self.course_model.instructor_id = instructor
         self.course_model.save()
-
-    def get_sections(self):
-        section_models = LabModel.objects.filter(course_id=self.course_model)
-        return [section.Section(section_model) for section_model in section_models]
 
     def get_primary_key(self):
         return self.course_model.pk

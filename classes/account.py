@@ -25,6 +25,32 @@ def create_account(data: Dict[str, any]):
         return None
 
 
+def delete_account(user_id):
+    try:
+        user_delete = UserModel.objects.get(id=user_id)
+        user_delete.delete()
+        return True
+    except UserModel.DoesNotExist:
+        return False
+
+
+def edit_account(user_id, data: Dict[str, any]):
+    try:
+        user = UserModel.objects.get(id=user_id)
+        account = Account(user)
+        account.set_first_name(data.get('first_name', account.get_first_name()))
+        account.set_last_name(data.get('last_name', account.get_last_name()))
+        account.set_address(data.get('address', account.get_address()))
+        account.set_phone_number(data.get('phone_number', account.get_phone_number()))
+        account.set_office_hours(data.get('office_hours', account.get_office_hours()))
+        account.user_model.save()
+        account.public_info_model.save()
+        account.private_info_model.save()
+        return account
+    except UserModel.DoesNotExist:
+        return None
+
+
 def __has_required_fields(data: Dict[str, any]):
     required_fields = {"email", "password", "account_type", "first_name", "last_name"}
     return required_fields.issubset(data.keys())
