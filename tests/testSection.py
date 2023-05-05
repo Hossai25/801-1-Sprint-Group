@@ -2,22 +2,22 @@ import unittest
 from django.test import TestCase
 from TAScheduler.models import Lab, Course as CourseModel
 from classes.section import Section, create_section, delete_section
-from classes.course import Course
+from classes.course import Course, create_course
 
 
 class MyTestCase(TestCase):
     def test_createSectionSuccesful(self):
-        course1 = CourseModel.objects.create(course_name="course1")
+        course1 = create_course("course1");
         self.assertIsInstance(create_section("testsection", course1), Section)
 
     def test_createDuplicateSection(self):
-        testCourse = CourseModel.objects.create(course_name="testCourse")
+        testCourse = create_course("testCourse");
         section1 = create_section("testsection", testCourse)
         section2 = create_section("testsection", testCourse)
         self.assertEqual(section2, None)
 
     def test_illegalSection(self):
-        testCourse = CourseModel.objects.create(course_name="testCourse")
+        testCourse = create_course("testcourse");
         testsection = create_section("", testCourse)
         self.assertEqual(testsection, None)
 

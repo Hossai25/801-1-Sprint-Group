@@ -271,6 +271,7 @@ class DisplayCourse(View):
                                                       'accounts': accounts})
 
 
+
 class EditAccount(View):
     def get(self, request, user_id):
         """
