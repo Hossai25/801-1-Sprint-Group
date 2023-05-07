@@ -13,6 +13,9 @@ def get_course_tas(course_id: int):
 def get_section_ta(section_id: int):
     pass
 
+def get_all_tas():
+    pass
+
 
 class Ta(Account):
     def get_grader_status(self, course_id: int):

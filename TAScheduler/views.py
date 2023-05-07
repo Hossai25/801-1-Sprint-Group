@@ -218,7 +218,7 @@ class DisplayCourse(View):
 
     def get(self, request, course_id):
         course_obj = course.get_course_by_id(course_id)
-        ta_list = ta.get_course_tas(course_id)
+        ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
@@ -236,7 +236,7 @@ class DisplayCourse(View):
 
     def post(self, request, course_id):
         course_obj = course.get_course_by_id(course_id)
-        ta_list = ta.get_course_tas(course_id)
+        ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
@@ -274,7 +274,6 @@ class DisplayCourse(View):
                                "error_instructor": DisplayCourse.error_duplicateinstructor})
             else:
                 course_instructor = new_instructor
-                # course_instructor = instructor.get_course_instructor(course_id)
         return render(request, "displayCourse.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"],
                                                       'course': course_obj,
