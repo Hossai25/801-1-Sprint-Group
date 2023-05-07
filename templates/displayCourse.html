@@ -42,8 +42,8 @@
         {% for course_ta in course_tas %}
             <tr>
                 <td style="width: 500px">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</td>
-                <td>{{ course_ta.get_grader_status }}</td>
-                <td>{{ course_ta.get_number_sections }}</td>
+                <td>{{ course_ta.grader_status }}</td>
+                <td>{{ course_ta.number_sections }}</td>
                 <td>
                     <a class="btn" href="{% url 'editCourseTa' course_id=course.get_primary_key user_id=course_ta.get_primary_key %}">
                         <img src="{% static 'TAScheduler/icons/edit.svg' %}">
