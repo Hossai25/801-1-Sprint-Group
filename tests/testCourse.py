@@ -1,7 +1,7 @@
 import unittest
 from django.test import TestCase
 
-from TAScheduler.models import Course as CourseModel, Lab as LabModel
+from TAScheduler.models import Course as CourseModel, Lab as LabModel, CourseTa as CourseTaModel, User as UserModel
 from classes import course
 
 
@@ -62,6 +62,15 @@ class TestDeleteCourse(TestCase):
         course.delete_course(course_model.pk)
         with self.assertRaises(LabModel.DoesNotExist):
             LabModel.objects.get(lab_name="test_section")
+
+    def test_courseTaModelRemoved(self):
+        course_model = CourseModel.objects.create(course_name="test_course")
+        user_model = UserModel.objects.create(email="test", password="test", account_type="ta")
+        course_ta_model = CourseTaModel.objects.create(course_id=course_model, ta_id=user_model)
+        course_ta_key = course_ta_model.pk
+        course.delete_course(course_model.pk)
+        with self.assertRaises(CourseTaModel.DoesNotExist):
+            CourseTaModel.objects.get(id=course_ta_key)
 
     def test_trueOnSuccess(self):
         course_model = CourseModel.objects.create(course_name="test_course")
