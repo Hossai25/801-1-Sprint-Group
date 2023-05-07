@@ -249,12 +249,13 @@ class DisplayCourse(View):
             if new_course_ta is None:
                 context["error_ta"] = DisplayCourse.error_duplicateta
                 return render(request, "displayCourse.html", context)
+            else:
+                context["course_tas"] = ta.get_course_tas(course_id)
             new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
             new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
         elif 'submitInstructor' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('instructor_id'))
             new_instructor = instructor.Instructor(new_user)
-            print(new_instructor)
             new_course_instructor = new_instructor.add_to_course(course_id)
             if new_course_instructor is None:
                 context["error_instructor"] = DisplayCourse.error_duplicateinstructor

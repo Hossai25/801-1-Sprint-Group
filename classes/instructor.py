@@ -12,6 +12,8 @@ def account_to_instructor(account_id: int):
 
 def get_course_instructor(course_id: int):
     course = CourseModel.objects.get(id=course_id)
+    if course.instructor_id is None:
+        return None
     instructor = account_to_instructor(course.instructor_id.pk)
     return instructor
 
