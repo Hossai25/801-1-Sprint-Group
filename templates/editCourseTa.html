@@ -7,7 +7,8 @@
 
 {% block content %}
 <form action="{% url 'editCourseTa' course_id=course.get_primary_key user_id=selected_ta.user_model.pk %}" method="post">
-    <h2>{{ selected_ta.user_model.publicinfo.first_name }} {{ selected_ta.user_model.publicinfo.last_name }}</h2>
+    <h2>{{ course.get_course_name }}</h2>
+    <h3>{{ selected_ta.user_model.publicinfo.first_name }} {{ selected_ta.user_model.publicinfo.last_name }}</h3>
     {% csrf_token %}
     <div class="row">
         <label for="is_grader" class="col-sm-3 col-form-label">Is grader</label>

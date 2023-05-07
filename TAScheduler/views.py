@@ -274,6 +274,7 @@ class DisplayCourse(View):
                                "error_instructor": DisplayCourse.error_duplicateinstructor})
             else:
                 course_instructor = new_instructor
+                # course_instructor = instructor.get_course_instructor(course_id)
         return render(request, "displayCourse.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"],
                                                       'course': course_obj,
@@ -282,6 +283,7 @@ class DisplayCourse(View):
                                                       'ta_list': ta_list,
                                                       'instructor_list': instructor_list,
                                                       "sections": sections})
+
 
 def deleteCourseTa(request, course_id, user_id):
     ta_obj = ta.account_to_ta(user_id)

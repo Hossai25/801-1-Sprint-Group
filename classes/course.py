@@ -57,8 +57,5 @@ class Course:
     def get_course_name(self):
         return self.course_model.course_name
 
-    def get_instructor_id(self):
-        return self.course_model.instructor_id
-
     def get_primary_key(self):
         return self.course_model.pk
