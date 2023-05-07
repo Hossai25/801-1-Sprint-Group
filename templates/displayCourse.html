@@ -13,12 +13,16 @@
     {% csrf_token %}
 <div class="table-container">
     <h2>{{ course.get_course_name }}</h2>
-    <h4>{{ course_instructor.publicinfo.first_name }} {{ course_instructor.publicinfo.last_name }}</h4>
+    <h4>{{ course_instructor.get_first_name }} {{ course_instructor.get_last_name }}</h4>
     <h7>
-        <div class="input-group">
-            <select name="instructor_id" style="width: 500px">
+        <div class="input-group" style="width: 500px">
+            <select name="instructor_id" class="form-select">
                 {% for instructor in instructor_list %}
-                    <option value="{{ instructor.get_primary_key }}">{{instructor.get_first_name }} {{ instructor.get_last_name }}</option>
+                    {% if instructor.get_primary_key == course_instructor.get_primary_key %}
+                        <option selected value="{{ instructor.get_primary_key }}">{{instructor.get_first_name }} {{ instructor.get_last_name }}</option>
+                    {% else %}
+                        <option value="{{ instructor.get_primary_key }}">{{instructor.get_first_name }} {{ instructor.get_last_name }}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
             <input type="submit" class="btn btn-primary btn-sm" name="submitInstructor" value="Submit" formnovalidate>
@@ -54,7 +58,7 @@
     <tfoot>
             <tr>
                 <td style="width: 500px">
-                    <select name="ta_id" style="width: 500px">
+                    <select name="ta_id" class="form-select" style="width: 500px">
                         {% for account in ta_list %}
                                 <option value="{{ account.get_primary_key }}">{{account.get_first_name }} {{ account.get_last_name }}</option>
                         {% endfor %}
