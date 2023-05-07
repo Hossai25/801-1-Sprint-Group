@@ -34,8 +34,8 @@ class Instructor(Account):
     def add_to_course(self, course_id: int):
         try:
             course = CourseModel.objects.get(id=course_id)
-            if course.instructor_id.id == self.get_primary_key():
-                return None
+            # if course.instructor_id.id == self.get_primary_key():
+            #     return None
             instructor = UserModel.objects.get(id=self.get_primary_key())
             course.instructor_id = instructor
             course.save()

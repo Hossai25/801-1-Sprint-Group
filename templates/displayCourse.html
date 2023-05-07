@@ -13,7 +13,7 @@
     {% csrf_token %}
 <div class="table-container">
     <h2>{{ course.get_course_name }}</h2>
-    <h2>{{ course.get_instructor_id.publicinfo.first_name }} {{ course.get_instructor_id.publicinfo.last_name }}</h2>
+    <h2>{{ course_instructor.publicinfo.first_name }} {{ course_instructor.publicinfo.last_name }}</h2>
     <h7>
         <div class="input-group">
             <select name="instructor_id" style="width: 500px">

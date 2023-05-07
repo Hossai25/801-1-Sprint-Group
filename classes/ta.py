@@ -1,5 +1,5 @@
 from TAScheduler.models import CourseTa as CourseTaModel
-from account import Account
+from classes.account import Account
 
 
 def account_to_ta(account_id: int):
