@@ -216,7 +216,8 @@ class DisplayCourse(View):
     error_duplicateta = "TA is already in this course"
     error_duplicateinstructor = "Instructor is already in this course"
 
-    def get(self, request, course_id):
+    def get_context(self, request, course_id):
+        # TODO: I need to write unit tests for this!
         course_obj = course.get_course_by_id(course_id)
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
@@ -225,36 +226,29 @@ class DisplayCourse(View):
         sections = []  # TODO: call method to get actual lab list
         if "account_type" not in request.session:
             request.session["account_type"] = ""
-        return render(request, "displayCourse.html", {"email": request.session["email"],
-                                                      "account_type": request.session["account_type"],
-                                                      'course': course_obj,
-                                                      'course_tas': course_tas,
-                                                      'course_instructor': course_instructor,
-                                                      'ta_list': ta_list,
-                                                      'instructor_list': instructor_list,
-                                                      "sections": sections})
+        context = {"email": request.session["email"],
+                   "account_type": request.session["account_type"],
+                   'course': course_obj,
+                   'course_tas': course_tas,
+                   'course_instructor': course_instructor,
+                   'ta_list': ta_list,
+                   'instructor_list': instructor_list,
+                   "sections": sections}
+        return context
+
+    def get(self, request, course_id):
+        context = self.get_context(request, course_id)
+        return render(request, "displayCourse.html", context)
 
     def post(self, request, course_id):
-        course_obj = course.get_course_by_id(course_id)
-        ta_list = ta.get_all_tas()
-        instructor_list = instructor.get_all_instructors()
-        course_tas = ta.get_course_tas(course_id)
-        course_instructor = instructor.get_course_instructor(course_id)
-        sections = []  # TODO: call method to get actual lab list
+        context = self.get_context(request, course_id)
         if 'submitTa' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('ta_id'))
             new_ta = ta.Ta(new_user)
             new_course_ta = new_ta.add_to_course(course_id)
             if new_course_ta is None:
-                return render(request, "displayCourse.html",
-                              {"email": request.session["email"], "account_type": request.session["account_type"],
-                               'course': course_obj,
-                               'course_tas': course_tas,
-                               'course_instructor': course_instructor,
-                               'ta_list': ta_list,
-                               'instructor_list': instructor_list,
-                               "sections": sections,
-                               "error_ta": DisplayCourse.error_duplicateta})
+                context["error_ta"] = DisplayCourse.error_duplicateta
+                return render(request, "displayCourse.html", context)
             new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
             new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
         elif 'submitInstructor' in request.POST:
@@ -263,25 +257,11 @@ class DisplayCourse(View):
             print(new_instructor)
             new_course_instructor = new_instructor.add_to_course(course_id)
             if new_course_instructor is None:
-                return render(request, "displayCourse.html",
-                              {"email": request.session["email"], "account_type": request.session["account_type"],
-                               'course': course_obj,
-                               'course_tas': course_tas,
-                               'course_instructor': course_instructor,
-                               'ta_list': ta_list,
-                               'instructor_list': instructor_list,
-                               "sections": sections,
-                               "error_instructor": DisplayCourse.error_duplicateinstructor})
+                context["error_instructor"] = DisplayCourse.error_duplicateinstructor
+                return render(request, "displayCourse.html", context)
             else:
-                course_instructor = new_instructor
-        return render(request, "displayCourse.html", {"email": request.session["email"],
-                                                      "account_type": request.session["account_type"],
-                                                      'course': course_obj,
-                                                      'course_tas': course_tas,
-                                                      'course_instructor': course_instructor,
-                                                      'ta_list': ta_list,
-                                                      'instructor_list': instructor_list,
-                                                      "sections": sections})
+                context["course_instructor"] = new_instructor
+        return render(request, "displayCourse.html", context)
 
 
 def deleteCourseTa(request, course_id, user_id):
