@@ -34,7 +34,7 @@ urlpatterns = [
     path('accounts/delete/<int:user_id>', deleteAccount, name='deleteAccount'),
     path('courses/delete/<int:course_id>', deleteCourse, name='deleteCourse'),
     path('courses/view/<int:course_id>/', DisplayCourse.as_view(), name='displayCourse'),
-    path('courses/view/<int:course_id>/delete/<int:user_id>', deleteCourseTa, name='deleteCourseTa'),
-    path('courses/view/<int:course_id>/edit/<int:user_id>', EditCourseTa.as_view(), name='editCourseTa')
+    path('courses/view/<int:course_id>/delete-ta/<int:user_id>', deleteCourseTa, name='deleteCourseTa'),
+    path('courses/view/<int:course_id>/edit-ta/<int:user_id>', EditCourseTa.as_view(), name='editCourseTa')
 
 ]

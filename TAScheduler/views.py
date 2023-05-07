@@ -237,6 +237,7 @@ class DisplayCourse(View):
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
+        sections = []  # TODO: call method to get actual lab list
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "displayCourse.html", {"email": request.session["email"],
@@ -245,7 +246,8 @@ class DisplayCourse(View):
                                                       'course_tas': course_tas,
                                                       'course_instructor': course_instructor,
                                                       'ta_list': ta_list,
-                                                      'instructor_list': instructor_list})
+                                                      'instructor_list': instructor_list,
+                                                      "sections": sections})
 
     def post(self, request, course_id):
         course_obj = course.get_course_by_id(course_id)
@@ -253,6 +255,7 @@ class DisplayCourse(View):
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
+        sections = []  # TODO: call method to get actual lab list
         if 'submitTa' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('ta_id'))
             new_ta = ta.Ta(new_user)
@@ -265,6 +268,7 @@ class DisplayCourse(View):
                                'course_instructor': course_instructor,
                                'ta_list': ta_list,
                                'instructor_list': instructor_list,
+                               "sections": sections,
                                "error_ta": DisplayCourse.error_duplicateta})
             new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
             new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
@@ -281,14 +285,18 @@ class DisplayCourse(View):
                                'course_instructor': course_instructor,
                                'ta_list': ta_list,
                                'instructor_list': instructor_list,
+                               "sections": sections,
                                "error_instructor": DisplayCourse.error_duplicateinstructor})
+            else:
+                course_instructor = instructor.get_course_instructor(course_id)
         return render(request, "displayCourse.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"],
                                                       'course': course_obj,
                                                       'course_tas': course_tas,
                                                       'course_instructor': course_instructor,
                                                       'ta_list': ta_list,
-                                                      'instructor_list': instructor_list})
+                                                      'instructor_list': instructor_list,
+                                                      "sections": sections})
 
 
 def deleteCourseTa(request, course_id, user_id):

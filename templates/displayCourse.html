@@ -13,7 +13,7 @@
     {% csrf_token %}
 <div class="table-container">
     <h2>{{ course.get_course_name }}</h2>
-    <h2>{{ course.get_instructor_id.publicinfo.first_name }} {{ course.get_instructor_id.publicinfo.last_name }}</h2>
+    <h4>{{ course_instructor.publicinfo.first_name }} {{ course_instructor.publicinfo.last_name }}</h4>
     <h7>
         <div class="input-group">
             <select name="instructor_id" style="width: 500px">
@@ -81,5 +81,51 @@
 <div class="text-danger">{{ error_ta }}</div>
 
 <!-- Sections and their TAs -->
-
+<form action="{% url 'displayCourse' course.get_primary_key %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="form_type" value="section">
+<div class="table-container">
+<h3>Sections</h3>
+<table class="my-table">
+    <thead>
+        <tr>
+            <th>Section Name</th>
+            <th>Assigned TA</th>
+            <th>Edit/Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for section in sections %}
+        <tr>
+            <td><!-- section name --></td>
+            <td><!-- name of section's ta, if any --></td>
+            <td><!-- edit and delete buttons --></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>
+                <input type="text" class="form-control" name="section_name" placeholder="Section Name" required>
+            </td>
+            <td>
+                <select class="form-select" name="ta">
+                    <option value="None" selected>None Assigned</option>
+                    {% for course_ta in course_tas %}
+                    {% if course_ta.number_of_labs != 0 %}
+                    <option value="{{ course_ta.get_ta.get_email }}">
+                        {{ course_ta.ta_id.publicinfo.first_name }} {{ course_ta.ta_id.publicinfo.last_name }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <input type="submit" class="btn btn-primary" value="Add Section">
+            </td>
+        </tr>
+    </tfoot>
+</table>
+</div>
+</form>
 {%  endblock %}
