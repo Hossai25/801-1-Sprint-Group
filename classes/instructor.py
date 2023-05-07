@@ -12,13 +12,13 @@ def account_to_instructor(account_id: int):
 
 def get_course_instructor(course_id: int):
     course = CourseModel.objects.get(id=course_id)
-    instructor = course.instructor_id
+    instructor = account_to_instructor(course.instructor_id.pk)
     return instructor
 
 
 def get_all_instructors():
     instructors = UserModel.objects.filter(account_type='instructor')
-    instructor_objects = [Account(instructor_model) for instructor_model in instructors]
+    instructor_objects = [account_to_instructor(instructor_model.pk) for instructor_model in instructors]
     return instructor_objects
 
 
