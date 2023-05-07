@@ -119,11 +119,6 @@ class CreateCourse(View):
                                                      "account_type": request.session["account_type"]})
 
     def post(self, request):
-        """
-        Post method for the CreateCourse view.
-        :param request: TODO
-        :return: TODO
-        """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         key = 'course_name'
@@ -146,11 +141,6 @@ class CreateLab(View):
     error_no_course = "Course not found."
 
     def get(self, request):
-        """
-        TODO
-        :param request:
-        :return:
-        """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         courses = course.course_list()
@@ -159,11 +149,6 @@ class CreateLab(View):
                                                   'courses': courses})
 
     def post(self, request):
-        """
-        TODO
-        :param request:
-        :return:
-        """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         course_id = request.POST.get('course_id')
@@ -330,10 +315,10 @@ class EditAccount(View):
 class EditCourseTa(View):
     def get(self, request, course_id, user_id):
         """
-        Get method for the Notifications view.
+        Get method for the EditCourseTa view.
         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
             and request.session["account_type"] contains the account's type.
-        :return: a render of the notifications page.
+        :return: a render of the EditCourseTa page.
         """
         selected_ta = ta.account_to_ta(user_id)
         course_obj = course.get_course_by_id(course_id)
