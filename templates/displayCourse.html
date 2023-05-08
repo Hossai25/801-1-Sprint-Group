@@ -41,14 +41,14 @@
     <tbody>
         {% for course_ta in course_tas %}
             <tr>
-                <td style="width: 500px">{{ course_ta.ta_id.publicinfo.first_name }} {{ course_ta.ta_id.publicinfo.last_name }}</td>
-                <td>{{ course_ta.is_grader }}</td>
-                <td>{{ course_ta.number_of_labs }}</td>
+                <td style="width: 500px">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</td>
+                <td>{{ course_ta.grader_status }}</td>
+                <td>{{ course_ta.number_sections }}</td>
                 <td>
-                    <a class="btn" href="{% url 'editCourseTa' course_id=course.get_primary_key user_id=course_ta.ta_id.pk %}">
+                    <a class="btn" href="{% url 'editCourseTa' course_id=course.get_primary_key user_id=course_ta.get_primary_key %}">
                         <img src="{% static 'TAScheduler/icons/edit.svg' %}">
                     </a>
-                    <a class="btn" href="{% url 'deleteCourseTa' course_id=course.get_primary_key user_id=course_ta.ta_id.pk %}">
+                    <a class="btn" href="{% url 'deleteCourseTa' course_id=course.get_primary_key user_id=course_ta.get_primary_key %}">
                         <img src="{% static 'TAScheduler/icons/delete.svg' %}">
                     </a>
                 </td>

@@ -11,7 +11,7 @@
     <h3>{{ selected_ta.user_model.publicinfo.first_name }} {{ selected_ta.user_model.publicinfo.last_name }}</h3>
     {% csrf_token %}
     <div class="row">
-        <label for="is_grader" class="col-sm-3 col-form-label">Is grader</label>
+        <label for="is_grader" class="col-sm-3 col-form-label">Is Grader</label>
         <div class="col-sm-9">
             <select class="form-select" id="is_grader" name="is_grader" required>
                 <option value="" disabled selected hidden style="color: #6c757d;">{{ selected_ta.get_grader_status }}</option>
@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="row">
-        <label for="number_of_labs" class="col-sm-3 col-form-label">Last Name</label>
+        <label for="number_of_labs" class="col-sm-3 col-form-label">Number of Labs</label>
         <div class="col-sm-9">
             <input type="number" id="number_of_labs" class="form-control" name="number_of_labs" value="{{ selected_ta.get_number_labs }}" placeholder="# of Labs" required min="0" max="10">
         </div>

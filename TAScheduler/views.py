@@ -222,6 +222,9 @@ class DisplayCourse(View):
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
+        for course_ta in course_tas:
+            course_ta.grader_status = course_ta.get_grader_status(course_id)
+            course_ta.number_sections = course_ta.get_number_sections(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
         sections = []  # TODO: call method to get actual lab list
         if "account_type" not in request.session:
@@ -249,12 +252,17 @@ class DisplayCourse(View):
             if new_course_ta is None:
                 context["error_ta"] = DisplayCourse.error_duplicateta
                 return render(request, "displayCourse.html", context)
-            new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
-            new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
+            else:
+                new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
+                new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
+                course_tas = ta.get_course_tas(course_id)
+                for course_ta in course_tas:
+                    course_ta.grader_status = course_ta.get_grader_status(course_id)
+                    course_ta.number_sections = course_ta.get_number_sections(course_id)
+                context["course_tas"] = course_tas
         elif 'submitInstructor' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('instructor_id'))
             new_instructor = instructor.Instructor(new_user)
-            print(new_instructor)
             new_course_instructor = new_instructor.add_to_course(course_id)
             if new_course_instructor is None:
                 context["error_instructor"] = DisplayCourse.error_duplicateinstructor
