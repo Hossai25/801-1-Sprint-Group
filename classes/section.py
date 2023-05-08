@@ -43,3 +43,6 @@ class Section:
 
     def get_lab_name(self):
         return self.lab_model.lab_name
+
+    def get_primary_key(self):
+        return self.lab_model.pk
