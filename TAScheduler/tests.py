@@ -291,7 +291,7 @@ class Courses(TestCase):
         session["email"] = "test1@uwm.edu"
         session.save()
         resp = self.webpage.get(reverse('courses'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Labs</a>' % reverse('createLab'),
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
                             html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to the
@@ -469,11 +469,27 @@ class DeleteAccount(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
+        #Instructor User
+        newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
+        newUser.save()
+        newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
+        newUser2.save()
+        newUser3 = PrivateInfo(user_id=newUser)
+        newUser3.save()
+
+        #TA User
+        newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
+        newta.save()
+        newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
+        newta2.save()
+        newta3 = PrivateInfo(user_id=newta)
+        newta3.save()
+
     def test_successfuldeletion(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        temp = User(email="delete@uwm.edu", password="delete", account_type="ta")
+        temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
         temp2.save()
@@ -486,10 +502,30 @@ class DeleteAccount(TestCase):
         pass
 
     def test_tacantdeleteaccount(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "ta@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
+        self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
 
     def test_instructorcantdeleteaccount(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "teacher@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
+        self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
 class DeleteCourse(TestCase):
     webpage = None
     users = None
@@ -511,11 +547,27 @@ class DeleteCourse(TestCase):
             for j in self.courses:
                 Course(course_name=i, instructor_id=temp).save()
 
+            # Instructor User
+            newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
+            newUser.save()
+            newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
+            newUser2.save()
+            newUser3 = PrivateInfo(user_id=newUser)
+            newUser3.save()
+
+            # TA User
+            newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
+            newta.save()
+            newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
+            newta2.save()
+            newta3 = PrivateInfo(user_id=newta)
+            newta3.save()
+
     def test_successfuldeletion(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        temp = User(email="delete@uwm.edu", password="delete", account_type="ta")
+        temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
         temp2.save()
@@ -530,4 +582,32 @@ class DeleteCourse(TestCase):
 
     def test_tastillexists(self):
         pass
+
+    def test_tacantdeleteaccount(self):
+        session = self.webpage.session
+        session["email"] = "ta@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
+        self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+
+    def test_instructorcantdeleteaccount(self):
+        session = self.webpage.session
+        session["email"] = "teacher@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
+        self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
 
