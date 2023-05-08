@@ -4,7 +4,7 @@ from django.db import models
 class User(models.Model):
     email = models.CharField(max_length=25)
     password = models.CharField(max_length=25)
-    account_type = models.CharField(max_length=25)
+    account_type = models.CharField(max_length=25)  # admin - instructor - ta
 
 
 class PublicInfo(models.Model):
