@@ -101,9 +101,20 @@
     <tbody>
         {% for section in sections %}
         <tr>
-            <td><!-- section name --></td>
-            <td><!-- name of section's ta, if any --></td>
-            <td><!-- edit and delete buttons --></td>
+            <td>{{ section.get_lab_name }}</td>
+            <td>
+                {% if section.ta %}
+                    {{ section.ta.get_first_name }} {{ section.ta.get_last_name }}
+                {% else %}No TA Assigned{% endif %}
+            </td>
+            <td>
+                <a class="btn" href="{% url 'editSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
+                    <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+                </a>
+                <a class="btn" href="{% url 'deleteSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
+                    <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -116,9 +127,9 @@
                 <select class="form-select" name="ta">
                     <option value="None" selected>None Assigned</option>
                     {% for course_ta in course_tas %}
-                    {% if course_ta.number_of_labs != 0 %}
-                    <option value="{{ course_ta.get_ta.get_email }}">
-                        {{ course_ta.ta_id.publicinfo.first_name }} {{ course_ta.ta_id.publicinfo.last_name }}
+                    {% if course_ta.number_sections != 0 %}
+                    <option value="{{ course_ta.get_email }}">
+                        {{ course_ta.get_first_name }} {{ course_ta.get_last_name }}
                     </option>
                     {% endif %}
                     {% endfor %}

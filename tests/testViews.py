@@ -1,6 +1,7 @@
 from django import test
 from TAScheduler import views
 
+
 class TestDisplayCourseGetContext(test.TestCase):
     def setUp(self):
         self.view = views.DisplayCourse()

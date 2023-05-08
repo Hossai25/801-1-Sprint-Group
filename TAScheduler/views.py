@@ -177,10 +177,8 @@ class Dashboard(View):
         :return: If the user is not logged in, redirect the user to the login page.
             Else return a render of the dashboard.
         """
-        # TODO: get rid of this check? (and update the docstring)
         if "email" not in request.session:
             return redirect('/', {"email": "", "account_type": ""})
-        # TODO: get rid of this check?
         user = account.get_account(request.session["email"])
         if user is None:
             return redirect('/', {"email": "", "account_type": ""})
@@ -217,7 +215,7 @@ class DisplayCourse(View):
     error_duplicateinstructor = "Instructor is already in this course"
 
     def get_context(self, request, course_id):
-        # TODO: I need to write unit tests for this!
+        # TODO: unit tests
         course_obj = course.get_course_by_id(course_id)
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
@@ -226,7 +224,9 @@ class DisplayCourse(View):
             course_ta.grader_status = course_ta.get_grader_status(course_id)
             course_ta.number_sections = course_ta.get_number_sections(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
-        sections = []  # TODO: call method to get actual lab list
+        sections = section.section_list(course_id)
+        for section_obj in sections:
+            section_obj.ta = ta.get_section_ta(section_obj.get_primary_key)
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         context = {"email": request.session["email"],
@@ -278,6 +278,10 @@ def deleteCourseTa(request, course_id, user_id):
     return redirect(f"/courses/view/{course_id}/")
 
 
+def deleteSection(request, course_id, section_id):
+    section.delete_section(section_id)
+    return redirect(f"/courses/view/{course_id}")
+
 class EditAccount(View):
     def get(self, request, user_id):
         """
@@ -323,6 +327,22 @@ class EditCourseTa(View):
         course_obj = course.get_course_by_id(course_id)
         selected_ta.set_grader_status(course_id, request.POST.get('is_grader'))
         selected_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
+        return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
+
+
+class EditSection(View):
+    def get(self, request, course_id, section_id):
+        selected_section = section.get_section_by_id(section_id)
+        course_obj = course.get_course_by_id(course_id)
+        return render(request, "editSection.html", {"email": request.session["email"],
+                                                    "account_type": request.session["account_type"],
+                                                    'selected_section': selected_section,
+                                                    'course': course_obj})
+
+    def post(self, request, course_id, section_id):
+        selected_section = section.get_section_by_id(section_id)
+        course_obj = course.get_course_by_id(course_id)
+        # process and validate form, update database
         return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
 
 
