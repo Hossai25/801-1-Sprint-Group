@@ -213,6 +213,7 @@ class Database(View):
 class DisplayCourse(View):
     error_duplicateta = "TA is already in this course"
     error_duplicateinstructor = "Instructor is already in this course"
+    error_duplicatecourse = "A section with this name already exists"
 
     def get_context(self, request, course_id):
         # TODO: unit tests
@@ -225,8 +226,9 @@ class DisplayCourse(View):
             course_ta.number_sections = course_ta.get_number_sections(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
         sections = section.section_list(course_id)
-        for section_obj in sections:
-            section_obj.ta = ta.get_section_ta(section_obj.get_primary_key)
+        # TODO uncomment once section.section_list(course_id) is implemented
+        #for section_obj in sections:
+        #    section_obj.ta = ta.get_section_ta(section_obj.get_primary_key)
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         context = {"email": request.session["email"],
@@ -269,6 +271,14 @@ class DisplayCourse(View):
                 return render(request, "displayCourse.html", context)
             else:
                 context["course_instructor"] = new_instructor
+        elif 'submitSection' in request.POST:
+            section_name = request.POST.get('section_name')
+            new_section = section.create_section(section_name, context.get('course'))
+            if new_section is None:
+                context["error_section"] = DisplayCourse.error_duplicatecourse
+            elif 'ta' in request.POST and request.POST.get('ta') != 'None':
+                new_section_ta = ta.account_to_ta(request.POST.get('ta'))
+                new_section_ta.add_to_section(new_section.get_primary_key())
         return render(request, "displayCourse.html", context)
 
 
