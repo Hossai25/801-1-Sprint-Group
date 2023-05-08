@@ -16,6 +16,10 @@
                 {% if user != "" %}
                 <a class="container-fluid text-light bg-dark" href="{% url 'editAccount' user_id=user%}">Change Personal Info</a>
                 {% endif %}
+                {% if email and email != "" %}
+                        <!-- changes to this element require acceptance tests to be updated! -->
+                <a class="btn btn-primary" href="{% url 'dashboard' %}">Back to Dashboard</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -26,12 +30,6 @@
         {% endblock %}
     </div>
 </body>
-<footer class="fixed-bottom">
-    {% if email and email != "" %}
-        <div class="container-fluid p-3">
-            <!-- changes to this element require acceptance tests to be updated! -->
-            <a class="btn btn-primary" href="{% url 'dashboard' %}">Back to Dashboard</a>
-        </div>
-    {% endif %}
+<footer>
 </footer>
 </html>
