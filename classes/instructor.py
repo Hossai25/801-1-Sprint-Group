@@ -1,4 +1,4 @@
-from classes import account
+from classes import account, course
 from classes.account import Account
 from TAScheduler.models import User as UserModel, Course as CourseModel
 
@@ -31,7 +31,9 @@ class Instructor(Account):
         self.account = account
 
     def get_courses(self):
-        pass
+        courses = CourseModel.objects.filter(instructor_id=self.user_model)
+        course_objects = [course.Course(course_model) for course_model in courses]
+        return course_objects
 
     def add_to_course(self, course_id: int):
         try:
@@ -46,4 +48,14 @@ class Instructor(Account):
             return False
 
     def remove_from_course(self, course_id: int):
-        pass
+        try:
+            course = CourseModel.objects.get(id=course_id)
+            instructor = UserModel.objects.get(id=self.get_primary_key())
+            if course.instructor_id == instructor:
+                course.instructor_id = None
+                course.save()
+                return True
+            else:
+                return False
+        except CourseModel.DoesNotExist:
+            return False
