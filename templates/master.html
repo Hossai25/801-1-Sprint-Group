@@ -12,7 +12,11 @@
     <div class="container-fluid text-light bg-dark p-3">
         <div class="row justify-content-between">
             <div class="col-6 col-md-3 align-self-start">UWM TA Scheduler</div>
-            <div class="col-auto">DEBUG | email: {{ email }} | type: {{ account_type }}</div>
+            <div class="col-auto">DEBUG | email: {{ email }} | type: {{ account_type }}
+                {% if user != "" %}
+                <a class="container-fluid text-light bg-dark" href="{% url 'editAccount' user_id=user%}">Change Personal Info</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </header>
