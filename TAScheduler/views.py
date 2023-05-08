@@ -89,17 +89,20 @@ class CreateAccount(View):
         for key in ('email', 'password', 'account_type', 'first_name', 'last_name'):
             if key not in request.POST or request.POST[key] == '':
                 return render(request, "createAccount.html",
-                              {"email": request.session["email"], "account_type": request.session["account_type"],"user": request.session["user"],
+                              {"email": request.session["email"], "account_type": request.session["account_type"],
+                               "user": request.session["user"],
                                "error_message": "Error creating the account. A user with this email may already exist."})
 
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", request.POST['email']):
             return render(request, "createAccount.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"], "user": request.session["user"],
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": "Error creating the account. A user with this email may already exist."})
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
             return render(request, "createAccount.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"], "user": request.session["user"],
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": "Error creating the account. A user with this email may already exist."})
         return redirect('/accounts/', {"email": request.session["email"],
                                        "account_type": request.session["account_type"]})
@@ -134,7 +137,8 @@ class CreateCourse(View):
         created_course = course.create_course(request.POST["course_name"])
         if created_course is None:
             return render(request, "createCourse.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"], "user": request.session["user"],
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": "Error creating the course."})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"],
@@ -161,14 +165,16 @@ class CreateLab(View):
         course_object = course.get_course_by_id(course_id)
         if course_object is None:
             return render(request, "createLab.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"], "user": request.session["user"],
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": CreateLab.error_no_course})
         else:
             lab_name = request.POST.get('lab_name')
             created_lab = section.create_section(lab_name, course_object)
         if created_lab is None:
             return render(request, "createLab.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"], "user": request.session["user"],
+                          {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": CreateLab.error_duplicate})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"],
@@ -236,8 +242,8 @@ class DisplayCourse(View):
         course_instructor = instructor.get_course_instructor(course_id)
         sections = section.section_list(course_id)
         # TODO uncomment once section.section_list(course_id) is implemented
-        #for section_obj in sections:
-        #    section_obj.ta = ta.get_section_ta(section_obj.get_primary_key)
+        for section_obj in sections:
+            section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         context = {"email": request.session["email"],
@@ -289,6 +295,10 @@ class DisplayCourse(View):
             elif 'ta' in request.POST and request.POST.get('ta') != 'None':
                 new_section_ta = ta.account_to_ta(request.POST.get('ta'))
                 new_section_ta.add_to_section(new_section.get_primary_key())
+            sections = section.section_list(course_id)
+            for section_obj in sections:
+                section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
+            context["sections"] = sections
         return render(request, "displayCourse.html", context)
 
 
@@ -301,6 +311,7 @@ def deleteCourseTa(request, course_id, user_id):
 def deleteSection(request, course_id, section_id):
     section.delete_section(section_id)
     return redirect(f"/courses/view/{course_id}")
+
 
 class EditAccount(View):
     def get(self, request, user_id):
@@ -409,7 +420,8 @@ class LoginPage(View):
                                             "user": request.session["user"]})
         else:
             return render(request, "loginPage.html",
-                          {"email": "", "account_type": "", "user": "", "login_error_message": "Invalid username or password."})
+                          {"email": "", "account_type": "", "user": "",
+                           "login_error_message": "Invalid username or password."})
 
 
 class Notifications(View):

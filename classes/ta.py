@@ -19,7 +19,9 @@ def get_course_tas(course_id: int):
 def get_section_ta(section_id: int):
     section_model = LabModel.objects.get(id=section_id)
     ta_id = section_model.ta_id
-    ta = Ta(Account(ta_id))
+    if ta_id is None:
+        return None
+    ta = account_to_ta(ta_id.id)
     return ta
 
 

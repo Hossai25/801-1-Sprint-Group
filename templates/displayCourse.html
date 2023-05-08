@@ -12,8 +12,8 @@
 <form action="{% url 'displayCourse' course.get_primary_key %}" method="post">
     {% csrf_token %}
 <div class="table-container">
-    <h2>{{ course.get_course_name }}</h2>
-    <h4>{{ course_instructor.get_first_name }} {{ course_instructor.get_last_name }}</h4>
+    <h2>Course: {{ course.get_course_name }}</h2>
+    <h4>Instructor: {{ course_instructor.get_first_name }} {{ course_instructor.get_last_name }}</h4>
     <h7>
         <div class="input-group" style="width: 500px">
             <select name="instructor_id" class="form-select">
@@ -29,7 +29,10 @@
         </div>
     </h7>
     <div class="text-danger">{{ error_instructor }}</div>
-<table class="my-table mt-4">
+</div>
+    <div class = "table-container">
+        <h3>TAs</h3>
+<table class="my-table">
     <thead>
         <tr>
             <th>TA name</th>
@@ -80,7 +83,7 @@
             </tr>
     </tfoot>
 </table>
-</div>
+    </div>
 </form>
 <div class="text-danger">{{ error_ta }}</div>
 
