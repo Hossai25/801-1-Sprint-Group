@@ -22,13 +22,13 @@
             <input type="text" class="form-control" id="last_name" name="last_name" required value="{{ account.get_last_name }}">
         </div>
     </div>
+    {% endif %}
     <div class="row">
         <label for="office_hours" class="col-sm-3 col-form-label">Office Hours</label>
         <div class="col-sm-9">
             <input type="office_hours" class="form-control" id="office_hours" name="office_hours" required value="{{ account.get_office_hours }}">
         </div>
     </div>
-    {% endif %}
     <div class="row">
         <label for="address" class="col-sm-3 col-form-label">Address</label>
         <div class="col-sm-9">
