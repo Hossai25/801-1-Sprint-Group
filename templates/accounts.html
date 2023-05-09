@@ -25,6 +25,7 @@
     </thead>
     <tbody>
         {% for account in accounts %}
+        {% if account.get_primary_key != current_account.get_primary_key %}
             <tr>
                 <td>{{ account.get_email }}</td>
                 <td>{{ account.get_first_name }}</td>
@@ -41,6 +42,7 @@
                     </a>
                 </td>
             </tr>
+        {% endif %}
         {% endfor %}
     </tbody>
 </table>
