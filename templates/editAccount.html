@@ -9,6 +9,7 @@
 <form action="{% url 'editAccount' account.get_primary_key %}" method="post">
     <h2>{{ account.get_email }}</h2>
     {% csrf_token %}
+    {% if account_type == "admin" %}
     <div class="row">
         <label for="first_name" class="col-sm-3 col-form-label">First Name</label>
         <div class="col-sm-9">
@@ -27,6 +28,7 @@
             <input type="office_hours" class="form-control" id="office_hours" name="office_hours" required value="{{ account.get_office_hours }}">
         </div>
     </div>
+    {% endif %}
     <div class="row">
         <label for="address" class="col-sm-3 col-form-label">Address</label>
         <div class="col-sm-9">
