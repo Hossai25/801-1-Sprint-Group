@@ -157,28 +157,29 @@ class CreateLab(View):
                                                   "account_type": request.session["account_type"],
                                                   "user": request.session["user"],
                                                   'courses': courses})
-
-    def post(self, request):
-        if "account_type" not in request.session:
-            request.session["account_type"] = ""
-        course_id = request.POST.get('course_id')
-        course_object = course.get_course_by_id(course_id)
-        if course_object is None:
-            return render(request, "createLab.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "user": request.session["user"],
-                           "error_message": CreateLab.error_no_course})
-        else:
-            lab_name = request.POST.get('lab_name')
-            created_lab = section.create_section(lab_name, course_object)
-        if created_lab is None:
-            return render(request, "createLab.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "user": request.session["user"],
-                           "error_message": CreateLab.error_duplicate})
-        return redirect('/courses/', {"email": request.session["email"],
-                                      "account_type": request.session["account_type"],
-                                      "user": request.session["user"]})
+    #
+    #
+    # def post(self, request):
+    #     if "account_type" not in request.session:
+    #         request.session["account_type"] = ""
+    #     course_id = request.POST.get('course_id')
+    #     course_object = course.get_course_by_id(course_id)
+    #     if course_object is None:
+    #         return render(request, "createLab.html",
+    #                       {"email": request.session["email"], "account_type": request.session["account_type"],
+    #                        "user": request.session["user"],
+    #                        "error_message": CreateLab.error_no_course})
+    #     else:
+    #         lab_name = request.POST.get('lab_name')
+    #         created_lab = section.create_section(lab_name, course_object)
+    #     if created_lab is None:
+    #         return render(request, "createLab.html",
+    #                       {"email": request.session["email"], "account_type": request.session["account_type"],
+    #                        "user": request.session["user"],
+    #                        "error_message": CreateLab.error_duplicate})
+    #     return redirect('/courses/', {"email": request.session["email"],
+    #                                   "account_type": request.session["account_type"],
+    #                                   "user": request.session["user"]})
 
 
 class Dashboard(View):
@@ -205,21 +206,21 @@ class Dashboard(View):
 
     def post(self, request):
         pass
-
-
-class Database(View):
-    def get(self, request):
-        """
-        Get method for the Database view.
-        :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
-            and request.session["account_type"] contains the account's type.
-        :return: a render of the dashboard.
-        """
-        if "account_type" not in request.session:
-            request.session["account_type"] = ""
-        return render(request, "database.html", {"email": request.session["email"],
-                                                 "account_type": request.session["account_type"],
-                                                 "user": request.session["user"]})
+#
+#
+# class Database(View):
+#     def get(self, request):
+#         """
+#         Get method for the Database view.
+#         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
+#             and request.session["account_type"] contains the account's type.
+#         :return: a render of the dashboard.
+#         """
+#         if "account_type" not in request.session:
+#             request.session["account_type"] = ""
+#         return render(request, "database.html", {"email": request.session["email"],
+#                                                  "account_type": request.session["account_type"],
+#                                                  "user": request.session["user"]})
 
     def post(self, request):
         pass
@@ -228,7 +229,7 @@ class Database(View):
 class DisplayCourse(View):
     error_duplicateta = "TA is already in this course"
     error_duplicateinstructor = "Instructor is already in this course"
-    error_duplicatecourse = "A section with this name already exists"
+    error_duplicatesection = "A section with this name already exists"
 
     def get_context(self, request, course_id):
         # TODO: unit tests
@@ -291,7 +292,7 @@ class DisplayCourse(View):
             section_name = request.POST.get('section_name')
             new_section = section.create_section(section_name, context.get('course'))
             if new_section is None:
-                context["error_section"] = DisplayCourse.error_duplicatecourse
+                context["error_section"] = DisplayCourse.error_duplicatesection
             elif 'ta' in request.POST and request.POST.get('ta') != 'None':
                 new_section_ta = ta.account_to_ta(request.POST.get('ta'))
                 new_section_ta.add_to_section(new_section.get_primary_key())
@@ -412,9 +413,10 @@ class LoginPage(View):
         password_attempt = request.POST["password"]
 
         if account.valid_login(email_attempt, password_attempt):
-            request.session["email"] = email_attempt
-            request.session["account_type"] = account.get_account(email_attempt).get_account_type()
-            request.session["user"] = account.get_user_model(email_attempt).id
+            user = account.get_account(email_attempt)
+            request.session["email"] = user.get_email()
+            request.session["account_type"] = user.get_account_type()
+            request.session["user"] = user.get_primary_key()
             return redirect('/dashboard/', {"email": request.session["email"],
                                             "account_type": request.session["account_type"],
                                             "user": request.session["user"]})
