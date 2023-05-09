@@ -20,6 +20,7 @@ class Accounts(View):
             request.session["account_type"] = ""
         return render(request, "accounts.html", {"email": request.session["email"],
                                                  "account_type": request.session["account_type"],
+                                                 "user": request.session["user"],
                                                  'accounts': accounts})
 
     def post(self, request):
@@ -44,6 +45,7 @@ class Courses(View):
             request.session["account_type"] = ""
         return render(request, "courses.html", {"email": request.session["email"],
                                                 "account_type": request.session["account_type"],
+                                                "user": request.session["user"],
                                                 'courses': courses})
 
     def post(self, request):
@@ -66,7 +68,8 @@ class CreateAccount(View):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "createAccount.html", {"email": request.session["email"],
-                                                      "account_type": request.session["account_type"]})
+                                                      "account_type": request.session["account_type"],
+                                                      "user": request.session["user"]})
 
     def post(self, request):
         """
@@ -87,17 +90,19 @@ class CreateAccount(View):
             if key not in request.POST or request.POST[key] == '':
                 return render(request, "createAccount.html",
                               {"email": request.session["email"], "account_type": request.session["account_type"],
+                               "user": request.session["user"],
                                "error_message": "Error creating the account. A user with this email may already exist."})
 
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", request.POST['email']):
             return render(request, "createAccount.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": "Error creating the account. A user with this email may already exist."})
-
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
             return render(request, "createAccount.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": "Error creating the account. A user with this email may already exist."})
         return redirect('/accounts/', {"email": request.session["email"],
                                        "account_type": request.session["account_type"]})
@@ -116,7 +121,8 @@ class CreateCourse(View):
             request.session["account_type"] = ""
 
         return render(request, "createCourse.html", {"email": request.session["email"],
-                                                     "account_type": request.session["account_type"]})
+                                                     "account_type": request.session["account_type"],
+                                                     "user": request.session["user"]})
 
     def post(self, request):
         if "account_type" not in request.session:
@@ -125,15 +131,18 @@ class CreateCourse(View):
         if key not in request.POST or request.POST[key] == '':
             return render(request, "createCourse.html", {"email": request.session["email"],
                                                          "account_type": request.session["account_type"],
+                                                         "user": request.session["user"],
                                                          "error_message": "Error creating the course."})
 
         created_course = course.create_course(request.POST["course_name"])
         if created_course is None:
             return render(request, "createCourse.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": "Error creating the course."})
         return redirect('/courses/', {"email": request.session["email"],
-                                      "account_type": request.session["account_type"]})
+                                      "account_type": request.session["account_type"],
+                                      "user": request.session["user"]})
 
 
 class CreateLab(View):
@@ -146,6 +155,7 @@ class CreateLab(View):
         courses = course.course_list()
         return render(request, "createLab.html", {"email": request.session["email"],
                                                   "account_type": request.session["account_type"],
+                                                  "user": request.session["user"],
                                                   'courses': courses})
 
     def post(self, request):
@@ -156,6 +166,7 @@ class CreateLab(View):
         if course_object is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": CreateLab.error_no_course})
         else:
             lab_name = request.POST.get('lab_name')
@@ -163,9 +174,11 @@ class CreateLab(View):
         if created_lab is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
+                           "user": request.session["user"],
                            "error_message": CreateLab.error_duplicate})
         return redirect('/courses/', {"email": request.session["email"],
-                                      "account_type": request.session["account_type"]})
+                                      "account_type": request.session["account_type"],
+                                      "user": request.session["user"]})
 
 
 class Dashboard(View):
@@ -177,10 +190,8 @@ class Dashboard(View):
         :return: If the user is not logged in, redirect the user to the login page.
             Else return a render of the dashboard.
         """
-        # TODO: get rid of this check? (and update the docstring)
         if "email" not in request.session:
             return redirect('/', {"email": "", "account_type": ""})
-        # TODO: get rid of this check?
         user = account.get_account(request.session["email"])
         if user is None:
             return redirect('/', {"email": "", "account_type": ""})
@@ -189,7 +200,8 @@ class Dashboard(View):
             request.session["account_type"] = ""
 
         return render(request, "dashboard.html", {"email": request.session["email"],
-                                                  "account_type": request.session["account_type"]})
+                                                  "account_type": request.session["account_type"],
+                                                  "user": request.session["user"]})
 
     def post(self, request):
         pass
@@ -206,7 +218,8 @@ class Database(View):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "database.html", {"email": request.session["email"],
-                                                 "account_type": request.session["account_type"]})
+                                                 "account_type": request.session["account_type"],
+                                                 "user": request.session["user"]})
 
     def post(self, request):
         pass
@@ -215,9 +228,10 @@ class Database(View):
 class DisplayCourse(View):
     error_duplicateta = "TA is already in this course"
     error_duplicateinstructor = "Instructor is already in this course"
+    error_duplicatecourse = "A section with this name already exists"
 
     def get_context(self, request, course_id):
-        # TODO: I need to write unit tests for this!
+        # TODO: unit tests
         course_obj = course.get_course_by_id(course_id)
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
@@ -226,11 +240,15 @@ class DisplayCourse(View):
             course_ta.grader_status = course_ta.get_grader_status(course_id)
             course_ta.number_sections = course_ta.get_number_sections(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
-        sections = []  # TODO: call method to get actual lab list
+        sections = section.section_list(course_id)
+        # TODO uncomment once section.section_list(course_id) is implemented
+        for section_obj in sections:
+            section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         context = {"email": request.session["email"],
                    "account_type": request.session["account_type"],
+                   "user": request.session["user"],
                    'course': course_obj,
                    'course_tas': course_tas,
                    'course_instructor': course_instructor,
@@ -269,6 +287,18 @@ class DisplayCourse(View):
                 return render(request, "displayCourse.html", context)
             else:
                 context["course_instructor"] = new_instructor
+        elif 'submitSection' in request.POST:
+            section_name = request.POST.get('section_name')
+            new_section = section.create_section(section_name, context.get('course'))
+            if new_section is None:
+                context["error_section"] = DisplayCourse.error_duplicatecourse
+            elif 'ta' in request.POST and request.POST.get('ta') != 'None':
+                new_section_ta = ta.account_to_ta(request.POST.get('ta'))
+                new_section_ta.add_to_section(new_section.get_primary_key())
+            sections = section.section_list(course_id)
+            for section_obj in sections:
+                section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
+            context["sections"] = sections
         return render(request, "displayCourse.html", context)
 
 
@@ -276,6 +306,11 @@ def deleteCourseTa(request, course_id, user_id):
     ta_obj = ta.account_to_ta(user_id)
     ta_obj.remove_from_course(course_id)
     return redirect(f"/courses/view/{course_id}/")
+
+
+def deleteSection(request, course_id, section_id):
+    section.delete_section(section_id)
+    return redirect(f"/courses/view/{course_id}")
 
 
 class EditAccount(View):
@@ -291,6 +326,7 @@ class EditAccount(View):
             request.session["account_type"] = ""
         return render(request, "editAccount.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"],
+                                                    "user": request.session["user"],
                                                     'account': userView})
 
     def post(self, request, user_id):
@@ -313,8 +349,11 @@ class EditCourseTa(View):
         course_obj = course.get_course_by_id(course_id)
         if "account_type" not in request.session:
             request.session["account_type"] = ""
+        selected_ta.grader_status = selected_ta.get_grader_status(course_id)
+        selected_ta.number_sections = selected_ta.get_number_sections(course_id)
         return render(request, "editCourseTa.html", {"email": request.session["email"],
                                                      "account_type": request.session["account_type"],
+                                                     "user": request.session["user"],
                                                      'selected_ta': selected_ta,
                                                      'course': course_obj})
 
@@ -323,6 +362,23 @@ class EditCourseTa(View):
         course_obj = course.get_course_by_id(course_id)
         selected_ta.set_grader_status(course_id, request.POST.get('is_grader'))
         selected_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
+        return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
+
+
+class EditSection(View):
+    def get(self, request, course_id, section_id):
+        selected_section = section.get_section_by_id(section_id)
+        course_obj = course.get_course_by_id(course_id)
+        return render(request, "editSection.html", {"email": request.session["email"],
+                                                    "account_type": request.session["account_type"],
+                                                    "user": request.session["user"],
+                                                    'selected_section': selected_section,
+                                                    'course': course_obj})
+
+    def post(self, request, course_id, section_id):
+        selected_section = section.get_section_by_id(section_id)
+        course_obj = course.get_course_by_id(course_id)
+        # process and validate form, update database
         return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
 
 
@@ -335,7 +391,7 @@ class LoginPage(View):
         """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
-        return render(request, "loginPage.html", {"email": "", "account_type": ""})
+        return render(request, "loginPage.html", {"email": "", "account_type": "", "user": ""})
 
     def post(self, request):
         """
@@ -358,11 +414,14 @@ class LoginPage(View):
         if account.valid_login(email_attempt, password_attempt):
             request.session["email"] = email_attempt
             request.session["account_type"] = account.get_account(email_attempt).get_account_type()
+            request.session["user"] = account.get_user_model(email_attempt).id
             return redirect('/dashboard/', {"email": request.session["email"],
-                                            "account_type": request.session["account_type"]})
+                                            "account_type": request.session["account_type"],
+                                            "user": request.session["user"]})
         else:
             return render(request, "loginPage.html",
-                          {"email": "", "account_type": "", "login_error_message": "Invalid username or password."})
+                          {"email": "", "account_type": "", "user": "",
+                           "login_error_message": "Invalid username or password."})
 
 
 class Notifications(View):
@@ -376,7 +435,8 @@ class Notifications(View):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "notifications.html", {"email": request.session["email"],
-                                                      "account_type": request.session["account_type"]})
+                                                      "account_type": request.session["account_type"],
+                                                      "user": request.session["user"]})
 
     def post(self, request):
         pass

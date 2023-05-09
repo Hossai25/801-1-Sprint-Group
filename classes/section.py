@@ -29,8 +29,19 @@ def __has_required_fields(data: Dict[str, any]):
     return required_fields.issubset(data.keys())
 
 
+def get_section_by_id(lab_id):
+    try:
+        lab_model = LabModel.objects.get(id=lab_id)
+        lab_object = Section(lab_model)
+        return lab_object
+    except LabModel.DoesNotExist:
+        return None
+
+
 def section_list(course_id):
-    pass
+    sections = LabModel.objects.filter(course_id=course_id)
+    section_objects = [Section(lab_model) for lab_model in sections]
+    return section_objects
 
 
 class Section:
