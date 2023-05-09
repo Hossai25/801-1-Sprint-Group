@@ -111,9 +111,11 @@ class Accounts(TestCase):
     webpage = None
     users = None
 
+
     def setUp(self):
         self.webpage = Client()
         self.users = ["test1", "test2"]
+        self.account_objs = []
 
         # Fill test database with users
         for i in self.users:
@@ -123,6 +125,7 @@ class Accounts(TestCase):
             temp2.save()
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
+            self.account_objs.append(temp)
 
     #This test checks to see that if the create account button is pressed it brings the user to the
     # right page
@@ -141,8 +144,8 @@ class Accounts(TestCase):
         session["email"] = "test1@uwm.edu"
         session.save()
         resp = self.webpage.get(reverse('accounts'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
-                            html=True)
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s"><img src="/static/TAScheduler/icons/edit.svg"></a>' % reverse('editAccount',
+                            kwargs={'user_id': self.account_objs[1].pk}), html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
     # the right page
@@ -459,6 +462,7 @@ class DeleteAccount(TestCase):
     def setUp(self):
         self.webpage = Client()
         self.users = ["test1", "test2"]
+        self.account_objs = []
 
         # Fill test database with users
         for i in self.users:
@@ -468,6 +472,7 @@ class DeleteAccount(TestCase):
             temp2.save()
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
+            self.account_objs.append(temp)
 
         #Instructor User
         newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
@@ -526,6 +531,7 @@ class DeleteAccount(TestCase):
         temp3.save()
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
         self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
+
 class DeleteCourse(TestCase):
     webpage = None
     users = None
@@ -610,4 +616,99 @@ class DeleteCourse(TestCase):
         testcourse = CourseModel.objects.create(course_name="test_course")
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
         self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+
+    def test_backToHomepage(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('deleteCourse'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                            html=True)
+
+
+class EditAccount(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+
+    def test_checkSuccessful(self):
+        pass
+
+    def test_editFirstNameFail(self):
+        pass
+
+    def test_editLastNameFail(self):
+        pass
+
+    def test_editPasswordFail(self):
+        pass
+
+    def test_toHomepage(self):
+        pass
+
+    def test_accountUpdatedInDatabase(self):
+        pass
+
+class DisplayCourse(TestCase):
+    webpage = None
+    users = None
+    courses = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1"]
+        self.courses = ["Course1", "Course2"]
+        self.course_objs = []
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            for j in self.courses:
+                temp_model = Course(course_name=i, instructor_id=temp)
+                self.course_objs.append(temp_model)
+                temp_model.save()
+
+                # Instructor User
+            newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
+            newUser.save()
+            newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
+            newUser2.save()
+            newUser3 = PrivateInfo(user_id=newUser)
+            newUser3.save()
+
+            # TA User
+            newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
+            newta.save()
+            newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
+            newta2.save()
+            newta3 = PrivateInfo(user_id=newta)
+            newta3.save()
+    def test_backToHomepage(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                            html=True)
+
+    def test_displaysAllCourses(self):
+        pass
 

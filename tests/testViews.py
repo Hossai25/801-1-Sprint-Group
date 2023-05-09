@@ -1,3 +1,5 @@
+import unittest
+
 from django.test import TestCase
 from TAScheduler import views
 
@@ -6,6 +8,7 @@ class TestDisplayCourseGetContext(TestCase):
         pass
 
     def test_method_exists(self):
+        pass
 
 
 

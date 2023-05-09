@@ -3,7 +3,7 @@ from TAScheduler.models import User, PublicInfo, PrivateInfo
 from typing import Dict
 from unittest.mock import patch, MagicMock
 
-from classes.account import create_account, delete_account
+from classes.account import create_account, delete_account, edit_account, Account
 
 
 class TestCreateAccount(TestCase):
@@ -56,6 +56,72 @@ class TestCreateAccount(TestCase):
         result = create_account(data)
         self.assertIsNone(result)
         mock_user_create.assert_called_once_with(email='test@example.com', password='password123', account_type='T')
+
+class TestEditAccount(TestCase):
+    def test_selectedUserDoesNotExist(self):
+        self.assertEqual(None, edit_account(0, {"first_name":"No", "last_name": "User", "address": "123 New Street", "phone_number":1234567890, "office_hours": "MW 2-4pm"}))
+
+    def test_successfulEdit(self):
+        newUser=User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertIsInstance(edit_account(newUser.pk, {"first_name": "New", "last_name": "User", "address": "123 Street", "phone_number": 1234567890, "office_hours": "None"}), Account)
+
+    def test_illegalFirstName(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "", "last_name": "User", "address": "123 Street",
+                                            "phone_number": 1234567890, "office_hours": "None"}), None)
+
+    def test_illegalLastName(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "New", "last_name": "", "address": "123 Street",
+                                            "phone_number": 1234567890, "office_hours": "None"}), None)
+
+    def test_illegalAddress(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "New", "last_name": "User", "address": "",
+                                            "phone_number": 1234567890, "office_hours": "None"}), None)
+
+    def test_noPhoneNumber(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "New", "last_name": "User", "address": "123 Street",
+                                            "phone_number": "", "office_hours": "None"}), None)
+
+    def test_tooLongPhoneNumber(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "New", "last_name": "User", "address": "123 Street",
+                                            "phone_number": 12345678900, "office_hours": "None"}), None)
+
+    def test_tooShortPhoneNumber(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "New", "last_name": "User", "address": "123 Street",
+                                            "phone_number": 123456789, "office_hours": "None"}), None)
+
+    def test_illegalOfficeHours(self):
+        newUser = User.objects.create(email="newuser@uwm.edu")
+        PublicInfo.objects.create(first_name="test", user_id=newUser)
+        PrivateInfo.objects.create(address="test", user_id=newUser)
+        self.assertEqual(edit_account(newUser.pk,
+                                           {"first_name": "New", "last_name": "User", "address": "123 Street",
+                                            "phone_number": 1234567890, "office_hours": ""}), None)
 
 
 class TestDeleteAccount(TestCase):
