@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from classes import account, section, course
+from classes import account, section, course, ta, instructor
 from django.urls import reverse
-import re   # regular expressions for parsing strings
+import re  # regular expressions for parsing strings
+
+from classes.course import Course
 
 
 class Accounts(View):
@@ -46,6 +48,11 @@ class Courses(View):
 
     def post(self, request):
         pass
+
+
+def deleteCourse(request, course_id):
+    course.delete_course(course_id)
+    return redirect("/courses/")
 
 
 class CreateAccount(View):
@@ -112,11 +119,6 @@ class CreateCourse(View):
                                                      "account_type": request.session["account_type"]})
 
     def post(self, request):
-        """
-        Post method for the CreateCourse view.
-        :param request: TODO
-        :return: TODO
-        """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         key = 'course_name'
@@ -135,12 +137,10 @@ class CreateCourse(View):
 
 
 class CreateLab(View):
+    error_duplicate = "Section name blank or already exists."
+    error_no_course = "Course not found."
+
     def get(self, request):
-        """
-        TODO
-        :param request: TODO
-        :return: TODO
-        """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         courses = course.course_list()
@@ -149,11 +149,6 @@ class CreateLab(View):
                                                   'courses': courses})
 
     def post(self, request):
-        """
-        TODO
-        :param request: TODO
-        :return: TODO
-        """
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         course_id = request.POST.get('course_id')
@@ -161,14 +156,14 @@ class CreateLab(View):
         if course_object is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Course not found."})
+                           "error_message": CreateLab.error_no_course})
         else:
             lab_name = request.POST.get('lab_name')
             created_lab = section.create_section(lab_name, course_object)
         if created_lab is None:
             return render(request, "createLab.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "error_message": "Class ID or TA ID does not exist"})
+                           "error_message": CreateLab.error_duplicate})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"]})
 
@@ -217,21 +212,118 @@ class Database(View):
         pass
 
 
+class DisplayCourse(View):
+    error_duplicateta = "TA is already in this course"
+    error_duplicateinstructor = "Instructor is already in this course"
+
+    def get_context(self, request, course_id):
+        # TODO: I need to write unit tests for this!
+        course_obj = course.get_course_by_id(course_id)
+        ta_list = ta.get_all_tas()
+        instructor_list = instructor.get_all_instructors()
+        course_tas = ta.get_course_tas(course_id)
+        for course_ta in course_tas:
+            course_ta.grader_status = course_ta.get_grader_status(course_id)
+            course_ta.number_sections = course_ta.get_number_sections(course_id)
+        course_instructor = instructor.get_course_instructor(course_id)
+        sections = []  # TODO: call method to get actual lab list
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        context = {"email": request.session["email"],
+                   "account_type": request.session["account_type"],
+                   'course': course_obj,
+                   'course_tas': course_tas,
+                   'course_instructor': course_instructor,
+                   'ta_list': ta_list,
+                   'instructor_list': instructor_list,
+                   "sections": sections}
+        return context
+
+    def get(self, request, course_id):
+        context = self.get_context(request, course_id)
+        return render(request, "displayCourse.html", context)
+
+    def post(self, request, course_id):
+        context = self.get_context(request, course_id)
+        if 'submitTa' in request.POST:
+            new_user = account.get_account_by_id(request.POST.get('ta_id'))
+            new_ta = ta.Ta(new_user)
+            new_course_ta = new_ta.add_to_course(course_id)
+            if new_course_ta is None:
+                context["error_ta"] = DisplayCourse.error_duplicateta
+                return render(request, "displayCourse.html", context)
+            else:
+                new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
+                new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
+                course_tas = ta.get_course_tas(course_id)
+                for course_ta in course_tas:
+                    course_ta.grader_status = course_ta.get_grader_status(course_id)
+                    course_ta.number_sections = course_ta.get_number_sections(course_id)
+                context["course_tas"] = course_tas
+        elif 'submitInstructor' in request.POST:
+            new_user = account.get_account_by_id(request.POST.get('instructor_id'))
+            new_instructor = instructor.Instructor(new_user)
+            new_course_instructor = new_instructor.add_to_course(course_id)
+            if new_course_instructor is None:
+                context["error_instructor"] = DisplayCourse.error_duplicateinstructor
+                return render(request, "displayCourse.html", context)
+            else:
+                context["course_instructor"] = new_instructor
+        return render(request, "displayCourse.html", context)
+
+
+def deleteCourseTa(request, course_id, user_id):
+    ta_obj = ta.account_to_ta(user_id)
+    ta_obj.remove_from_course(course_id)
+    return redirect(f"/courses/view/{course_id}/")
+
+
 class EditAccount(View):
-    def get(self, request):
+    def get(self, request, user_id):
         """
         Get method for the EditAccount view.
         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
             and request.session["account_type"] contains the account's type.
         :return: a render of the editAccount page.
         """
+        userView = account.get_account_by_id(user_id)
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "editAccount.html", {"email": request.session["email"],
-                                                    "account_type": request.session["account_type"]})
+                                                    "account_type": request.session["account_type"],
+                                                    'account': userView})
 
-    def post(self, request):
-        pass
+    def post(self, request, user_id):
+        userView = account.get_account_by_id(user_id)
+        edited_account = account.edit_account(user_id, request.POST.dict())
+        accounts = account.account_list()
+
+        return redirect(reverse('accounts'))
+
+
+class EditCourseTa(View):
+    def get(self, request, course_id, user_id):
+        """
+        Get method for the EditCourseTa view.
+        :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
+            and request.session["account_type"] contains the account's type.
+        :return: a render of the EditCourseTa page.
+        """
+        selected_ta = ta.account_to_ta(user_id)
+        course_obj = course.get_course_by_id(course_id)
+        if "account_type" not in request.session:
+            request.session["account_type"] = ""
+        return render(request, "editCourseTa.html", {"email": request.session["email"],
+                                                     "account_type": request.session["account_type"],
+                                                     'selected_ta': selected_ta,
+                                                     'course': course_obj})
+
+    def post(self, request, course_id, user_id):
+        selected_ta = ta.account_to_ta(user_id)
+        course_obj = course.get_course_by_id(course_id)
+        selected_ta.set_grader_status(course_id, request.POST.get('is_grader'))
+        selected_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
+        return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
 
 
 class LoginPage(View):
