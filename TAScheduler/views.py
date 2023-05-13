@@ -265,8 +265,7 @@ class DisplayCourse(View):
     def post(self, request, course_id):
         context = self.get_context(request, course_id)
         if 'submitTa' in request.POST:
-            new_user = account.get_account_by_id(request.POST.get('ta_id'))
-            new_ta = ta.Ta(new_user)
+            new_ta = ta.account_to_ta(request.POST.get('ta_id'))
             new_course_ta = new_ta.add_to_course(course_id)
             if new_course_ta is None:
                 context["error_ta"] = DisplayCourse.error_duplicateta
