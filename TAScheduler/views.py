@@ -43,6 +43,15 @@ class Courses(View):
         :return: a render of the courses page.
         """
         courses = course.course_list()
+        user = account.get_account(request.session["email"])
+        if user.get_account_type() == "ta":
+            assistant = ta.account_to_ta(user.get_primary_key())
+            assistant_courses = assistant.get_courses()
+            return render(request, "courses.html", {"email": request.session["email"],
+                                                    "account_type": request.session["account_type"],
+                                                    "user": request.session["user"],
+                                                    'courses': courses,
+                                                    "assistant_courses": assistant_courses})
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "courses.html", {"email": request.session["email"],
