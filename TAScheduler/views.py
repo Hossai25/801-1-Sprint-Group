@@ -242,7 +242,6 @@ class DisplayCourse(View):
             course_ta.number_sections = course_ta.get_number_sections(course_id)
         course_instructor = instructor.get_course_instructor(course_id)
         sections = section.section_list(course_id)
-        # TODO uncomment once section.section_list(course_id) is implemented
         for section_obj in sections:
             section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
         if "account_type" not in request.session:
@@ -370,6 +369,10 @@ class EditSection(View):
     def get(self, request, course_id, section_id):
         selected_section = section.get_section_by_id(section_id)
         course_obj = course.get_course_by_id(course_id)
+        selected_section.ta = ta.get_section_ta(section_id)
+        course_obj.tas = ta.get_course_tas(course_id)
+        for course_ta in course_obj.tas:
+            course_ta.number_sections = course_ta.get_number_sections(course_id)
         return render(request, "editSection.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
@@ -379,7 +382,34 @@ class EditSection(View):
     def post(self, request, course_id, section_id):
         selected_section = section.get_section_by_id(section_id)
         course_obj = course.get_course_by_id(course_id)
+        selected_section_ta = ta.get_section_ta(section_id)
         # process and validate form, update database
+        if "ta" in request.POST and request.POST.get("ta") != "":
+            new_ta = ta.account_to_ta(request.POST.get("ta"))
+        else:
+            new_ta = ""
+
+        if selected_section_ta is not None:
+            if new_ta == "":
+                selected_section_ta.remove_from_section(selected_section.get_primary_key())
+            elif new_ta.get_primary_key() != selected_section_ta.get_primary_key():
+                selected_section_ta.remove_from_section(selected_section.get_primary_key())
+                new_ta.add_to_section(selected_section.get_primary_key())
+        else:
+            if new_ta != "":
+                new_ta.add_to_section(selected_section.get_primary_key())
+
+        """
+        if False:  # if bad data
+            selected_section.ta = selected_session_ta
+            course_obj.tas = ta.get_course_tas(course_id)
+            return render(request, "editSection.html", {"email": request.session["email"],
+                                                        "account_type": request.session["account_type"],
+                                                        "user": request.session["user"],
+                                                        'selected_section': selected_section,
+                                                        'course': course_obj,
+                                                        "error_message": ''})
+        """
         return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
 
 
