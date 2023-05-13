@@ -24,7 +24,7 @@
                 {% for course_ta in course.tas %}
                     {% if selected_section.ta and selected_section.ta.get_primary_key == course_ta.get_primary_key %}
                         <!-- ta was already displayed above, so we don't show it here -->
-                    {% elif course_ta.number_sections != 0 %}
+                    {% elif course_ta.number_sections > course_ta.current_number_sections %}
                         <option value="{{ course_ta.get_primary_key }}">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</option>
                     {% endif %}
                 {% endfor %}

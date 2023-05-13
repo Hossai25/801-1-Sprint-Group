@@ -240,6 +240,7 @@ class DisplayCourse(View):
         for course_ta in course_tas:
             course_ta.grader_status = course_ta.get_grader_status(course_id)
             course_ta.number_sections = course_ta.get_number_sections(course_id)
+            course_ta.current_number_sections = len(course_ta.get_sections())
         course_instructor = instructor.get_course_instructor(course_id)
         sections = section.section_list(course_id)
         for section_obj in sections:
@@ -373,6 +374,7 @@ class EditSection(View):
         course_obj.tas = ta.get_course_tas(course_id)
         for course_ta in course_obj.tas:
             course_ta.number_sections = course_ta.get_number_sections(course_id)
+            course_ta.current_number_sections = len(course_ta.get_sections())
         return render(request, "editSection.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
@@ -403,6 +405,9 @@ class EditSection(View):
         if False:  # if bad data
             selected_section.ta = selected_session_ta
             course_obj.tas = ta.get_course_tas(course_id)
+            for course_ta in course_obj.tas:
+                course_ta.number_sections = course_ta.get_number_sections(course_id)
+                course_ta.current_number_sections = len(course_ta.get_sections())
             return render(request, "editSection.html", {"email": request.session["email"],
                                                         "account_type": request.session["account_type"],
                                                         "user": request.session["user"],
