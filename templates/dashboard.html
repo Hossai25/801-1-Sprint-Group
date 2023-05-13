@@ -1,26 +1,91 @@
 {% extends "master.html" %}
 
 {% block title %}
-    Home
+Home
 {% endblock %}
 
 
 {% block content %}
-    <div class="container">
-        <h1>Home</h1>
-        <div class="container m-1">
+<style>
+    th {
+        text-decoration: underline;
+    }
+
+    th, td {
+        text-align: left;
+        font-size: 20px; /* Adjust the font size as desired */
+    }
+</style>
+<div class="container">
+    <h1>Welcome, {{first_name}} {{last_name}}</h1>
+    <div class="container m-1">
             <span>
                 <!-- changes to this element require acceptance tests to be updated! -->
                 <a class="btn btn-primary" href="{% url 'accounts' %}">Accounts</a>
             </span>
-            <span>
+        <span>
                 <!-- changes to this element require acceptance tests to be updated! -->
                 <a class="btn btn-primary" href="{% url 'courses' %}">Courses/Labs</a>
             </span>
-            <span>
+        <span>
                 <!-- changes to this element require acceptance tests to be updated! -->
                 <a class="btn btn-primary" href="{% url 'notifications' %}">Notifications</a>
             </span>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <table>
+                <tr>
+                    <th>Personal Info</th>
+                </tr>
+                <tr>
+                    <td>Office Hours: {{ office_hours }}</td>
+                </tr>
+                <tr>
+                    <td>Address: {{ address }}</td>
+                </tr>
+                <tr>
+                    <td>Phone Number: {{ phone_number }}</td>
+                </tr>
+                <tr></tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            {% if account_type == "instructor" %}
+            <table>
+                <tr>
+                    <th>Courses</th>
+                </tr>
+                {% for course in teacher_courses %}
+                <tr>
+                    <td>{{ course.get_course_name }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            {% if account_type == "ta" %}
+            <table>
+                <tr>
+                    <th>Courses</th>
+                </tr>
+                {% for course in assistant_courses %}
+                <tr>
+                    <td>{{ course.get_course_name }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <table>
+                <tr>
+                    <th>Sections</th>
+                </tr>
+                {% for section in assistant_sections %}
+                <tr>
+                    <td>{{ section.get_lab_name }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
         </div>
     </div>
+</div>
 {%  endblock %}
