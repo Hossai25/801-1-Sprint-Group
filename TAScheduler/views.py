@@ -230,6 +230,8 @@ class DisplayCourse(View):
     error_duplicateta = "TA is already in this course"
     error_duplicateinstructor = "Instructor is already in this course"
     error_duplicatesection = "A section with this name already exists"
+    error_nosuchinstructor = "The instructor could not be found"
+    error_nosuchta = "The TA could not be found"
 
     def get_context(self, request, course_id):
         # TODO: unit tests
@@ -263,42 +265,49 @@ class DisplayCourse(View):
         return render(request, "displayCourse.html", context)
 
     def post(self, request, course_id):
-        context = self.get_context(request, course_id)
         if 'submitTa' in request.POST:
             new_ta = ta.account_to_ta(request.POST.get('ta_id'))
+            if new_ta is None:
+                context = self.get_context(request, course_id)
+                context["error_ta"] = DisplayCourse.error_nosuchta
+                return render(request, "displayCourse.html", context)
             new_course_ta = new_ta.add_to_course(course_id)
             if new_course_ta is None:
+                context = self.get_context(request, course_id)
                 context["error_ta"] = DisplayCourse.error_duplicateta
                 return render(request, "displayCourse.html", context)
             else:
                 new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
                 new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
-                course_tas = ta.get_course_tas(course_id)
-                for course_ta in course_tas:
-                    course_ta.grader_status = course_ta.get_grader_status(course_id)
-                    course_ta.number_sections = course_ta.get_number_sections(course_id)
-                context["course_tas"] = course_tas
+                context = self.get_context(request, course_id)
         elif 'submitInstructor' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('instructor_id'))
+            if new_user is None:
+                context = self.get_context(request, course_id)
+                context["error_instructor"] = DisplayCourse.error_nosuchinstructor
+                return render(request, "displayCourse.html", context)
             new_instructor = instructor.Instructor(new_user)
             new_course_instructor = new_instructor.add_to_course(course_id)
             if new_course_instructor is None:
+                context = self.get_context(request, course_id)
                 context["error_instructor"] = DisplayCourse.error_duplicateinstructor
                 return render(request, "displayCourse.html", context)
             else:
-                context["course_instructor"] = new_instructor
+                context = self.get_context(request, course_id)
         elif 'submitSection' in request.POST:
             section_name = request.POST.get('section_name')
-            new_section = section.create_section(section_name, context.get('course'))
+            new_section = section.create_section(section_name, course.get_course_by_id(course_id))
             if new_section is None:
+                context = self.get_context(request, course_id)
                 context["error_section"] = DisplayCourse.error_duplicatesection
             elif 'ta' in request.POST and request.POST.get('ta') != 'None':
                 new_section_ta = ta.account_to_ta(request.POST.get('ta'))
+                if new_section_ta is None:
+                    context = self.get_context(request, course_id)
+                    context["error_section"] = DisplayCourse.error_nosuchta
+                    return render(request, "displayCourse.html", context)
                 new_section_ta.add_to_section(new_section.get_primary_key())
-            sections = section.section_list(course_id)
-            for section_obj in sections:
-                section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
-            context["sections"] = sections
+                context = self.get_context(request, course_id)
         return render(request, "displayCourse.html", context)
 
 
