@@ -129,7 +129,7 @@
                 <select class="form-select" name="ta">
                     <option value="None" selected>None Assigned</option>
                     {% for course_ta in course_tas %}
-                    {% if course_ta.number_sections != 0 %}
+                    {% if course_ta.number_sections > course_ta.current_number_sections %}
                     <option value="{{ course_ta.get_primary_key }}">
                         {{ course_ta.get_first_name }} {{ course_ta.get_last_name }}
                     </option>
@@ -145,5 +145,5 @@
 </table>
 </div>
 </form>
-    <div class="text-danger">{{ error_section }}</div>
+<div class="text-danger">{{ error_section }}</div>
 {%  endblock %}

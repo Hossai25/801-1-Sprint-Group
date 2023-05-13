@@ -96,7 +96,7 @@ class Ta(Account):
     def add_to_section(self, section_id: int):
         try:
             section = LabModel.objects.get(id=section_id)
-            ta = UserModel.objects.get(id=self.get_primary_key())
+            ta = self.user_model
             section.ta_id = ta
             section.save()
             return True
@@ -106,7 +106,7 @@ class Ta(Account):
     def remove_from_section(self, section_id: int):
         try:
             section = LabModel.objects.get(id=section_id)
-            ta = UserModel.objects.get(id=self.get_primary_key())
+            ta = self.user_model
             if section.ta_id == ta:
                 section.ta_id = None
                 section.save()
