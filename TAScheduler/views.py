@@ -278,6 +278,7 @@ class DisplayCourse(View):
     def get_context(self, request, course_id):
         # TODO: unit tests
         course_obj = course.get_course_by_id(course_id)
+        current_user = account.get_account(request.session["email"])
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
@@ -294,6 +295,7 @@ class DisplayCourse(View):
         context = {"email": request.session["email"],
                    "account_type": request.session["account_type"],
                    "user": request.session["user"],
+                   'current_user': current_user,
                    'course': course_obj,
                    'course_tas': course_tas,
                    'course_instructor': course_instructor,
