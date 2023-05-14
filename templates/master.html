@@ -19,6 +19,9 @@
                 <!-- changes to this element require acceptance tests to be updated! -->
                 <a class="btn btn-primary" href="{% url 'dashboard' %}">Back to Dashboard</a>
                 {% endif %}
+                {% if back_href %}
+                <a class="container-fluid text-light" href="{{ back_href}}">Back</a>
+                {% endif %}
             </div>
         </div>
     </div>
