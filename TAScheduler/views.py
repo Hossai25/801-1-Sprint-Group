@@ -339,7 +339,7 @@ class DisplayCourse(View):
             else:
                 new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
                 new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
-                context = self.get_context(request, course_id)
+
         elif 'submitInstructor' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('instructor_id'))
             if new_user is None:
@@ -352,24 +352,23 @@ class DisplayCourse(View):
                 context = self.get_context(request, course_id)
                 context["error_instructor"] = DisplayCourse.error_duplicateinstructor
                 return render(request, "displayCourse.html", context)
-            else:
-                context = self.get_context(request, course_id)
+
         elif 'submitSection' in request.POST:
             section_name = request.POST.get('section_name')
             new_section = section.create_section(section_name, course.get_course_by_id(course_id))
             if new_section is None:
                 context = self.get_context(request, course_id)
                 context["error_section"] = DisplayCourse.error_duplicatesection
-            elif 'ta' in request.POST and request.POST.get('ta') != 'None':
+                return render(request, "displayCourse.html", context)
+            if 'ta' in request.POST and request.POST.get('ta') != 'None':
                 new_section_ta = ta.account_to_ta(request.POST.get('ta'))
                 if new_section_ta is None:
                     context = self.get_context(request, course_id)
                     context["error_section"] = DisplayCourse.error_nosuchta
                     return render(request, "displayCourse.html", context)
                 new_section_ta.add_to_section(new_section.get_primary_key())
-                context = self.get_context(request, course_id)
-        else:
-            context = self.get_context(request, course_id)
+
+        context = self.get_context(request, course_id)
         return render(request, "displayCourse.html", context)
 
 
