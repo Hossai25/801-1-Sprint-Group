@@ -107,7 +107,7 @@
             <th>Assigned TA</th>
             {% if account_type == "admin" %}
             <th>Edit/Delete</th>
-            {% elif account_type == "instructor" %}
+            {% elif account_type == "instructor" and course_instructor.get_primary_key == current_user.get_primary_key %}
             <th>Edit</th>
             {% endif %}
         </tr>
@@ -122,10 +122,12 @@
                 {% else %}No TA Assigned{% endif %}
             </td>
             {% if account_type == "admin" or account_type == "instructor" %}
+            {% if course_instructor.get_primary_key == current_user.get_primary_key or account_type == "admin" %}
             <td>
                 <a class="btn" href="{% url 'editSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
                     <img src="{% static 'TAScheduler/icons/edit.svg' %}">
                 </a>
+                {% endif %}
                 {% endif %}
                 {% if account_type == "admin" %}
                 <a class="btn" href="{% url 'deleteSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
