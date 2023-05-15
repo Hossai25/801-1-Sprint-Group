@@ -4,10 +4,15 @@ from TAScheduler.models import User as UserModel, Course as CourseModel
 
 
 def account_to_instructor(account_id: int):
-    user = UserModel.objects.get(id=account_id)
-    acc = Account(user)
-    instructor = Instructor(acc)
-    return instructor
+    try:
+        user = UserModel.objects.get(id=account_id)
+        if user.account_type != "instructor":
+            return False
+        acc = Account(user)
+        instructor = Instructor(acc)
+        return instructor
+    except UserModel.DoesNotExist:
+        return False
 
 
 def get_course_instructor(course_id: int):
