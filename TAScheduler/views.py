@@ -16,11 +16,13 @@ class Accounts(View):
         :return: a render of the accounts page.
         """
         accounts = account.account_list()
+        current_account = account.get_account(request.session["email"])
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "accounts.html", {"email": request.session["email"],
                                                  "account_type": request.session["account_type"],
                                                  "user": request.session["user"],
+                                                 "current_account": current_account,
                                                  'accounts': accounts})
 
     def post(self, request):
@@ -41,6 +43,15 @@ class Courses(View):
         :return: a render of the courses page.
         """
         courses = course.course_list()
+        user = account.get_account(request.session["email"])
+        if user.get_account_type() == "ta":
+            assistant = ta.account_to_ta(user.get_primary_key())
+            assistant_courses = assistant.get_courses()
+            return render(request, "courses.html", {"email": request.session["email"],
+                                                    "account_type": request.session["account_type"],
+                                                    "user": request.session["user"],
+                                                    'courses': courses,
+                                                    "assistant_courses": assistant_courses})
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "courses.html", {"email": request.session["email"],
@@ -194,6 +205,34 @@ class Dashboard(View):
         if "email" not in request.session:
             return redirect('/', {"email": "", "account_type": ""})
         user = account.get_account(request.session["email"])
+        if user.get_account_type() == "instructor":
+            teacher = instructor.account_to_instructor(user.get_primary_key())
+            teacher_courses = teacher.get_courses()
+            return render(request, "dashboard.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      "user": request.session["user"],
+                                                      "first_name": user.get_first_name(),
+                                                      "last_name": user.get_last_name(),
+                                                      "office_hours": user.get_office_hours(),
+                                                      "address": user.get_address(),
+                                                      "phone_number": user.get_phone_number(),
+                                                      "instructor": teacher,
+                                                      "teacher_courses": teacher_courses})
+        if user.get_account_type() == "ta":
+            assistant = ta.account_to_ta(user.get_primary_key())
+            assistant_courses = assistant.get_courses()
+            assistant_sections = assistant.get_sections()
+            return render(request, "dashboard.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      "user": request.session["user"],
+                                                      "first_name": user.get_first_name(),
+                                                      "last_name": user.get_last_name(),
+                                                      "office_hours": user.get_office_hours(),
+                                                      "address": user.get_address(),
+                                                      "phone_number": user.get_phone_number(),
+                                                      "ta": assistant,
+                                                      "assistant_courses": assistant_courses,
+                                                      "assistant_sections": assistant_sections})
         if user is None:
             return redirect('/', {"email": "", "account_type": ""})
 
@@ -202,7 +241,12 @@ class Dashboard(View):
 
         return render(request, "dashboard.html", {"email": request.session["email"],
                                                   "account_type": request.session["account_type"],
-                                                  "user": request.session["user"]})
+                                                  "user": request.session["user"],
+                                                  "first_name": user.get_first_name(),
+                                                  "last_name": user.get_last_name(),
+                                                  "office_hours": user.get_office_hours(),
+                                                  "address": user.get_address(),
+                                                  "phone_number": user.get_phone_number()})
 
     def post(self, request):
         pass
@@ -234,6 +278,7 @@ class DisplayCourse(View):
     def get_context(self, request, course_id):
         # TODO: unit tests
         course_obj = course.get_course_by_id(course_id)
+        current_user = account.get_account(request.session["email"])
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
         course_tas = ta.get_course_tas(course_id)
@@ -250,6 +295,7 @@ class DisplayCourse(View):
         context = {"email": request.session["email"],
                    "account_type": request.session["account_type"],
                    "user": request.session["user"],
+                   'current_user': current_user,
                    'course': course_obj,
                    'course_tas': course_tas,
                    'course_instructor': course_instructor,
@@ -322,19 +368,25 @@ class EditAccount(View):
         :return: a render of the editAccount page.
         """
         userView = account.get_account_by_id(user_id)
+        current_user = account.get_account_by_id(request.session["user"])
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "editAccount.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
-                                                    'account': userView})
+                                                    'account': userView,
+                                                    "current_user": current_user})
 
     def post(self, request, user_id):
         userView = account.get_account_by_id(user_id)
+        current_user = account.get_account_by_id(request.session["user"])
         edited_account = account.edit_account(user_id, request.POST.dict())
         accounts = account.account_list()
 
-        return redirect(reverse('accounts'))
+        if current_user.get_primary_key() == userView.get_primary_key():
+            return redirect(reverse('dashboard'))
+        else:
+            return redirect(reverse('accounts'))
 
 
 class EditCourseTa(View):

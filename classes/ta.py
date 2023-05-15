@@ -1,17 +1,24 @@
 from TAScheduler.models import CourseTa as CourseTaModel, User as UserModel, Course as CourseModel, Lab as LabModel
-from classes import account, course, section
+from classes import course, section
 from classes.account import Account
 
 
 def account_to_ta(account_id: int):
-    user = UserModel.objects.get(id=account_id)
-    acc = Account(user)
-    ta = Ta(acc)
-    return ta
+    try:
+        user = UserModel.objects.get(id=account_id)
+        if user.account_type != "ta":
+            return False
+        acc = Account(user)
+        ta = Ta(acc)
+        return ta
+    except UserModel.DoesNotExist:
+        return False
 
 
 def get_course_tas(course_id: int):
     tas = CourseTaModel.objects.filter(course_id=course_id)
+    if tas is None:
+        return None
     ta_objects = [account_to_ta(ta_model.ta_id_id) for ta_model in tas]
     return ta_objects
 
@@ -83,7 +90,13 @@ class Ta(Account):
     def remove_from_course(self, course_id: int):
         try:
             course_ta = CourseTaModel.objects.get(course_id=course_id, ta_id=self.user_model)
+            sections = LabModel.objects.filter(course_id=course_id, ta_id=self.user_model)
+            ta = UserModel.objects.get(id=self.get_primary_key())
             course_ta.delete()
+            for sect in sections:
+                if sect.ta_id == ta:
+                    sect.ta_id = None
+                    sect.save()
             return True
         except CourseTaModel.DoesNotExist:
             return False
