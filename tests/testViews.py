@@ -10,7 +10,12 @@ class TestDisplayCourseGetContext(test.TestCase):
     def setUp(self):
         self.view = views.DisplayCourse()
         self.request = HttpRequest()
-        self.request.session = {"email": "test_email", "account_type": "test_account_type", "user": -1}
+
+        self.current_user = UserModel(email="current_user", password="current_user", account_type="current_user")
+        self.current_user.save()
+        PublicInfo(user_id=self.current_user).save()
+        PrivateInfo(user_id=self.current_user).save()
+        self.request.session = {"email": self.current_user.email, "account_type": self.current_user.account_type, "user": self.current_user.pk, "current_user": self.current_user}
 
         self.tas = []
         self.sections = []
@@ -124,11 +129,17 @@ class TestDisplayCourseGetContext(test.TestCase):
         for expected_section in self.sections:
             self.assertIn(expected_section, section_list, f"section {expected_section.lab_name} not found in {key}")
 
-    def test_course_instructor(self):
+    def test_back_href(self):
         key = "back_href"
         result = self.view.get_context(self.request, self.course.pk)
         self.assertIn(key, result, f"key {key} not in result")
         self.assertEqual(result[key], reverse('courses'), f"unexpected value for key {key}")
+
+    def test_current_user(self):
+        key = "current_user"
+        result = self.view.get_context(self.request, self.course.pk)
+        self.assertIn(key, result, f"key {key} not in result")
+        self.assertEqual(result[key].user_model, self.current_user, f"unexpected value for key {key}")
 
 
 if __name__ == '__main__':
