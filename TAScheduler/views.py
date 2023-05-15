@@ -289,7 +289,6 @@ class DisplayCourse(View):
     error_nosuchta = "The TA could not be found"
 
     def get_context(self, request, course_id):
-        # TODO: unit tests
         course_obj = course.get_course_by_id(course_id)
         ta_list = ta.get_all_tas()
         instructor_list = instructor.get_all_instructors()
