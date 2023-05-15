@@ -297,7 +297,10 @@ class DisplayCourse(View):
         for course_ta in course_tas:
             course_ta.grader_status = course_ta.get_grader_status(course_id)
             course_ta.number_sections = course_ta.get_number_sections(course_id)
-            course_ta.current_number_sections = len(course_ta.get_sections())
+            course_ta.current_number_sections = 0
+            for ta_lab in course_ta.get_sections():
+                if ta_lab.course_model.pk == course_obj.get_primary_key():
+                    course_ta.current_number_sections += 1
         course_instructor = instructor.get_course_instructor(course_id)
         sections = section.section_list(course_id)
         for section_obj in sections:
@@ -365,6 +368,8 @@ class DisplayCourse(View):
                     return render(request, "displayCourse.html", context)
                 new_section_ta.add_to_section(new_section.get_primary_key())
                 context = self.get_context(request, course_id)
+        else:
+            context = self.get_context(request, course_id)
         return render(request, "displayCourse.html", context)
 
 
