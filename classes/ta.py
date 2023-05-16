@@ -1,5 +1,5 @@
-from TAScheduler.models import CourseTa as CourseTaModel, User as UserModel, Course as CourseModel
-from classes import account
+from TAScheduler.models import CourseTa as CourseTaModel, User as UserModel, Course as CourseModel, Lab as LabModel
+from classes import account, course, section
 from classes.account import Account
 
 
@@ -17,7 +17,12 @@ def get_course_tas(course_id: int):
 
 
 def get_section_ta(section_id: int):
-    pass
+    section_model = LabModel.objects.get(id=section_id)
+    ta_id = section_model.ta_id
+    if ta_id is None:
+        return None
+    ta = account_to_ta(ta_id.id)
+    return ta
 
 
 def get_all_tas():
@@ -57,7 +62,13 @@ class Ta(Account):
         course_ta.save()
 
     def get_courses(self):
-        pass
+        try:
+            course_ta_objects = CourseTaModel.objects.filter(ta_id=self.user_model)
+            course_ids = course_ta_objects.values_list('course_id', flat=True)
+            course_models = CourseModel.objects.filter(id__in=course_ids)
+            return [course.Course(course_model) for course_model in course_models]
+        except CourseTaModel.DoesNotExist:
+            return None
 
     def add_to_course(self, course_id: int):
         course = CourseModel.objects.get(id=course_id)
@@ -78,10 +89,29 @@ class Ta(Account):
             return False
 
     def get_sections(self):
-        pass
+        sections = LabModel.objects.filter(ta_id=self.user_model)
+        section_objects = [section.Section(lab_model) for lab_model in sections]
+        return section_objects
 
     def add_to_section(self, section_id: int):
-        pass
+        try:
+            section = LabModel.objects.get(id=section_id)
+            ta = self.user_model
+            section.ta_id = ta
+            section.save()
+            return True
+        except LabModel.DoesNotExist:
+            return False
 
     def remove_from_section(self, section_id: int):
-        pass
+        try:
+            section = LabModel.objects.get(id=section_id)
+            ta = self.user_model
+            if section.ta_id == ta:
+                section.ta_id = None
+                section.save()
+                return True
+            else:
+                return False
+        except LabModel.DoesNotExist:
+            return False

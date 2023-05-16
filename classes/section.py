@@ -39,7 +39,9 @@ def get_section_by_id(lab_id):
 
 
 def section_list(course_id):
-    pass
+    sections = LabModel.objects.filter(course_id=course_id)
+    section_objects = [Section(lab_model) for lab_model in sections]
+    return section_objects
 
 
 class Section:
