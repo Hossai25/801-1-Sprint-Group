@@ -4,8 +4,6 @@ from classes import account, section, course, ta, instructor
 from django.urls import reverse
 import re  # regular expressions for parsing strings
 
-from classes.course import Course
-
 
 class Accounts(View):
     def get(self, request):
@@ -164,43 +162,43 @@ class CreateCourse(View):
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"],
                                       "user": request.session["user"]})
-
-
-class CreateLab(View):
-    error_duplicate = "Section name blank or already exists."
-    error_no_course = "Course not found."
-
-    # def get(self, request):
-    #     if "account_type" not in request.session:
-    #         request.session["account_type"] = ""
-    #     courses = course.course_list()
-    #     return render(request, "createLab.html", {"email": request.session["email"],
-    #                                               "account_type": request.session["account_type"],
-    #                                               "user": request.session["user"],
-    #                                               'courses': courses})
-    #
-    #
-    # def post(self, request):
-    #     if "account_type" not in request.session:
-    #         request.session["account_type"] = ""
-    #     course_id = request.POST.get('course_id')
-    #     course_object = course.get_course_by_id(course_id)
-    #     if course_object is None:
-    #         return render(request, "createLab.html",
-    #                       {"email": request.session["email"], "account_type": request.session["account_type"],
-    #                        "user": request.session["user"],
-    #                        "error_message": CreateLab.error_no_course})
-    #     else:
-    #         lab_name = request.POST.get('lab_name')
-    #         created_lab = section.create_section(lab_name, course_object)
-    #     if created_lab is None:
-    #         return render(request, "createLab.html",
-    #                       {"email": request.session["email"], "account_type": request.session["account_type"],
-    #                        "user": request.session["user"],
-    #                        "error_message": CreateLab.error_duplicate})
-    #     return redirect('/courses/', {"email": request.session["email"],
-    #                                   "account_type": request.session["account_type"],
-    #                                   "user": request.session["user"]})
+#
+#
+# class CreateLab(View):
+#     error_duplicate = "Section name blank or already exists."
+#     error_no_course = "Course not found."
+#
+#     def get(self, request):
+#         if "account_type" not in request.session:
+#             request.session["account_type"] = ""
+#         courses = course.course_list()
+#         return render(request, "createLab.html", {"email": request.session["email"],
+#                                                   "account_type": request.session["account_type"],
+#                                                   "user": request.session["user"],
+#                                                   'courses': courses})
+#
+#
+#     def post(self, request):
+#         if "account_type" not in request.session:
+#             request.session["account_type"] = ""
+#         course_id = request.POST.get('course_id')
+#         course_object = course.get_course_by_id(course_id)
+#         if course_object is None:
+#             return render(request, "createLab.html",
+#                           {"email": request.session["email"], "account_type": request.session["account_type"],
+#                            "user": request.session["user"],
+#                            "error_message": CreateLab.error_no_course})
+#         else:
+#             lab_name = request.POST.get('lab_name')
+#             created_lab = section.create_section(lab_name, course_object)
+#         if created_lab is None:
+#             return render(request, "createLab.html",
+#                           {"email": request.session["email"], "account_type": request.session["account_type"],
+#                            "user": request.session["user"],
+#                            "error_message": CreateLab.error_duplicate})
+#         return redirect('/courses/', {"email": request.session["email"],
+#                                       "account_type": request.session["account_type"],
+#                                       "user": request.session["user"]})
 
 
 class Dashboard(View):
@@ -261,24 +259,6 @@ class Dashboard(View):
     def post(self, request):
         pass
 
-    #
-    #
-    # class Database(View):
-    #     def get(self, request):
-    #         """
-    #         Get method for the Database view.
-    #         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
-    #             and request.session["account_type"] contains the account's type.
-    #         :return: a render of the dashboard.
-    #         """
-    #         if "account_type" not in request.session:
-    #             request.session["account_type"] = ""
-    #         return render(request, "database.html", {"email": request.session["email"],
-    #                                                  "account_type": request.session["account_type"],
-    #                                                  "user": request.session["user"]})
-    #
-    # def post(self, request):
-    #     pass
 
 
 class DisplayCourse(View):
@@ -546,6 +526,11 @@ class LoginPage(View):
             return render(request, "loginPage.html",
                           {"email": "", "account_type": "", "user": "",
                            "login_error_message": "Invalid username or password."})
+
+
+def logout(request):
+    request.session.clear()
+    return redirect(reverse('login'))
 
 
 class Notifications(View):

@@ -18,6 +18,7 @@
                 <a class="container-fluid text-light" href="{% url 'editAccount' user_id=user%}">Change Personal Info</a>
                 <!-- changes to this element require acceptance tests to be updated! -->
                 <a class="btn btn-primary" href="{% url 'dashboard' %}">Back to Dashboard</a>
+                <a class="btn btn-secondary" href="{% url 'logout' %}">Logout</a>
                 {% endif %}
                 {% if back_href %}
                 <a class="container-fluid text-light" href="{{ back_href}}">Back</a>

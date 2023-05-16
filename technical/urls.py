@@ -38,4 +38,5 @@ urlpatterns = [
     path('courses/view/<int:course_id>/edit-ta/<int:user_id>', EditCourseTa.as_view(), name='editCourseTa'),
     path('courses/view/<int:course_id>/delete-section/<int:section_id>', deleteSection, name='deleteSection'),
     path('courses/view/<int:course_id>/edit-section/<int:section_id>', EditSection.as_view(), name='editSection'),
+    path('logout/', logout, name='logout'),
 ]
