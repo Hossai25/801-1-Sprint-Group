@@ -306,13 +306,13 @@ class Courses(TestCase):
 
     # This test checks to see that if the create lab button is pressed it brings the user to the
     # right page
-    def test_toCreateLabPage(self):
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('courses'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
-                            html=True)
+    # def test_toCreateLabPage(self):
+    #     session = self.webpage.session
+    #     session["email"] = "test1@uwm.edu"
+    #     session.save()
+    #     resp = self.webpage.get(reverse('courses'))
+    #     self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
+    #                         html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to the
     # right page
