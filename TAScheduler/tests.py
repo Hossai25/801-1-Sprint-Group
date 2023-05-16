@@ -60,12 +60,6 @@ class Login(TestCase):
         resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "password"}, follow=True)
         self.assertContains(resp, "Invalid username or password.")
 
-    # This test checks to see if the forgot password redirects to the right page
-    def test_forgotPassword(self):
-        # HASN'T BEEN IMPLEMENTED YET
-        pass
-
-
 class Dashboard(TestCase):
     webpage = None
     users = None
@@ -121,7 +115,7 @@ class Accounts(TestCase):
 
         # Fill test database with users
         for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
             temp2.save()
@@ -134,6 +128,7 @@ class Accounts(TestCase):
     def test_toCreateAccountPage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
         session.save()
         resp = self.webpage.get(reverse('accounts'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Accounts</a>' % reverse('createAccount'),
@@ -144,6 +139,7 @@ class Accounts(TestCase):
     def test_toEditAccountPage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"]="admin"
         session.save()
         resp = self.webpage.get(reverse('accounts'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s"><img src="/static/TAScheduler/icons/edit.svg"></a>' % reverse('editAccount',
@@ -793,7 +789,7 @@ class DisplayCourse(TestCase):
 
         # Fill test database with users
         for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
             temp2.save()
@@ -805,20 +801,20 @@ class DisplayCourse(TestCase):
                 temp_model.save()
 
                 # Instructor User
-            newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
-            newUser.save()
-            newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
-            newUser2.save()
-            newUser3 = PrivateInfo(user_id=newUser)
-            newUser3.save()
+        newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
+        newUser.save()
+        newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
+        newUser2.save()
+        newUser3 = PrivateInfo(user_id=newUser)
+        newUser3.save()
 
             # TA User
-            newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
-            newta.save()
-            newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
-            newta2.save()
-            newta3 = PrivateInfo(user_id=newta)
-            newta3.save()
+        newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
+        newta.save()
+        newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
+        newta2.save()
+        newta3 = PrivateInfo(user_id=newta)
+        newta3.save()
 
     #This test checks to see if the user is navigated back to the homepage from the display course page
     def test_backToHomepage(self):
@@ -832,21 +828,55 @@ class DisplayCourse(TestCase):
 
     #This test checks that all the courses from the database are displayed in the graph
     def test_displaysAllCourses(self):
-        #session = self.webpage.session
-        #session["email"] = "test1@uwm.edu"
-        #session.save()
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
         pass
 
     #This test checks that a submitted TA is added to the database
     def test_submitTAtoDatabase(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse("displayCourse", kwargs={'course_id': self.course_objs[1].pk}),
+                                 {"submitTa": ""}, follow=True)
+        self.assertNotEqual(User.objects.get(email="tatemp@uwm.edu"), None)
 
     #This test checks that a submitted instructor is added to the database
     def test_submitInstructortoDatabase(self):
-        pass
-
+       pass
     #This test checks that a submitted section  is added to the database
     def test_submitSectiontoDatabase(self):
         pass
+
+    def test_tabutton(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
+        session.save()
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp,
+                            '<input type="submit" class="btn btn-primary" name="submitTa" value="Submit">',
+                            html=True)
+
+    def test_sectionbutton(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
+        session.save()
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp,
+                            '<input type="submit" class="btn btn-primary" name="submitSection" value="Add Section">',
+                            html=True)
+
+    def test_instructorbutton(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
+        session.save()
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp, '<input type="submit" class="btn btn-primary btn-sm" name="submitInstructor" value="Submit" formnovalidate>',
+                            html=True)
 
 
