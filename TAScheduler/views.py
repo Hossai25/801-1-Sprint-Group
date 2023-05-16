@@ -23,7 +23,8 @@ class Accounts(View):
                                                  "account_type": request.session["account_type"],
                                                  "user": request.session["user"],
                                                  "current_account": current_account,
-                                                 'accounts': accounts})
+                                                 'accounts': accounts,
+                                                 "back_href": reverse('dashboard')})
 
     def post(self, request):
         pass
@@ -51,13 +52,15 @@ class Courses(View):
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
                                                     'courses': courses,
-                                                    "assistant_courses": assistant_courses})
+                                                    "assistant_courses": assistant_courses,
+                                                    "back_href": reverse('dashboard')})
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         return render(request, "courses.html", {"email": request.session["email"],
                                                 "account_type": request.session["account_type"],
                                                 "user": request.session["user"],
-                                                'courses': courses})
+                                                'courses': courses,
+                                                "back_href": reverse('dashboard')})
 
     def post(self, request):
         pass
@@ -80,7 +83,8 @@ class CreateAccount(View):
             request.session["account_type"] = ""
         return render(request, "createAccount.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"],
-                                                      "user": request.session["user"]})
+                                                      "user": request.session["user"],
+                                                      "back_href": reverse('accounts')})
 
     def post(self, request):
         """
@@ -102,18 +106,21 @@ class CreateAccount(View):
                 return render(request, "createAccount.html",
                               {"email": request.session["email"], "account_type": request.session["account_type"],
                                "user": request.session["user"],
+                               "back_href": reverse('accounts'),
                                "error_message": "Error creating the account. A user with this email may already exist."})
 
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", request.POST['email']):
             return render(request, "createAccount.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "user": request.session["user"],
+                           "back_href": reverse('accounts'),
                            "error_message": "Error creating the account. A user with this email may already exist."})
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
             return render(request, "createAccount.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "user": request.session["user"],
+                           "back_href": reverse('accounts'),
                            "error_message": "Error creating the account. A user with this email may already exist."})
         return redirect('/accounts/', {"email": request.session["email"],
                                        "account_type": request.session["account_type"]})
@@ -133,7 +140,8 @@ class CreateCourse(View):
 
         return render(request, "createCourse.html", {"email": request.session["email"],
                                                      "account_type": request.session["account_type"],
-                                                     "user": request.session["user"]})
+                                                     "user": request.session["user"],
+                                                     "back_href": reverse('courses')})
 
     def post(self, request):
         if "account_type" not in request.session:
@@ -143,6 +151,7 @@ class CreateCourse(View):
             return render(request, "createCourse.html", {"email": request.session["email"],
                                                          "account_type": request.session["account_type"],
                                                          "user": request.session["user"],
+                                                         "back_href": reverse('courses'),
                                                          "error_message": "Error creating the course."})
 
         created_course = course.create_course(request.POST["course_name"])
@@ -150,6 +159,7 @@ class CreateCourse(View):
             return render(request, "createCourse.html",
                           {"email": request.session["email"], "account_type": request.session["account_type"],
                            "user": request.session["user"],
+                           "back_href": reverse('courses'),
                            "error_message": "Error creating the course."})
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"],
@@ -160,14 +170,14 @@ class CreateLab(View):
     error_duplicate = "Section name blank or already exists."
     error_no_course = "Course not found."
 
-    def get(self, request):
-        if "account_type" not in request.session:
-            request.session["account_type"] = ""
-        courses = course.course_list()
-        return render(request, "createLab.html", {"email": request.session["email"],
-                                                  "account_type": request.session["account_type"],
-                                                  "user": request.session["user"],
-                                                  'courses': courses})
+    # def get(self, request):
+    #     if "account_type" not in request.session:
+    #         request.session["account_type"] = ""
+    #     courses = course.course_list()
+    #     return render(request, "createLab.html", {"email": request.session["email"],
+    #                                               "account_type": request.session["account_type"],
+    #                                               "user": request.session["user"],
+    #                                               'courses': courses})
     #
     #
     # def post(self, request):
@@ -250,33 +260,35 @@ class Dashboard(View):
 
     def post(self, request):
         pass
-#
-#
-# class Database(View):
-#     def get(self, request):
-#         """
-#         Get method for the Database view.
-#         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
-#             and request.session["account_type"] contains the account's type.
-#         :return: a render of the dashboard.
-#         """
-#         if "account_type" not in request.session:
-#             request.session["account_type"] = ""
-#         return render(request, "database.html", {"email": request.session["email"],
-#                                                  "account_type": request.session["account_type"],
-#                                                  "user": request.session["user"]})
 
-    def post(self, request):
-        pass
+    #
+    #
+    # class Database(View):
+    #     def get(self, request):
+    #         """
+    #         Get method for the Database view.
+    #         :param request: An HttpResponse object. request.session["email"] contains the logged in account's username,
+    #             and request.session["account_type"] contains the account's type.
+    #         :return: a render of the dashboard.
+    #         """
+    #         if "account_type" not in request.session:
+    #             request.session["account_type"] = ""
+    #         return render(request, "database.html", {"email": request.session["email"],
+    #                                                  "account_type": request.session["account_type"],
+    #                                                  "user": request.session["user"]})
+    #
+    # def post(self, request):
+    #     pass
 
 
 class DisplayCourse(View):
     error_duplicateta = "TA is already in this course"
     error_duplicateinstructor = "Instructor is already in this course"
     error_duplicatesection = "A section with this name already exists"
+    error_nosuchinstructor = "The instructor could not be found"
+    error_nosuchta = "The TA could not be found"
 
     def get_context(self, request, course_id):
-        # TODO: unit tests
         course_obj = course.get_course_by_id(course_id)
         current_user = account.get_account(request.session["email"])
         ta_list = ta.get_all_tas()
@@ -285,7 +297,10 @@ class DisplayCourse(View):
         for course_ta in course_tas:
             course_ta.grader_status = course_ta.get_grader_status(course_id)
             course_ta.number_sections = course_ta.get_number_sections(course_id)
-            course_ta.current_number_sections = len(course_ta.get_sections())
+            course_ta.current_number_sections = 0
+            for ta_lab in course_ta.get_sections():
+                if ta_lab.course_model.pk == course_obj.get_primary_key():
+                    course_ta.current_number_sections += 1
         course_instructor = instructor.get_course_instructor(course_id)
         sections = section.section_list(course_id)
         for section_obj in sections:
@@ -301,7 +316,8 @@ class DisplayCourse(View):
                    'course_instructor': course_instructor,
                    'ta_list': ta_list,
                    'instructor_list': instructor_list,
-                   "sections": sections}
+                   "sections": sections,
+                   "back_href": reverse('courses')}
         return context
 
     def get(self, request, course_id):
@@ -309,42 +325,50 @@ class DisplayCourse(View):
         return render(request, "displayCourse.html", context)
 
     def post(self, request, course_id):
-        context = self.get_context(request, course_id)
         if 'submitTa' in request.POST:
             new_ta = ta.account_to_ta(request.POST.get('ta_id'))
+            if new_ta is None:
+                context = self.get_context(request, course_id)
+                context["error_ta"] = DisplayCourse.error_nosuchta
+                return render(request, "displayCourse.html", context)
             new_course_ta = new_ta.add_to_course(course_id)
             if new_course_ta is None:
+                context = self.get_context(request, course_id)
                 context["error_ta"] = DisplayCourse.error_duplicateta
                 return render(request, "displayCourse.html", context)
             else:
                 new_ta.set_grader_status(course_id, request.POST.get('is_grader'))
                 new_ta.set_number_sections(course_id, request.POST.get('number_of_labs'))
-                course_tas = ta.get_course_tas(course_id)
-                for course_ta in course_tas:
-                    course_ta.grader_status = course_ta.get_grader_status(course_id)
-                    course_ta.number_sections = course_ta.get_number_sections(course_id)
-                context["course_tas"] = course_tas
+
         elif 'submitInstructor' in request.POST:
             new_user = account.get_account_by_id(request.POST.get('instructor_id'))
+            if new_user is None:
+                context = self.get_context(request, course_id)
+                context["error_instructor"] = DisplayCourse.error_nosuchinstructor
+                return render(request, "displayCourse.html", context)
             new_instructor = instructor.Instructor(new_user)
             new_course_instructor = new_instructor.add_to_course(course_id)
             if new_course_instructor is None:
+                context = self.get_context(request, course_id)
                 context["error_instructor"] = DisplayCourse.error_duplicateinstructor
                 return render(request, "displayCourse.html", context)
-            else:
-                context["course_instructor"] = new_instructor
+
         elif 'submitSection' in request.POST:
             section_name = request.POST.get('section_name')
-            new_section = section.create_section(section_name, context.get('course'))
+            new_section = section.create_section(section_name, course.get_course_by_id(course_id))
             if new_section is None:
+                context = self.get_context(request, course_id)
                 context["error_section"] = DisplayCourse.error_duplicatesection
-            elif 'ta' in request.POST and request.POST.get('ta') != 'None':
+                return render(request, "displayCourse.html", context)
+            if 'ta' in request.POST and request.POST.get('ta') != 'None':
                 new_section_ta = ta.account_to_ta(request.POST.get('ta'))
+                if new_section_ta is None:
+                    context = self.get_context(request, course_id)
+                    context["error_section"] = DisplayCourse.error_nosuchta
+                    return render(request, "displayCourse.html", context)
                 new_section_ta.add_to_section(new_section.get_primary_key())
-            sections = section.section_list(course_id)
-            for section_obj in sections:
-                section_obj.ta = ta.get_section_ta(section_obj.get_primary_key())
-            context["sections"] = sections
+
+        context = self.get_context(request, course_id)
         return render(request, "displayCourse.html", context)
 
 
@@ -371,11 +395,18 @@ class EditAccount(View):
         current_user = account.get_account_by_id(request.session["user"])
         if "account_type" not in request.session:
             request.session["account_type"] = ""
+
+        if current_user.get_primary_key() == userView.get_primary_key():
+            back_href = reverse('dashboard')
+        else:
+            back_href = reverse('accounts')
+
         return render(request, "editAccount.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
                                                     'account': userView,
-                                                    "current_user": current_user})
+                                                    "current_user": current_user,
+                                                    "back_href": back_href})
 
     def post(self, request, user_id):
         userView = account.get_account_by_id(user_id)
@@ -407,7 +438,9 @@ class EditCourseTa(View):
                                                      "account_type": request.session["account_type"],
                                                      "user": request.session["user"],
                                                      'selected_ta': selected_ta,
-                                                     'course': course_obj})
+                                                     'course': course_obj,
+                                                     "back_href": reverse("displayCourse",
+                                                                          kwargs={'course_id': course_id})})
 
     def post(self, request, course_id, user_id):
         selected_ta = ta.account_to_ta(user_id)
@@ -430,13 +463,15 @@ class EditSection(View):
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
                                                     'selected_section': selected_section,
-                                                    'course': course_obj})
+                                                    'course': course_obj,
+                                                    "back_href": reverse("displayCourse",
+                                                                         kwargs={'course_id': course_id})})
 
     def post(self, request, course_id, section_id):
         selected_section = section.get_section_by_id(section_id)
         course_obj = course.get_course_by_id(course_id)
         selected_section_ta = ta.get_section_ta(section_id)
-        # process and validate form, update database
+
         if "ta" in request.POST and request.POST.get("ta") != "":
             new_ta = ta.account_to_ta(request.POST.get("ta"))
         else:
@@ -464,7 +499,8 @@ class EditSection(View):
                                                         "user": request.session["user"],
                                                         'selected_section': selected_section,
                                                         'course': course_obj,
-                                                        "error_message": ''})
+                                                        "error_message": '',
+                                                        "back_href": reverse('displayCourse', kwargs={'course_id': course_id})})
         """
         return redirect(reverse('displayCourse', kwargs={'course_id': course_id}))
 
@@ -524,7 +560,8 @@ class Notifications(View):
             request.session["account_type"] = ""
         return render(request, "notifications.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"],
-                                                      "user": request.session["user"]})
+                                                      "user": request.session["user"],
+                                                      "back_href": reverse("dashboard")})
 
     def post(self, request):
         pass
