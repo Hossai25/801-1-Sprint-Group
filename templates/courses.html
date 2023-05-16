@@ -8,8 +8,9 @@
 
 {% block content %}
      <!-- changes to this element require acceptance tests to be updated! -->
+    {% if account_type == "admin" %}
     <a class="btn btn-primary" href="{% url 'createCourse' %}">Create Courses</a>
-
+    {% endif %}
     <!-- changes to this element require acceptance tests to be updated! -->
     <!-- a class="btn btn-primary" href="{ % url 'createLab' %}">Create Labs</a -->
 
@@ -18,22 +19,36 @@
   <thead>
     <tr>
       <th>Course Name</th>
-        <th>Edit/Delete</th>
+        {% if account_type == "admin" %}
+        <th>Delete</th>
+        {% endif %}
     </tr>
   </thead>
   <tbody>
+    {% if account_type == "admin" or account_type == "instructor" %}
     {% for course in courses %}
       <tr>
           <td>
           <a href="{% url 'displayCourse' course.get_primary_key %}">{{ course.get_course_name }}</a>
           </td>
+          {% if account_type == "admin" %}
           <td>
               <a class="btn" href="{% url 'deleteCourse' course.get_primary_key %}">
                   <img src="{% static 'TAScheduler/icons/delete.svg' %}">
               </a>
           </td>
+          {% endif %}
       </tr>
     {% endfor %}
+    {% else %}
+      {% for course in assistant_courses %}
+      <tr>
+          <td>
+          <a href="{% url 'displayCourse' course.get_primary_key %}">{{ course.get_course_name }}</a>
+          </td>
+      </tr>
+  {% endfor %}
+  {% endif %}
   </tbody>
 </table>
 </div>
