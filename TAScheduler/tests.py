@@ -805,20 +805,20 @@ class DisplayCourse(TestCase):
                 temp_model.save()
 
                 # Instructor User
-            newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
-            newUser.save()
-            newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
-            newUser2.save()
-            newUser3 = PrivateInfo(user_id=newUser)
-            newUser3.save()
+        newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
+        newUser.save()
+        newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
+        newUser2.save()
+        newUser3 = PrivateInfo(user_id=newUser)
+        newUser3.save()
 
             # TA User
-            newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
-            newta.save()
-            newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
-            newta2.save()
-            newta3 = PrivateInfo(user_id=newta)
-            newta3.save()
+        newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
+        newta.save()
+        newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
+        newta2.save()
+        newta3 = PrivateInfo(user_id=newta)
+        newta3.save()
 
     #This test checks to see if the user is navigated back to the homepage from the display course page
     def test_backToHomepage(self):
@@ -839,11 +839,37 @@ class DisplayCourse(TestCase):
 
     #This test checks that a submitted TA is added to the database
     def test_submitTAtoDatabase(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="tatemp@uwm.edu", password="tatemp", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse("displayCourse", kwargs={'course_id': self.course_objs[1].pk}),
+                                 {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"},
+                                 follow=True)
+        self.assertNotEqual(User.objects.get(email="tatemp@uwm.edu"), None)
 
     #This test checks that a submitted instructor is added to the database
     def test_submitInstructortoDatabase(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="instructortemp@uwm.edu", password="instructortemp", account_type="instructor")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse("displayCourse", kwargs={'course_id': self.course_objs[1].pk}),
+                                 {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"},
+                                 follow=True)
+        self.assertNotEqual(User.objects.get(email="instructortemp@uwm.edu"), None)
 
     #This test checks that a submitted section  is added to the database
     def test_submitSectiontoDatabase(self):
