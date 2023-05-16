@@ -6,7 +6,7 @@ from classes.course import Course, create_course
 
 
 class MyTestCase(TestCase):
-    def test_createSectionSuccesful(self):
+    def test_createSectionSuccessful(self):
         course1 = create_course("course1");
         self.assertIsInstance(create_section("testsection", course1), Section)
 
