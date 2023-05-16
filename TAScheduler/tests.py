@@ -299,6 +299,7 @@ class Courses(TestCase):
     def test_toCreateCoursePage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
         session.save()
         resp = self.webpage.get(reverse('courses'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
@@ -535,7 +536,7 @@ class DeleteAccount(TestCase):
 
         # Fill test database with users
         for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
             temp2.save()
@@ -592,6 +593,7 @@ class DeleteAccount(TestCase):
     def test_tacantdeleteaccount(self):
         session = self.webpage.session
         session["email"] = "ta@uwm.edu"
+        session["account_type"] = "ta"
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -600,12 +602,13 @@ class DeleteAccount(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/accounts/"))
 
     #This test checks to make sure that an instructor can't delete an account
     def test_instructorcantdeleteaccount(self):
         session = self.webpage.session
         session["email"] = "teacher@uwm.edu"
+        session["account_type"] = "instructor"
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -614,7 +617,7 @@ class DeleteAccount(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/accounts/"))
 
 
 class DeleteCourse(TestCase):
@@ -695,6 +698,7 @@ class DeleteCourse(TestCase):
     def test_tacantdeletecourse(self):
         session = self.webpage.session
         session["email"] = "ta@uwm.edu"
+        session["account_type"] = "ta"
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -704,7 +708,7 @@ class DeleteCourse(TestCase):
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/courses/"))
 
     #This test checks that an instructor can't delete an a course
     def test_instructorcantdeletecourse(self):
@@ -719,7 +723,7 @@ class DeleteCourse(TestCase):
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/courses/"))
 
 
 class EditAccount(TestCase):
