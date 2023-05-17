@@ -1,21 +1,12 @@
 from django.test import TestCase
 from TAScheduler.models import User, PublicInfo, PrivateInfo
-from typing import Dict
-# from unittest.mock import patch, MagicMock
 from classes import account
+from classes.account import create_account, delete_account, Account
 
 
 class TestCreateAccount(TestCase):
     """tests whether the create_account function creates a new user, public info and private info object
     correctly when provided with a valid dictionary containing all required fields."""
-
-
-from classes.account import create_account, delete_account, Account
-
-
-class TestCreateAccount(TestCase):
-    '''tests whether the create_account function creates a new user, public info and private info object
-    correctly when provided with a valid dictionary containing all required fields.'''
 
     def test_create_account_success(self):
         data = {
@@ -25,8 +16,8 @@ class TestCreateAccount(TestCase):
             'first_name': 'John',
             'last_name': 'Doe'
         }
-        newAccount = create_account(data)
-        self.assertIsInstance(newAccount, Account)
+        new_account = create_account(data)
+        self.assertIsInstance(new_account, Account)
 
     '''Tests whether the create_account function returns None when required fields are missing.'''
 
