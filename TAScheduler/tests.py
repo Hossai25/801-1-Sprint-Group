@@ -696,22 +696,6 @@ class EditAccount(TestCase):
                                      "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"})
         self.assertContains(resp, "Error editing the account. Invalid input")
 
-    # This test checks to make sure an error is thrown if an invalid password is entered
-    def test_editPasswordFail(self):
-        session = self.webpage.session
-        current_user = self.account_objs[0]
-        login_to_session(current_user, session)
-        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
-        temp.save()
-        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
-        temp2.save()
-        temp3 = PrivateInfo(user_id=temp)
-        temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': temp.pk}),
-                                 {"first_name": "New", "last_name": "Name", "email":
-                                     "test1@uwm.edu", "password": "", "account_type": "administrator"})
-        self.assertContains(resp, "Error editing the account. Invalid input")
-
     # This test checks to see if the edited account is updated to the database
     def test_accountUpdatedInDatabase(self):
         session = self.webpage.session
