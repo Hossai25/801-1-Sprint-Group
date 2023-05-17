@@ -75,8 +75,8 @@ class TestTaStaticMethods(TestCase):
         self.assertIsNone(section_ta)
 
     def test_getSectionTaSuccess(self):
-        self.section_model.ta_id = self.user_model
-        section_ta = ta.get_section_ta(self.section_model.pk)
+        section_model = SectionModel.objects.create(lab_name="1", course_id=self.course_model, ta_id=self.user_model)
+        section_ta = ta.get_section_ta(section_model.pk)
         self.assertIsInstance(section_ta, Ta)
 
     def test_getAllTasReturnsTaList(self):
@@ -225,5 +225,5 @@ class TestTaClassMethods(TestCase):
         self.assertFalse(self.ta_instance.remove_from_section(self.section_model.pk))
 
     def test_removeFromSectionSuccess(self):
-        SectionModel.objects.create(lab_name="1", course_id=self.course_model, ta_id=self.user_model)
-        self.assertTrue(self.ta_instance.remove_from_section(self.section_model.pk))
+        section_model = SectionModel.objects.create(lab_name="1", course_id=self.course_model, ta_id=self.user_model)
+        self.assertTrue(self.ta_instance.remove_from_section(section_model.pk))

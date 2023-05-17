@@ -29,7 +29,9 @@ def get_course_tas(course_id: int):
 def get_section_ta(section_id: int):
     try:
         section_model = LabModel.objects.get(id=section_id)
-        ta_id = section_model.ta_id
+        if section_model.ta_id is None:
+            return None
+        ta_id = section_model.ta_id.pk
         ta = account_to_ta(ta_id)
         return ta
     except LabModel.DoesNotExist:
