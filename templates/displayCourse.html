@@ -49,7 +49,13 @@
         {% for course_ta in course_tas %}
             <tr>
                 <td style="width: 500px">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</td>
-                <td>{{ course_ta.grader_status }}</td>
+                <td>
+                    {% if course_ta.grader_status %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
                 <td>{{ course_ta.number_sections }}</td>
                 {% if account_type == "admin" %}
                 <td>

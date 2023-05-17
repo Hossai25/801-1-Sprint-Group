@@ -314,7 +314,7 @@ class DisplayCourse(View):
                 context["error_ta"] = DisplayCourse.error_nosuchta
                 return render(request, "displayCourse.html", context)
             new_course_ta = new_ta.add_to_course(course_id)
-            if new_course_ta is None:
+            if new_course_ta is False:
                 context = self.get_context(request, course_id)
                 context["error_ta"] = DisplayCourse.error_duplicateta
                 return render(request, "displayCourse.html", context)
