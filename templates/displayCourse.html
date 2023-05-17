@@ -14,6 +14,7 @@
 <div class="table-container">
     <h2>Course: {{ course.get_course_name }}</h2>
     <h4>Instructor: {{ course_instructor.get_first_name }} {{ course_instructor.get_last_name }}</h4>
+    {% if account_type == "admin" %}
     <h7>
         <div class="input-group" style="width: 500px">
             <select name="instructor_id" class="form-select">
@@ -29,6 +30,7 @@
         </div>
     </h7>
     <div class="text-danger">{{ error_instructor }}</div>
+    {% endif %}
 </div>
     <div class = "table-container">
         <h3>TAs</h3>
@@ -38,7 +40,9 @@
             <th>TA name</th>
             <th>Grader Status</th>
             <th># of Labs</th>
+            {% if account_type == "admin" %}
             <th>Edit/Delete</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -47,6 +51,7 @@
                 <td style="width: 500px">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</td>
                 <td>{{ course_ta.grader_status }}</td>
                 <td>{{ course_ta.number_sections }}</td>
+                {% if account_type == "admin" %}
                 <td>
                     <a class="btn" href="{% url 'editCourseTa' course_id=course.get_primary_key user_id=course_ta.get_primary_key %}">
                         <img src="{% static 'TAScheduler/icons/edit.svg' %}">
@@ -55,9 +60,11 @@
                         <img src="{% static 'TAScheduler/icons/delete.svg' %}">
                     </a>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
+    {% if account_type == "admin" %}
     <tfoot>
             <tr>
                 <td style="width: 500px">
@@ -82,6 +89,7 @@
                 </td>
             </tr>
     </tfoot>
+    {% endif %}
 </table>
     </div>
 </form>
@@ -97,7 +105,11 @@
         <tr>
             <th>Section Name</th>
             <th>Assigned TA</th>
+            {% if account_type == "admin" %}
             <th>Edit/Delete</th>
+            {% elif account_type == "instructor" and course_instructor.get_primary_key == current_user.get_primary_key %}
+            <th>Edit</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -109,17 +121,24 @@
                     {{ section.ta.get_first_name }} {{ section.ta.get_last_name }}
                 {% else %}No TA Assigned{% endif %}
             </td>
+            {% if account_type == "admin" or account_type == "instructor" %}
+            {% if course_instructor.get_primary_key == current_user.get_primary_key or account_type == "admin" %}
             <td>
                 <a class="btn" href="{% url 'editSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
                     <img src="{% static 'TAScheduler/icons/edit.svg' %}">
                 </a>
+                {% endif %}
+                {% endif %}
+                {% if account_type == "admin" %}
                 <a class="btn" href="{% url 'deleteSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
                     <img src="{% static 'TAScheduler/icons/delete.svg' %}">
                 </a>
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>
+    {% if account_type == "admin" %}
     <tfoot>
         <tr>
             <td>
@@ -129,7 +148,7 @@
                 <select class="form-select" name="ta">
                     <option value="None" selected>None Assigned</option>
                     {% for course_ta in course_tas %}
-                    {% if course_ta.number_sections != 0 %}
+                    {% if course_ta.number_sections > course_ta.current_number_sections %}
                     <option value="{{ course_ta.get_primary_key }}">
                         {{ course_ta.get_first_name }} {{ course_ta.get_last_name }}
                     </option>
@@ -142,8 +161,9 @@
             </td>
         </tr>
     </tfoot>
+    {% endif %}
 </table>
 </div>
 </form>
-    <div class="text-danger">{{ error_section }}</div>
+<div class="text-danger">{{ error_section }}</div>
 {%  endblock %}

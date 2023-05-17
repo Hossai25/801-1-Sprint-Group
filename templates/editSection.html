@@ -1,0 +1,38 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Edit Section
+{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'editSection' course_id=course.get_primary_key section_id=selected_section.lab_model.pk %}" method="post">
+    <h2>{{ course.get_course_name }}</h2>
+    <h3>{{ selected_section.lab_model.lab_name }}</h3>
+    {% csrf_token %}
+    <div class="row">
+        <label for="ta" class="col-sm-3 col-form-label">Section TA</label>
+        <div class="col-sm-9">
+            <select class="form-select" name="ta">
+                {% if selected_section.ta %}
+                    <option value="{{ selected_section.ta.get_primary_key }}" selected>{{ selected_section.ta.get_first_name }} {{ selected_section.ta.get_last_name }}</option>
+                    <option value="">None</option>
+                {% else %}
+                    <option selected value="">None</option>
+                {% endif %}
+
+                {% for course_ta in course.tas %}
+                    {% if selected_section.ta and selected_section.ta.get_primary_key == course_ta.get_primary_key %}
+                        <!-- ta was already displayed above, so we don't show it here -->
+                    {% elif course_ta.number_sections > course_ta.current_number_sections %}
+                        <option value="{{ course_ta.get_primary_key }}">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Submit">
+    <a class="btn btn-primary" href="{% url 'displayCourse' course_id=course.get_primary_key %}">Cancel</a>
+</form>
+
+{%  endblock %}

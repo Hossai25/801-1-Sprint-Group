@@ -9,105 +9,17 @@ from django import urls
 from classes.section import create_section
 
 
+def set_default_session(session: Client.session):
+    default_session = {"email": "",
+                       "account_type": "",
+                       "user": ""}
+    for key in default_session.keys():
+        if key not in session or session.get(key) is None:
+            session[key] = default_session[key]
+    session.save()
+
+
 class Login(TestCase):
-    webpage = None
-    users = None
-
-    def setUp(self):
-        self.webpage = Client()
-        self.users = ["test1", "test2"]
-
-        #Fill test database with users
-        for i in self.users:
-            temp = User(email=i+"@uwm.edu", password=i, account_type="administrator")
-            temp.save()
-            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
-            temp2.save()
-            temp3 = PrivateInfo(user_id=temp)
-            temp3.save()
-
-
-    #This test checks to see if the username and password are passed from login into the database
-    def test_correctName(self):
-        for i in self.users:
-            resp = self.webpage.post("/", {"username": i+"@uwm.edu", "password": i},
-                                     follow=True)
-            self.assertEqual(resp.context["email"], i+"@uwm.edu", "username not passed from login")
-
-
-    #This test checks to see if upon a successful login the user is brought to the dashboard/homepage
-    def test_successfulLogin(self):
-        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "test1"},
-                                 follow=True)
-        self.assertRedirects(resp, "/dashboard/")
-
-    #This test checks to see that if no password is used an error message appears
-    def test_noPassword(self):
-        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": ""},
-                                 follow=True)
-        self.assertContains(resp, "Invalid username or password.")
-
-    #This test checks to see if the wrong password is used an error message appears
-    def test_wrongPassword(self):
-        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "password"}, follow=True)
-        self.assertContains(resp, "Invalid username or password.")
-
-    #This test checks to see if the forgot password redirects to the right page
-    def test_forgotPassword(self):
-        #HASN'T BEEN IMPLEMENTED YET
-        pass
-
-class Dashboard(TestCase):
-    webpage = None
-    users = None
-
-    def setUp(self):
-        self.webpage = Client()
-        self.users = ["test1", "test2"]
-
-        for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
-            temp.save()
-            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
-            temp2.save()
-            temp3 = PrivateInfo(user_id=temp)
-            temp3.save()
-
-    #This test checks to see if the user is redirected to the accounts page when the button is pressed
-    def test_accountsClicked(self):
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('dashboard'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Accounts</a>' % reverse('accounts'), html=True)
-
-    # This test checks to see if the user is redirected to the courses page when the button is pressed
-    def test_coursesClicked(self):
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('dashboard'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Courses/Labs</a>' % reverse('courses'), html=True)
-
-    # This test checks to see if the user is redirected to the access data page when the button is pressed
-    def test_accessDataClicked(self):
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('dashboard'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Access Data</a>' % reverse('database'),
-                            html=True)
-
-    # This test checks to see if the user is redirected to the notifications page when the button is pressed
-    def test_notificationsClicked(self):
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('dashboard'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Notifications</a>' % reverse('notifications'),
-                            html=True)
-
-class Accounts(TestCase):
     webpage = None
     users = None
 
@@ -124,11 +36,99 @@ class Accounts(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
-    #This test checks to see that if the create account button is pressed it brings the user to the
+    # This test checks to see if the username and password are passed from login into the database
+    def test_correctName(self):
+        for i in self.users:
+            resp = self.webpage.post("/", {"username": i + "@uwm.edu", "password": i},
+                                     follow=True)
+            self.assertEqual(resp.context["email"], i + "@uwm.edu", "username not passed from login")
+
+    # This test checks to see if upon a successful login the user is brought to the dashboard/homepage
+    def test_successfulLogin(self):
+        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "test1"},
+                                 follow=True)
+        self.assertRedirects(resp, "/dashboard/")
+
+    # This test checks to see that if no password is used an error message appears
+    def test_noPassword(self):
+        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": ""},
+                                 follow=True)
+        self.assertContains(resp, "Invalid username or password.")
+
+    # This test checks to see if the wrong password is used an error message appears
+    def test_wrongPassword(self):
+        resp = self.webpage.post("/", {"username": "test1@uwm.edu", "password": "password"}, follow=True)
+        self.assertContains(resp, "Invalid username or password.")
+
+class Dashboard(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
+
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+
+    # This test checks to see if the user is redirected to the accounts page when the button is pressed
+    def test_accountsClicked(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('dashboard'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Accounts</a>' % reverse('accounts'), html=True)
+
+    # This test checks to see if the user is redirected to the courses page when the button is pressed
+    def test_coursesClicked(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('dashboard'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Courses/Labs</a>' % reverse('courses'), html=True)
+
+    # This test checks to see if the user is redirected to the notifications page when the button is pressed
+    def test_notificationsClicked(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        resp = self.webpage.get(reverse('dashboard'))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Notifications</a>' % reverse('notifications'),
+                            html=True)
+
+
+class Accounts(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+        self.account_objs = []
+        set_default_session(self.webpage.session)
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            self.account_objs.append(temp)
+
+    # This test checks to see that if the create account button is pressed it brings the user to the
     # right page
     def test_toCreateAccountPage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
         session.save()
         resp = self.webpage.get(reverse('accounts'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Accounts</a>' % reverse('createAccount'),
@@ -139,10 +139,11 @@ class Accounts(TestCase):
     def test_toEditAccountPage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"]="admin"
         session.save()
         resp = self.webpage.get(reverse('accounts'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Edit Accounts</a>' % reverse('editAccount'),
-                            html=True)
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s"><img src="/static/TAScheduler/icons/edit.svg"></a>' % reverse('editAccount',
+                            kwargs={'user_id': self.account_objs[1].pk}), html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
     # the right page
@@ -162,6 +163,7 @@ class CreateAccounts(TestCase):
     def setUp(self):
         self.webpage = Client()
         self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
 
         # Fill test database with users
         for i in self.users:
@@ -172,7 +174,7 @@ class CreateAccounts(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
-    #This test checks to see that when the information is entered correctly user is brought back
+    # This test checks to see that when the information is entered correctly user is brought back
     # to dashboard
     def test_checkSuccessfully(self):
         session = self.webpage.session
@@ -182,7 +184,7 @@ class CreateAccounts(TestCase):
             "avfronk@uwm.edu", "password": "annafronk", "account_type": "administrator"}, follow=True)
         self.assertRedirects(resp, "/accounts/")
 
-    #This test checks if the first name has an invalid input then an error message appears
+    # This test checks if the first name has an invalid input then an error message appears
     def test_checkFirstNameFail(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -244,7 +246,7 @@ class CreateAccounts(TestCase):
         session.save()
         resp = self.webpage.get(reverse('createAccount'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-                           html=True)
+                            html=True)
 
     # This test checks to see if a successful submission is added to the database
     def test_accountAddedToDatabase(self):
@@ -263,6 +265,7 @@ class Courses(TestCase):
     def setUp(self):
         self.webpage = Client()
         self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
 
         # Fill test database with users
         for i in self.users:
@@ -272,7 +275,6 @@ class Courses(TestCase):
             temp2.save()
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
-
 
     # This test checks to see that if the create course button is pressed it brings the user to the
     # right page
@@ -304,6 +306,7 @@ class Courses(TestCase):
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
                             html=True)
 
+
 class CreateCourse(TestCase):
     webpage = None
     users = None
@@ -313,6 +316,7 @@ class CreateCourse(TestCase):
         self.webpage = Client()
         self.users = ["test1"]
         self.courses = ["Course1", "Course2"]
+        set_default_session(self.webpage.session)
 
         # Fill test database with users
         for i in self.users:
@@ -325,7 +329,7 @@ class CreateCourse(TestCase):
             for j in self.courses:
                 Course(course_name=i, instructor_id=temp).save()
 
-    #This test checks to see after a course is created the user is redirected to the dashboard
+    # This test checks to see after a course is created the user is redirected to the dashboard
     def test_successfulCourseCreation(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -333,7 +337,7 @@ class CreateCourse(TestCase):
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
         self.assertRedirects(resp, "/courses/")
 
-    #This test checks to see if an error appears if a duplicate course is created
+    # This test checks to see if an error appears if a duplicate course is created
     def test_duplicateCourse(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -341,7 +345,7 @@ class CreateCourse(TestCase):
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course1"}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
-    #This test checks to see if an error appears if a blank field is entered
+    # This test checks to see if an error appears if a blank field is entered
     def test_blankFields(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -349,13 +353,14 @@ class CreateCourse(TestCase):
         resp = self.webpage.post(reverse("createCourse"), {"course_name": ""}, follow=True)
         self.assertContains(resp, "Error creating the course.")
 
-    #This test checks to see if the course is successfully added to the database when it is submitted
+    # This test checks to see if the course is successfully added to the database when it is submitted
     def test_courseAddedToDatabase(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
         self.assertNotEqual(Course.objects.get(course_name="Course3"), None)
+
 
 class CreateSection(TestCase):
     webpage = None
@@ -366,10 +371,11 @@ class CreateSection(TestCase):
         self.webpage = Client()
         self.users = ["test1"]
         self.courses = ["Course1", "Course2"]
+        set_default_session(self.webpage.session)
 
         # Fill test database with users
         for i in self.users:
-            #Instructor
+            # Instructor
             temp = User(email=i + "@uwm.edu", password=i, account_type="instructor")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
@@ -377,8 +383,8 @@ class CreateSection(TestCase):
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
 
-            #TA
-            tatemp= User(email=i + "ta@uwm.edu", password=i, account_type="ta")
+            # TA
+            tatemp = User(email=i + "ta@uwm.edu", password=i, account_type="ta")
             tatemp.save()
             tatemp2 = PublicInfo(user_id=tatemp, first_name=i, last_name=i)
             tatemp2.save()
@@ -386,8 +392,10 @@ class CreateSection(TestCase):
             tatemp3.save()
             for j in self.courses:
                 tempCourse = Course(course_name=j, instructor_id=temp).save()
-                Lab(lab_name=j+" Section", course_id=tempCourse, ta_id=tatemp)
+                Lab(lab_name=j + " Section", course_id=tempCourse, ta_id=tatemp)
 
+    #This tests to see that once a section is successfully created, the webpage is redirected back to the
+    #courses page
     def test_successfulSectionCreation(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -399,9 +407,12 @@ class CreateSection(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
-        resp = self.webpage.post(reverse("createLab"), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"}, follow=True)
+        resp = self.webpage.post(reverse("createLab"),
+                                 {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"},
+                                 follow=True)
         self.assertRedirects(resp, "/courses/")
 
+    #This tests checks that if a duplicate section is created an error is thrown
     def test_duplicateSection(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -413,10 +424,13 @@ class CreateSection(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
-        testlab = Lab.objects.create(lab_name= "testsection", course_id= testcourse , ta_id= temp)
-        resp = self.webpage.post(reverse('createLab'), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "testsection"}, follow=True)
+        testlab = Lab.objects.create(lab_name="testsection", course_id=testcourse, ta_id=temp)
+        resp = self.webpage.post(reverse('createLab'),
+                                 {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "testsection"},
+                                 follow=True)
         self.assertContains(resp, "Section name blank or already exists.")
 
+    #This test checks to see that if fields are left blank an error is thrown
     def test_blankSectionFields(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -428,16 +442,20 @@ class CreateSection(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
-        resp = self.webpage.post(reverse('createLab'), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": ""}, follow=True)
+        resp = self.webpage.post(reverse('createLab'),
+                                 {"course_id": testcourse.id, "course_object": testcourse, "lab_name": ""}, follow=True)
         self.assertContains(resp, "Section name blank or already exists.")
 
+    #This test checks to see how a invalid course is handled when linking with a section
     def test_noCourseForSection(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        resp = self.webpage.post(reverse("createLab"), {"course_id": 000, "course_object": "", "lab_name": "New Section"}, follow=True)
+        resp = self.webpage.post(reverse("createLab"),
+                                 {"course_id": 000, "course_object": "", "lab_name": "New Section"}, follow=True)
         self.assertContains(resp, "Course not found.")
 
+    #This test checks to that sections once created are added to the database
     def test_sectionAddedToDatabase(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -449,8 +467,11 @@ class CreateSection(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
-        resp = self.webpage.post(reverse("createLab"), {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"}, follow=True)
+        resp = self.webpage.post(reverse("createLab"),
+                                 {"course_id": testcourse.id, "course_object": testcourse, "lab_name": "New Section"},
+                                 follow=True)
         self.assertNotEqual(Lab.objects.get(lab_name="New Section"), None)
+
 
 class DeleteAccount(TestCase):
     webpage = None
@@ -459,6 +480,8 @@ class DeleteAccount(TestCase):
     def setUp(self):
         self.webpage = Client()
         self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
+        self.account_objs = []
 
         # Fill test database with users
         for i in self.users:
@@ -468,8 +491,9 @@ class DeleteAccount(TestCase):
             temp2.save()
             temp3 = PrivateInfo(user_id=temp)
             temp3.save()
+            self.account_objs.append(temp)
 
-        #Instructor User
+        # Instructor User
         newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
         newUser.save()
         newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
@@ -477,7 +501,7 @@ class DeleteAccount(TestCase):
         newUser3 = PrivateInfo(user_id=newUser)
         newUser3.save()
 
-        #TA User
+        # TA User
         newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
         newta.save()
         newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
@@ -485,6 +509,7 @@ class DeleteAccount(TestCase):
         newta3 = PrivateInfo(user_id=newta)
         newta3.save()
 
+    #This test checks that once an account is deleted, a user is redirected to the account page
     def test_successfuldeletion(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
@@ -498,9 +523,22 @@ class DeleteAccount(TestCase):
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
         self.assertRedirects(resp, "/accounts/")
 
+    #This test checks when deleting an account, any courses connected still exist in the database
     def test_anyclassesconnectedstillexist(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="instructor")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        Course(course_name="test", instructor_id=temp).save()
+        resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
+        self.assertNotEqual(Course(course_name="test", instructor_id=temp), None)
 
+    #This test checks to make sure that a TA can't delete a user account
     def test_tacantdeleteaccount(self):
         session = self.webpage.session
         session["email"] = "ta@uwm.edu"
@@ -514,6 +552,7 @@ class DeleteAccount(TestCase):
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
         self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
 
+    #This test checks to make sure that an instructor can't delete an account
     def test_instructorcantdeleteaccount(self):
         session = self.webpage.session
         session["email"] = "teacher@uwm.edu"
@@ -526,6 +565,8 @@ class DeleteAccount(TestCase):
         temp3.save()
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
         self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
+
+
 class DeleteCourse(TestCase):
     webpage = None
     users = None
@@ -535,6 +576,7 @@ class DeleteCourse(TestCase):
         self.webpage = Client()
         self.users = ["test1"]
         self.courses = ["Course1", "Course2"]
+        set_default_session(self.webpage.session)
 
         # Fill test database with users
         for i in self.users:
@@ -563,9 +605,11 @@ class DeleteCourse(TestCase):
             newta3 = PrivateInfo(user_id=newta)
             newta3.save()
 
+    #This test checks to see if once a course is successfully created, the user is navigated back to the courses page
     def test_successfuldeletion(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        set_default_session(session)
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -577,13 +621,28 @@ class DeleteCourse(TestCase):
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
         self.assertRedirects(resp, "/courses/")
 
+    #This test checks to see that an insturctor that is connected to a course that is deleted still exists
     def test_instructorstillexists(self):
-        pass
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="delete@uwm.edu", password="delete", account_type="instructor")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        tempcourse = Course(course_name="test", instructor_id=temp)
+        tempcourse.save()
+        resp = self.webpage.get(reverse('deleteCourse', args=[tempcourse.pk]))
+        self.assertNotEqual(User(email="delete@uwm.edu", password="delete", account_type="instructor"), None)
 
+    # This test checks to see that a TA that is connected to a course that is deleted still exists
     def test_tastillexists(self):
         pass
 
-    def test_tacantdeleteaccount(self):
+    #This test checks that a TA can't delete a course
+    def test_tacantdeletecourse(self):
         session = self.webpage.session
         session["email"] = "ta@uwm.edu"
         session.save()
@@ -597,7 +656,8 @@ class DeleteCourse(TestCase):
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
         self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
 
-    def test_instructorcantdeleteaccount(self):
+    #This test checks that an instructor can't delete an a course
+    def test_instructorcantdeletecourse(self):
         session = self.webpage.session
         session["email"] = "teacher@uwm.edu"
         session.save()
@@ -610,4 +670,213 @@ class DeleteCourse(TestCase):
         testcourse = CourseModel.objects.create(course_name="test_course")
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
         self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+
+
+class EditAccount(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
+        self.account_objs = []
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            self.account_objs.append(temp)
+
+    #This test checks that you can successfully edit an account
+    def test_checkSuccessful(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}), {"first_name": "New", "last_name": "Name", "email":
+            "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"}, self.account_objs[1].pk)
+        self.assertRedirects(resp, "/accounts/")
+
+    #This test checks to make sure an error is thrown if an invalid first name is entered
+    def test_editFirstNameFail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}),
+                                 {"first_name": " ", "last_name": "Name", "email":
+                                     "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"},
+                                 self.account_objs[1].pk)
+        self.assertContains(resp, "Error editing the account. Invalid input")
+
+    # This test checks to make sure an error is thrown if an invalid last name is entered
+    def test_editLastNameFail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}),
+                                 {"first_name": "New", "last_name": " ", "email":
+                                     "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"},
+                                 self.account_objs[1].pk)
+        self.assertContains(resp, "Error editing the account. Invalid input")
+
+    # This test checks to make sure an error is thrown if an invalid password is entered
+    def test_editPasswordFail(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}),
+                                 {"first_name": "New", "last_name": "Name", "email":
+                                     "test1@uwm.edu", "password": " ", "account_type": "administrator"},
+                                 self.account_objs[1].pk)
+        self.assertContains(resp, "Error editing the account. Invalid input")
+
+    #This test checks to see if the edited account is updated to the database
+    def test_accountUpdatedInDatabase(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        temp = User(email="instructor@uwm.edu", password="instructor", account_type="instructor")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        resp = self.webpage.post(reverse('editAccount', kwargs={'course_id': self.account_objs[1].pk}),
+                                 {"first_name": "New", "last_name": "Name", "email":
+                                     "test1@uwm.edu", "password": "testpassword", "account_type": "administrator"},
+                                 self.account_objs[1].pk)
+        self.assertNotEqual(User.objects.get(email="test1@uwm.edu", password="testpassword", account_type="administrator"), None)
+
+class DisplayCourse(TestCase):
+    webpage = None
+    users = None
+    courses = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1"]
+        self.courses = ["Course1", "Course2"]
+        self.course_objs = []
+        set_default_session(self.webpage.session)
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            for j in self.courses:
+                temp_model = Course(course_name=i, instructor_id=temp)
+                self.course_objs.append(temp_model)
+                temp_model.save()
+
+                # Instructor User
+        newUser = User(email="teacher@uwm.edu", password="teacher", account_type="instructor")
+        newUser.save()
+        newUser2 = PublicInfo(user_id=newUser, first_name="Tom", last_name="Teacher")
+        newUser2.save()
+        newUser3 = PrivateInfo(user_id=newUser)
+        newUser3.save()
+
+            # TA User
+        newta = User(email="ta@uwm.edu", password="ta", account_type="ta")
+        newta.save()
+        newta2 = PublicInfo(user_id=newta, first_name="Tina", last_name="TA")
+        newta2.save()
+        newta3 = PrivateInfo(user_id=newta)
+        newta3.save()
+
+    #This test checks to see if the user is navigated back to the homepage from the display course page
+    def test_backToHomepage(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                            html=True)
+
+    #This test checks that all the courses from the database are displayed in the graph
+    def test_displaysAllCourses(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        pass
+
+    #This test checks that a submitted TA is added to the database
+    def test_submitTAtoDatabase(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(reverse("displayCourse", kwargs={'course_id': self.course_objs[1].pk}),
+                                 {"submitTa": ""}, follow=True)
+        self.assertNotEqual(User.objects.get(email="tatemp@uwm.edu"), None)
+
+    #This test checks that a submitted instructor is added to the database
+    def test_submitInstructortoDatabase(self):
+       pass
+    #This test checks that a submitted section  is added to the database
+    def test_submitSectiontoDatabase(self):
+        pass
+
+    def test_tabutton(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
+        session.save()
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp,
+                            '<input type="submit" class="btn btn-primary" name="submitTa" value="Submit">',
+                            html=True)
+
+    def test_sectionbutton(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
+        session.save()
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp,
+                            '<input type="submit" class="btn btn-primary" name="submitSection" value="Add Section">',
+                            html=True)
+
+    def test_instructorbutton(self):
+        session = self.webpage.session
+        session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
+        session.save()
+        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+        self.assertContains(resp, '<input type="submit" class="btn btn-primary btn-sm" name="submitInstructor" value="Submit" formnovalidate>',
+                            html=True)
+
 

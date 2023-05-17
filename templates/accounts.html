@@ -8,8 +8,9 @@
 
 {% block content %}
     <!-- changes to this element require acceptance tests to be updated! -->
+    {% if account_type == "admin" %}
     <a class="btn btn-primary" href="{% url 'createAccount' %}">Create Accounts</a>
-
+    {% endif %}
 <div class="table-container">
 <table class="my-table">
     <thead>
@@ -18,9 +19,11 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Office Hours</th>
+            {% if account_type == "admin" %}
             <th>Address</th>
             <th>Phone Number</th>
             <th>Edit/Delete</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -31,6 +34,7 @@
                 <td>{{ account.get_first_name }}</td>
                 <td>{{ account.get_last_name }}</td>
                 <td>{{ account.get_office_hours }}</td>
+                {% if account_type == "admin" %}
                 <td>{{ account.get_address }}</td>
                 <td>{{ account.get_phone_number }}</td>
                 <td>
@@ -41,6 +45,7 @@
                         <img src="{% static 'TAScheduler/icons/delete.svg' %}">
                     </a>
                 </td>
+                {% endif %}
             </tr>
         {% endif %}
         {% endfor %}

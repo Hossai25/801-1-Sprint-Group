@@ -66,12 +66,20 @@ Home
             {% if account_type == "ta" %}
             <table>
                 <tr>
-                    <th>Courses |</th>
+                    <th>Courses</th>
+                </tr>
+                {% for course in assistant_courses %}
+                <tr>
+                    <td>{{ course.get_course_name }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <table>
+                <tr>
                     <th>Sections</th>
                 </tr>
                 {% for section in assistant_sections %}
                 <tr>
-                    <td>{{ section.get_course_name }}</td>
                     <td>{{ section.get_lab_name }}</td>
                 </tr>
                 {% endfor %}
