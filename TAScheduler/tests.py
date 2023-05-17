@@ -19,6 +19,13 @@ def set_default_session(session: Client.session):
     session.save()
 
 
+def login_to_session(user: User, session: Client.session):
+    session["email"] = user.email
+    session["account_type"] = user.account_type
+    session["user"] = str(user.pk)
+    session.save()
+
+
 class Login(TestCase):
     webpage = None
     users = None
@@ -102,6 +109,17 @@ class Dashboard(TestCase):
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Notifications</a>' % reverse('notifications'),
                             html=True)
 
+    # This test checks to see that if the Change Personal info button is pressed it brings the user to the
+    # right page
+    def test_toEditAccountPage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('accounts'))
+            self.assertContains(resp,
+                                '<a class="container-fluid text-light" href="%s">Change Personal Info</a>'
+                                % reverse('editAccount', kwargs={'user_id': session["user"]}), html=True)
+
 
 class Accounts(TestCase):
     webpage = None
@@ -134,26 +152,26 @@ class Accounts(TestCase):
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Accounts</a>' % reverse('createAccount'),
                             html=True)
 
-    # This test checks to see that if the edit account button is pressed it brings the user to the
+    # This test checks to see that if the Change Personal info button is pressed it brings the user to the
     # right page
     def test_toEditAccountPage(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session["account_type"]="admin"
-        session.save()
-        resp = self.webpage.get(reverse('accounts'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s"><img src="/static/TAScheduler/icons/edit.svg"></a>' % reverse('editAccount',
-                            kwargs={'user_id': self.account_objs[1].pk}), html=True)
+        for user_obj in self.account_objs:
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('accounts'))
+            self.assertContains(resp,
+                                '<a class="container-fluid text-light" href="%s">Change Personal Info</a>'
+                                % reverse('editAccount', kwargs={'user_id': session["user"]}), html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
     # the right page
     def test_toHomepage(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('accounts'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-                            html=True)
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('accounts'))
+            self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
 
 
 class CreateAccounts(TestCase):
@@ -242,11 +260,11 @@ class CreateAccounts(TestCase):
     # the right page
     def test_toHomepage(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('createAccount'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-                            html=True)
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('createAccount'))
+            self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
 
     # This test checks to see if a successful submission is added to the database
     def test_accountAddedToDatabase(self):
@@ -281,6 +299,7 @@ class Courses(TestCase):
     def test_toCreateCoursePage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
         session.save()
         resp = self.webpage.get(reverse('courses'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
@@ -291,6 +310,7 @@ class Courses(TestCase):
     def test_toCreateLabPage(self):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
+        session["account_type"] = "admin"
         session.save()
         resp = self.webpage.get(reverse('courses'))
         self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
@@ -300,11 +320,22 @@ class Courses(TestCase):
     # right page
     def test_toHomepage(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        resp = self.webpage.get(reverse('courses'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-                            html=True)
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('courses'))
+            self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
+
+    # This test checks to see that if the Change Personal info button is pressed it brings the user to the
+    # right page
+    def test_toEditAccountPage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('accounts'))
+            self.assertContains(resp,
+                                '<a class="container-fluid text-light" href="%s">Change Personal Info</a>'
+                                % reverse('editAccount', kwargs={'user_id': session["user"]}), html=True)
 
 
 class CreateCourse(TestCase):
@@ -320,7 +351,7 @@ class CreateCourse(TestCase):
 
         # Fill test database with users
         for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
             temp2.save()
@@ -360,6 +391,27 @@ class CreateCourse(TestCase):
         session.save()
         resp = self.webpage.post(reverse("createCourse"), {"course_name": "Course3"}, follow=True)
         self.assertNotEqual(Course.objects.get(course_name="Course3"), None)
+
+    # This test checks to see that if the Change Personal info button is pressed it brings the user to the
+    # right page
+    def test_toEditAccountPage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('accounts'))
+            self.assertContains(resp,
+                                '<a class="container-fluid text-light" href="%s">Change Personal Info</a>'
+                                % reverse('editAccount', kwargs={'user_id': session["user"]}), html=True)
+
+    # This test checks to see that if the back to dashboard button is pressed it brings the user to
+    # the right page
+    def test_toHomepage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.filter(account_type="admin"):
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('createCourse'))
+            self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
 
 
 class CreateSection(TestCase):
@@ -485,7 +537,7 @@ class DeleteAccount(TestCase):
 
         # Fill test database with users
         for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
             temp2.save()
@@ -542,6 +594,7 @@ class DeleteAccount(TestCase):
     def test_tacantdeleteaccount(self):
         session = self.webpage.session
         session["email"] = "ta@uwm.edu"
+        session["account_type"] = "ta"
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -550,12 +603,13 @@ class DeleteAccount(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/accounts/"))
 
     #This test checks to make sure that an instructor can't delete an account
     def test_instructorcantdeleteaccount(self):
         session = self.webpage.session
         session["email"] = "teacher@uwm.edu"
+        session["account_type"] = "instructor"
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -564,7 +618,7 @@ class DeleteAccount(TestCase):
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
         resp = self.webpage.get(reverse('deleteAccount', args=[temp.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/accounts/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/accounts/"))
 
 
 class DeleteCourse(TestCase):
@@ -645,6 +699,7 @@ class DeleteCourse(TestCase):
     def test_tacantdeletecourse(self):
         session = self.webpage.session
         session["email"] = "ta@uwm.edu"
+        session["account_type"] = "ta"
         session.save()
         temp = User(email="delete@uwm.edu", password="delete", account_type="administrator")
         temp.save()
@@ -654,7 +709,7 @@ class DeleteCourse(TestCase):
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/courses/"))
 
     #This test checks that an instructor can't delete an a course
     def test_instructorcantdeletecourse(self):
@@ -669,7 +724,7 @@ class DeleteCourse(TestCase):
         temp3.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
         resp = self.webpage.get(reverse('deleteCourse', args=[testcourse.pk]))
-        self.assertEqual(False, self.assertRedirects(resp, "/courses/"))
+        self.assertEqual(None, self.assertRedirects(resp, "/courses/"))
 
 
 class EditAccount(TestCase):
@@ -703,9 +758,19 @@ class EditAccount(TestCase):
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}), {"first_name": "New", "last_name": "Name", "email":
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}), {"first_name": "New", "last_name": "Name", "email":
             "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"}, self.account_objs[1].pk)
         self.assertRedirects(resp, "/accounts/")
+
+    # This test checks to see that if the back to dashboard button is pressed it brings the user to
+    # the right page
+    def test_toHomepage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('editAccount', kwargs={'user_id': user_obj.pk}))
+            self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
 
     #This test checks to make sure an error is thrown if an invalid first name is entered
     def test_editFirstNameFail(self):
@@ -718,7 +783,7 @@ class EditAccount(TestCase):
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}),
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}),
                                  {"first_name": " ", "last_name": "Name", "email":
                                      "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"},
                                  self.account_objs[1].pk)
@@ -735,7 +800,7 @@ class EditAccount(TestCase):
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}),
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}),
                                  {"first_name": "New", "last_name": " ", "email":
                                      "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"},
                                  self.account_objs[1].pk)
@@ -752,7 +817,7 @@ class EditAccount(TestCase):
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'course_id': self.account_objs[1].pk}),
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}),
                                  {"first_name": "New", "last_name": "Name", "email":
                                      "test1@uwm.edu", "password": " ", "account_type": "administrator"},
                                  self.account_objs[1].pk)
@@ -769,7 +834,7 @@ class EditAccount(TestCase):
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse('editAccount', kwargs={'course_id': self.account_objs[1].pk}),
+        resp = self.webpage.post(reverse('editAccount', kwargs={'user_id': self.account_objs[1].pk}),
                                  {"first_name": "New", "last_name": "Name", "email":
                                      "test1@uwm.edu", "password": "testpassword", "account_type": "administrator"},
                                  self.account_objs[1].pk)
@@ -819,12 +884,22 @@ class DisplayCourse(TestCase):
     #This test checks to see if the user is navigated back to the homepage from the display course page
     def test_backToHomepage(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
+            self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
 
-        resp = self.webpage.get(reverse('displayCourse', kwargs={'course_id': self.course_objs[1].pk}))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
-                            html=True)
+    # This test checks to see that if the Change Personal info button is pressed it brings the user to the
+    # right page
+    def test_toEditAccountPage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            resp = self.webpage.get(reverse('accounts'))
+            self.assertContains(resp,
+                                '<a class="container-fluid text-light" href="%s">Change Personal Info</a>'
+                                % reverse('editAccount', kwargs={'user_id': session["user"]}), html=True)
 
     #This test checks that all the courses from the database are displayed in the graph
     def test_displaysAllCourses(self):
