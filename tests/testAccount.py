@@ -1,29 +1,21 @@
-#<<<<<<< HEAD
-#=======
 from django.test import TestCase
-#>>>>>>> main
 from TAScheduler.models import User, PublicInfo, PrivateInfo
 from typing import Dict
-#from unittest.mock import patch, MagicMock
-
-#<<<<<<< HEAD
+# from unittest.mock import patch, MagicMock
 from classes import account
 
 
 class TestCreateAccount(TestCase):
-
-
     """tests whether the create_account function creates a new user, public info and private info object
     correctly when provided with a valid dictionary containing all required fields."""
-#=======
+
+
 from classes.account import create_account, delete_account, Account
 
 
 class TestCreateAccount(TestCase):
     '''tests whether the create_account function creates a new user, public info and private info object
     correctly when provided with a valid dictionary containing all required fields.'''
-
-#>>>>>>> main
 
     def test_create_account_success(self):
         data = {
@@ -34,7 +26,7 @@ class TestCreateAccount(TestCase):
             'last_name': 'Doe'
         }
         newAccount = create_account(data)
-        self.assertIsInstance(newAccount,Account)
+        self.assertIsInstance(newAccount, Account)
 
     '''Tests whether the create_account function returns None when required fields are missing.'''
 
@@ -49,7 +41,8 @@ class TestCreateAccount(TestCase):
 
     '''Tests whether the create_account function returns None when a user with the same email already 
     exists in the database.'''
-#add user model,
+
+    # add user model,
 
     def test_create_account_existing_user(self):
         data = {
@@ -71,18 +64,18 @@ class TestCreateAccount(TestCase):
         self.assertEqual(result, None)
 
     def test_valid_login(self):
-    # Test case 1: Valid email and password
+        # Test case 1: Valid email and password
 
         email_attempt = "test@example.com"
         password_attempt = "password123"
-    #    self.assertEqual(account.valid_login(email_attempt,password_attempt),True)
+        #    self.assertEqual(account.valid_login(email_attempt,password_attempt),True)
 
-    # Test case 2: Invalid email
-        self.assertEqual(account.valid_login("invalid@example.com", password_attempt),False)
+        # Test case 2: Invalid email
+        self.assertEqual(account.valid_login("invalid@example.com", password_attempt), False)
 
-    # Test case 3: Invalid password
+        # Test case 3: Invalid password
 
-        self.assertEqual(account.valid_login(email_attempt, "wrongpassword"),False)
+        self.assertEqual(account.valid_login(email_attempt, "wrongpassword"), False)
 
     def test_editAccountReturnOnSuccess(self):
         user_model = User.objects.create(email="1", password="1", account_type="ta")
@@ -124,7 +117,6 @@ class TestCreateAccount(TestCase):
         self.assertIsInstance(result, Account)
 
 
-#=======
 class TestDeleteAccount(TestCase):
     def test_userModelRemoved(self):
         user_model = User.objects.create(email="test_email")
@@ -155,4 +147,3 @@ class TestDeleteAccount(TestCase):
         primary_key = user_model.pk
         user_model.delete()
         self.assertFalse(delete_account(primary_key))
-#>>>>>>> main
