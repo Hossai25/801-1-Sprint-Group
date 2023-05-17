@@ -1,11 +1,11 @@
 from typing import Dict
 
 from TAScheduler.models import Lab as LabModel
-from classes import account, course
+from classes import course
 
 
 def create_section(name: str, course_object: course.Course):
-    if LabModel.objects.filter(lab_name=name).exists():
+    if LabModel.objects.filter(lab_name=name, course_id=course_object.get_primary_key()).exists():
         return None
 
     new_section_model = LabModel.objects.create(
@@ -29,6 +29,21 @@ def __has_required_fields(data: Dict[str, any]):
     return required_fields.issubset(data.keys())
 
 
+def get_section_by_id(lab_id):
+    try:
+        lab_model = LabModel.objects.get(id=lab_id)
+        lab_object = Section(lab_model)
+        return lab_object
+    except LabModel.DoesNotExist:
+        return None
+
+
+def section_list(course_id):
+    sections = LabModel.objects.filter(course_id=course_id)
+    section_objects = [Section(lab_model) for lab_model in sections]
+    return section_objects
+
+
 class Section:
     def __init__(self, lab_model: LabModel):
         self.lab_model = lab_model
@@ -40,15 +55,5 @@ class Section:
     def get_lab_name(self):
         return self.lab_model.lab_name
 
-    def set_lab_name(self, new_lab_name: str):
-        self.lab_model.lab_name = new_lab_name
-        self.lab_model.save()
-
-    def get_ta(self):
-        ta_id = self.course_model.instructor_id
-        ta = account.get_account_by_id(ta_id)
-        return ta
-
-    def set_ta(self, ta: account.Account):
-        self.course_model.instructor_id = ta.get_primary_key()
-        self.course_model.save()
+    def get_primary_key(self):
+        return self.lab_model.pk

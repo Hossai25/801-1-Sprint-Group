@@ -12,35 +12,70 @@
 <form action="{% url 'displayCourse' course.get_primary_key %}" method="post">
     {% csrf_token %}
 <div class="table-container">
-    <h1>{{ course.get_course_name }}</h1>
+    <h2>Course: {{ course.get_course_name }}</h2>
+    <h4>Instructor: {{ course_instructor.get_first_name }} {{ course_instructor.get_last_name }}</h4>
+    {% if account_type == "admin" %}
+    <h7>
+        <div class="input-group" style="width: 500px">
+            <select name="instructor_id" class="form-select">
+                {% for instructor in instructor_list %}
+                    {% if instructor.get_primary_key == course_instructor.get_primary_key %}
+                        <option selected value="{{ instructor.get_primary_key }}">{{instructor.get_first_name }} {{ instructor.get_last_name }}</option>
+                    {% else %}
+                        <option value="{{ instructor.get_primary_key }}">{{instructor.get_first_name }} {{ instructor.get_last_name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input type="submit" class="btn btn-primary btn-sm" name="submitInstructor" value="Submit" formnovalidate>
+        </div>
+    </h7>
+    <div class="text-danger">{{ error_instructor }}</div>
+    {% endif %}
+</div>
+    <div class = "table-container">
+        <h3>TAs</h3>
 <table class="my-table">
     <thead>
         <tr>
             <th>TA name</th>
             <th>Grader Status</th>
             <th># of Labs</th>
+            {% if account_type == "admin" %}
             <th>Edit/Delete</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
         {% for course_ta in course_tas %}
             <tr>
-                <td style="width: 500px">{{ course_ta.ta_id.publicinfo.first_name }} {{ course_ta.ta_id.publicinfo.last_name }}</td>
-                <td>{{ course_ta.is_grader }}</td>
-                <td>{{ course_ta.number_of_labs }}</td>
+                <td style="width: 500px">{{ course_ta.get_first_name }} {{ course_ta.get_last_name }}</td>
                 <td>
-                    <a class="btn" href="{% url 'deleteCourseTa' course_id=course.get_primary_key courseta_id=course_ta.pk %}">
+                    {% if course_ta.grader_status %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>{{ course_ta.number_sections }}</td>
+                {% if account_type == "admin" %}
+                <td>
+                    <a class="btn" href="{% url 'editCourseTa' course_id=course.get_primary_key user_id=course_ta.get_primary_key %}">
+                        <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+                    </a>
+                    <a class="btn" href="{% url 'deleteCourseTa' course_id=course.get_primary_key user_id=course_ta.get_primary_key %}">
                         <img src="{% static 'TAScheduler/icons/delete.svg' %}">
                     </a>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
+    {% if account_type == "admin" %}
     <tfoot>
             <tr>
                 <td style="width: 500px">
-                    <select name="ta_id" style="width: 500px">
-                        {% for account in accounts %}
+                    <select name="ta_id" class="form-select" style="width: 500px">
+                        {% for account in ta_list %}
                                 <option value="{{ account.get_primary_key }}">{{account.get_first_name }} {{ account.get_last_name }}</option>
                         {% endfor %}
                     </select>
@@ -48,23 +83,93 @@
                 <td>
                     <select class="form-select" id="is_grader" name="is_grader" required>
                         <option value="" disabled selected hidden style="color: #6c757d;">Is grader?</option>
-                        <option value="True">Yes</option>
-                        <option value="False">No</option>
+                        <option value="True">True</option>
+                        <option value="False">False</option>
                     </select>
                 </td>
                 <td>
                     <input type="number" class="form-control" name="number_of_labs" placeholder="# of Labs" required min="0" max="10">
                 </td>
                 <td>
-                    <input type="submit" class="btn btn-primary" value="Submit">
+                    <input type="submit" class="btn btn-primary" name="submitTa" value="Add TA">
                 </td>
             </tr>
     </tfoot>
+    {% endif %}
+</table>
+    </div>
+</form>
+<div class="text-danger">{{ error_ta }}</div>
+
+<!-- Sections and their TAs -->
+<form action="{% url 'displayCourse' course.get_primary_key %}" method="post">
+{% csrf_token %}
+<div class="table-container">
+<h3>Sections</h3>
+<table class="my-table">
+    <thead>
+        <tr>
+            <th>Section Name</th>
+            <th>Assigned TA</th>
+            {% if account_type == "admin" %}
+            <th>Edit/Delete</th>
+            {% elif account_type == "instructor" and course_instructor.get_primary_key == current_user.get_primary_key %}
+            <th>Edit</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for section in sections %}
+        <tr>
+            <td>{{ section.get_lab_name }}</td>
+            <td>
+                {% if section.ta %}
+                    {{ section.ta.get_first_name }} {{ section.ta.get_last_name }}
+                {% else %}No TA Assigned{% endif %}
+            </td>
+            {% if account_type == "admin" or account_type == "instructor" %}
+            {% if course_instructor.get_primary_key == current_user.get_primary_key or account_type == "admin" %}
+            <td>
+                <a class="btn" href="{% url 'editSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
+                    <img src="{% static 'TAScheduler/icons/edit.svg' %}">
+                </a>
+                {% endif %}
+                {% endif %}
+                {% if account_type == "admin" %}
+                <a class="btn" href="{% url 'deleteSection' course_id=course.get_primary_key section_id=section.get_primary_key %}">
+                    <img src="{% static 'TAScheduler/icons/delete.svg' %}">
+                </a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% if account_type == "admin" %}
+    <tfoot>
+        <tr>
+            <td>
+                <input type="text" class="form-control" name="section_name" placeholder="Section Name" required>
+            </td>
+            <td>
+                <select class="form-select" name="ta">
+                    <option value="None" selected>None Assigned</option>
+                    {% for course_ta in course_tas %}
+                    {% if course_ta.number_sections > course_ta.current_number_sections %}
+                    <option value="{{ course_ta.get_primary_key }}">
+                        {{ course_ta.get_first_name }} {{ course_ta.get_last_name }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <input type="submit" class="btn btn-primary" name="submitSection" value="Add Section">
+            </td>
+        </tr>
+    </tfoot>
+    {% endif %}
 </table>
 </div>
 </form>
-<div class="text-danger">{{ error_message }}</div>
-
-<!-- Sections and their TAs -->
-
+<div class="text-danger">{{ error_section }}</div>
 {%  endblock %}

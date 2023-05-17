@@ -6,9 +6,11 @@
 
 
 {% block content %}
+<div class="text-danger">{{ error_message }}</div>
 <form action="{% url 'editAccount' account.get_primary_key %}" method="post">
     <h2>{{ account.get_email }}</h2>
     {% csrf_token %}
+    {% if account_type == "admin" %}
     <div class="row">
         <label for="first_name" class="col-sm-3 col-form-label">First Name</label>
         <div class="col-sm-9">
@@ -21,25 +23,30 @@
             <input type="text" class="form-control" id="last_name" name="last_name" required value="{{ account.get_last_name }}">
         </div>
     </div>
+    {% endif %}
     <div class="row">
         <label for="office_hours" class="col-sm-3 col-form-label">Office Hours</label>
         <div class="col-sm-9">
-            <input type="office_hours" class="form-control" id="office_hours" name="office_hours" required value="{{ account.get_office_hours }}">
+            <input type="office_hours" class="form-control" id="office_hours" name="office_hours" value="{{ account.get_office_hours }}">
         </div>
     </div>
     <div class="row">
         <label for="address" class="col-sm-3 col-form-label">Address</label>
         <div class="col-sm-9">
-            <input type="address" class="form-control" id="address" name="address" required value="{{ account.get_address }}">
+            <input type="address" class="form-control" id="address" name="address" value="{{ account.get_address }}">
         </div>
     </div>
     <div class="row">
         <label for="phone_number" class="col-sm-3 col-form-label">Phone Number</label>
         <div class="col-sm-9">
-            <input type="phone_number" class="form-control" id="phone_number" name="phone_number" required value="{{ account.get_phone_number }}">
+            <input type="phone_number" class="form-control" id="phone_number" name="phone_number" value="{{ account.get_phone_number }}">
         </div>
     </div>
     <input type="submit" class="btn btn-primary" value="Submit">
-    <a class="btn btn-primary" href="{% url 'accounts' %}">Cancel</a>
+    {% if account.get_primary_key == current_user.get_primary_key %}
+        <a class="btn btn-primary" href="{% url 'dashboard' %}">Cancel</a>
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'accounts' %}">Cancel</a>
+    {% endif %}
 </form>
 {%  endblock %}

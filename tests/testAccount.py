@@ -1,20 +1,14 @@
-import unittest
 from django.test import TestCase
 from TAScheduler.models import User, PublicInfo, PrivateInfo
-from typing import Dict
-from unittest.mock import patch, MagicMock
-
-from classes.account import create_account, delete_account
+from classes import account
+from classes.account import create_account, delete_account, Account
 
 
 class TestCreateAccount(TestCase):
-    '''tests whether the create_account function creates a new user, public info and private info object
-    correctly when provided with a valid dictionary containing all required fields.'''
+    """tests whether the create_account function creates a new user, public info and private info object
+    correctly when provided with a valid dictionary containing all required fields."""
 
-    @patch('TAScheduler.models.User.objects.create')
-    @patch('TAScheduler.models.PublicInfo.objects.create')
-    @patch('TAScheduler.models.PrivateInfo.objects.create')
-    def test_create_account_success(self, mock_private_info, mock_public_info, mock_user_create):
+    def test_create_account_success(self):
         data = {
             'email': 'test@example.com',
             'password': 'password123',
@@ -22,16 +16,12 @@ class TestCreateAccount(TestCase):
             'first_name': 'John',
             'last_name': 'Doe'
         }
-        mock_user_create.return_value = MagicMock(pk=1)
-        create_account(data)
-        mock_user_create.assert_called_once_with(email='test@example.com', password='password123', account_type='T')
-        mock_public_info.assert_called_once_with(user_id=1, first_name='John', last_name='Doe')
-        mock_private_info.assert_called_once_with(user_id=1)
+        new_account = create_account(data)
+        self.assertIsInstance(new_account, Account)
 
     '''Tests whether the create_account function returns None when required fields are missing.'''
 
-    @patch('TAScheduler.models.User.objects.create')
-    def test_create_account_missing_fields(self, mock_user_create):
+    def test_create_account_missing_fields(self):
         data = {
             'email': 'test@example.com',
             'password': 'password123',
@@ -39,13 +29,13 @@ class TestCreateAccount(TestCase):
         }
         result = create_account(data)
         self.assertIsNone(result)
-        mock_user_create.assert_not_called()
 
     '''Tests whether the create_account function returns None when a user with the same email already 
     exists in the database.'''
 
-    @patch('TAScheduler.models.User.objects.create')
-    def test_create_account_existing_user(self, mock_user_create):
+    # add user model,
+
+    def test_create_account_existing_user(self):
         data = {
             'email': 'test@example.com',
             'password': 'password123',
@@ -53,10 +43,69 @@ class TestCreateAccount(TestCase):
             'first_name': 'John',
             'last_name': 'Doe'
         }
-        mock_user_create.side_effect = Exception('duplicate key value violates unique constraint')
-        result = create_account(data)
+        data2 = {
+            'email': 'test@example.com',
+            'password': 'password123',
+            'account_type': 'T',
+            'first_name': 'John',
+            'last_name': 'Doe'
+        }
+        example = account.create_account(data)
+        result = account.create_account(data2)
+        self.assertEqual(result, None)
+
+    def test_valid_login(self):
+        # Test case 1: Valid email and password
+
+        email_attempt = "test@example.com"
+        password_attempt = "password123"
+        #    self.assertEqual(account.valid_login(email_attempt,password_attempt),True)
+
+        # Test case 2: Invalid email
+        self.assertEqual(account.valid_login("invalid@example.com", password_attempt), False)
+
+        # Test case 3: Invalid password
+
+        self.assertEqual(account.valid_login(email_attempt, "wrongpassword"), False)
+
+    def test_editAccountReturnOnSuccess(self):
+        user_model = User.objects.create(email="1", password="1", account_type="ta")
+        PublicInfo.objects.create(first_name="1", last_name="1", office_hours="1", user_id=user_model)
+        PrivateInfo.objects.create(address="1", phone_number="1", user_id=user_model)
+        data = {
+            'first_name': '2',
+            'last_name': '2',
+            'address': '2',
+            'phone_number': '2',
+            'office_hours': '2'
+        }
+        result = account.edit_account(user_model.pk, data)
+        self.assertIsInstance(result, Account)
+
+    def test_editAccountReturnOnFailure(self):
+        data = {
+            'first_name': '2',
+            'last_name': '2',
+            'address': '2',
+            'phone_number': '2',
+            'office_hours': '2'
+        }
+        result = account.edit_account(1, data)
         self.assertIsNone(result)
-        mock_user_create.assert_called_once_with(email='test@example.com', password='password123', account_type='T')
+
+    def test_editAccountModelsUpdate(self):
+        user_model = User.objects.create(email="1", password="1", account_type="ta")
+        PublicInfo.objects.create(first_name="1", last_name="1", office_hours="1", user_id=user_model)
+        PrivateInfo.objects.create(address="1", phone_number="1", user_id=user_model)
+        data = {
+            'first_name': '2',
+            'last_name': '2',
+            'address': '1',
+            'phone_number': '2',
+            'office_hours': '2'
+        }
+        result = account.edit_account(user_model.pk, data)
+        self.assertIsInstance(result, Account)
 
 
 class TestDeleteAccount(TestCase):

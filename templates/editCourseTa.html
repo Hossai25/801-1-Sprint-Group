@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Edit Course Ta
+{% endblock %}
+
+
+{% block content %}
+<form action="{% url 'editCourseTa' course_id=course.get_primary_key user_id=selected_ta.user_model.pk %}" method="post">
+    <h2>{{ course.get_course_name }}</h2>
+    <h3>{{ selected_ta.user_model.publicinfo.first_name }} {{ selected_ta.user_model.publicinfo.last_name }}</h3>
+    {% csrf_token %}
+    <div class="row">
+        <label for="is_grader" class="col-sm-3 col-form-label">Is Grader</label>
+        <div class="col-sm-9">
+            <select class="form-select" id="is_grader" name="is_grader" required>
+                <option value="{{ selected_ta.grader_status }}" selected hidden style="color: #6c757d;">{{ selected_ta.grader_status }}</option>
+                <option value="True">True</option>
+                <option value="False">False</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <label for="number_of_labs" class="col-sm-3 col-form-label">Number of Labs</label>
+        <div class="col-sm-9">
+            <input type="number" id="number_of_labs" class="form-control" name="number_of_labs" value="{{ selected_ta.number_sections }}" placeholder="# of Labs" required min="0" max="10">
+        </div>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Submit">
+    <a class="btn btn-primary" href="{% url 'displayCourse' course_id=course.get_primary_key %}">Cancel</a>
+</form>
+{%  endblock %}>
