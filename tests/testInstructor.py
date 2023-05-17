@@ -34,6 +34,13 @@ class TestStaticMethods(TestCase):
         instructor_object = instructor.account_to_instructor(user_id)
         self.assertIsInstance(instructor_object, instructor.Instructor)
 
+    def test_wrongAccountToInstructor(self):
+        self.user.account_type = "ta"
+        self.user.save()
+        user_id = self.user.id
+        instructor_object = instructor.account_to_instructor(user_id)
+        self.assertFalse(instructor_object)
+
     def test_getCourseInstructor(self):
         returned_instructor = instructor.get_course_instructor(self.course_model.id)
         self.assertEqual(returned_instructor.user_model, self.user)
