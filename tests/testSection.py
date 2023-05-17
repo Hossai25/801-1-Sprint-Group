@@ -1,20 +1,21 @@
 import unittest
 from django.test import TestCase
 from TAScheduler.models import Lab as LabModel, Course as CourseModel
+from django.core.exceptions import ObjectDoesNotExist
 from classes import section
 from classes.section import Section, create_section, delete_section
-from classes.course import Course, create_course
+from classes.course import create_course
 
 
 class TestSectionStaticMethods(TestCase):
     def test_createSectionSuccessful(self):
-        course1 = create_course("course1");
-        self.assertIsInstance(create_section("testsection", course1), Section)
+        course1 = create_course("course1")
+        self.assertIsInstance(create_section("testSection", course1), Section)
 
     def test_createDuplicateSection(self):
-        testCourse = create_course("testCourse")
-        section1 = create_section("testsection", testCourse)
-        section2 = create_section("testsection", testCourse)
+        test_course = create_course("testCourse")
+        create_section("testSection", test_course)
+        section2 = create_section("testSection", test_course)
         self.assertEqual(section2, None)
 
     def test_getSectionById(self):
@@ -29,8 +30,8 @@ class TestSectionStaticMethods(TestCase):
 
     def test_getFullCourseList(self):
         course1 = CourseModel.objects.create(course_name="course1")
-        section_1 = LabModel.objects.create(lab_name="sect1", course_id=course1)
-        section_2 = LabModel.objects.create(lab_name="sect2", course_id=course1)
+        LabModel.objects.create(lab_name="sect1", course_id=course1)
+        LabModel.objects.create(lab_name="sect2", course_id=course1)
         self.assertEquals(section.section_list(course1).__len__(), 2)
 
     def test_getEmptyCourseList(self):
@@ -45,7 +46,7 @@ class TestDeleteSection(TestCase):
         course_model = CourseModel.objects.create(course_name="test_course")
         section_model = LabModel.objects.create(lab_name="test_section", course_id=course_model)
         delete_section(section_model.pk)
-        with self.assertRaises(LabModel.DoesNotExist):
+        with self.assertRaises(ObjectDoesNotExist):
             LabModel.objects.get(lab_name="test_section")
 
     def test_trueOnSuccess(self):
