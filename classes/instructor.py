@@ -1,4 +1,4 @@
-from classes import account, course
+from classes import course
 from classes.account import Account
 from TAScheduler.models import User as UserModel, Course as CourseModel
 
@@ -16,10 +16,10 @@ def account_to_instructor(account_id: int):
 
 
 def get_course_instructor(course_id: int):
-    course = CourseModel.objects.get(id=course_id)
-    if course.instructor_id is None:
+    course_model = CourseModel.objects.get(id=course_id)
+    if course_model.instructor_id is None:
         return None
-    instructor = account_to_instructor(course.instructor_id.pk)
+    instructor = account_to_instructor(course_model.instructor_id.pk)
     return instructor
 
 
@@ -42,23 +42,23 @@ class Instructor(Account):
 
     def add_to_course(self, course_id: int):
         try:
-            course = CourseModel.objects.get(id=course_id)
-            if course.instructor_id is not None and course.instructor_id.id == self.get_primary_key():
+            course_model = CourseModel.objects.get(id=course_id)
+            if course_model.instructor_id is not None and course_model.instructor_id.id == self.get_primary_key():
                 return None
             instructor = UserModel.objects.get(id=self.get_primary_key())
-            course.instructor_id = instructor
-            course.save()
+            course_model.instructor_id = instructor
+            course_model.save()
             return True
         except CourseModel.DoesNotExist:
             return False
 
     def remove_from_course(self, course_id: int):
         try:
-            course = CourseModel.objects.get(id=course_id)
+            course_model = CourseModel.objects.get(id=course_id)
             instructor = UserModel.objects.get(id=self.get_primary_key())
-            if course.instructor_id == instructor:
-                course.instructor_id = None
-                course.save()
+            if course_model.instructor_id == instructor:
+                course_model.instructor_id = None
+                course_model.save()
                 return True
             else:
                 return False
