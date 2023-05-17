@@ -298,7 +298,7 @@ class EditAccount(View):
                                                         "back_href": back_href,
                                                         "error_message": self.error_invalidinput})
 
-        edited_account = account.edit_account(user_id, request.POST.dict())
+        account.edit_account(user_id, request.POST.dict())
 
         if current_user.get_primary_key() == userView.get_primary_key():
             return redirect(reverse('dashboard'))
