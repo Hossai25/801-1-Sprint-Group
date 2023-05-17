@@ -749,16 +749,16 @@ class EditAccount(TestCase):
     #This test checks that you can successfully edit an account
     def test_checkSuccessful(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
         temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount"), {"first_name": "New", "last_name": "Name", "email":
-            "test1@uwm.edu", "password": "annafronk", "account_type": "admin"}, self.account_objs[1].pk)
+        resp = self.webpage.post(reverse("editAccount", kwargs={"user_id": temp.pk}), {"first_name": "New", "last_name": "Name", "email":
+                                 "test1@uwm.edu", "password": "annafronk", "account_type": "admin"})
         self.assertRedirects(resp, "/accounts/")
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
@@ -776,7 +776,7 @@ class EditAccount(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
