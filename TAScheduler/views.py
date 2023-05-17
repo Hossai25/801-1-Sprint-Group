@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
+from TAScheduler import forms
 from classes import account, section, course, ta, instructor
 from django.urls import reverse
 import re  # regular expressions for parsing strings
@@ -366,6 +367,7 @@ def deleteSection(request, course_id, section_id):
 
 
 class EditAccount(View):
+    error_invalidinput = "Error editing the account. Invalid input"
     def get(self, request, user_id):
         """
         Get method for the EditAccount view.
@@ -393,8 +395,22 @@ class EditAccount(View):
     def post(self, request, user_id):
         userView = account.get_account_by_id(user_id)
         current_user = account.get_account_by_id(request.session["user"])
+
+        form = forms.EditAccountForm(request.POST)
+        if not form.is_valid():
+            if current_user.get_primary_key() == userView.get_primary_key():
+                back_href = reverse('dashboard')
+            else:
+                back_href = reverse('accounts')
+            return render(request, "editAccount.html", {"email": request.session["email"],
+                                                        "account_type": request.session["account_type"],
+                                                        "user": request.session["user"],
+                                                        'account': userView,
+                                                        "current_user": current_user,
+                                                        "back_href": back_href,
+                                                        "error_message": self.error_invalidinput})
+
         edited_account = account.edit_account(user_id, request.POST.dict())
-        accounts = account.account_list()
 
         if current_user.get_primary_key() == userView.get_primary_key():
             return redirect(reverse('dashboard'))
