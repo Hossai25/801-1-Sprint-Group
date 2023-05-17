@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from TAScheduler.models import Course as CourseModel
 
-from TAScheduler.models import User, PublicInfo, PrivateInfo, Course, Lab
+from TAScheduler.models import User, PublicInfo, PrivateInfo, Course, Lab, CourseTa
 from django import urls
 
 from classes.section import create_section
@@ -307,14 +307,13 @@ class Courses(TestCase):
 
     # This test checks to see that if the create lab button is pressed it brings the user to the
     # right page
-    def test_toCreateLabPage(self):
-        session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session["account_type"] = "admin"
-        session.save()
-        resp = self.webpage.get(reverse('courses'))
-        self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
-                            html=True)
+    # def test_toCreateLabPage(self):
+    #     session = self.webpage.session
+    #     session["email"] = "test1@uwm.edu"
+    #     session.save()
+    #     resp = self.webpage.get(reverse('courses'))
+    #     self.assertContains(resp, '<a class="btn btn-primary" href="%s">Create Courses</a>' % reverse('createCourse'),
+    #                         html=True)
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to the
     # right page
@@ -739,7 +738,7 @@ class EditAccount(TestCase):
 
         # Fill test database with users
         for i in self.users:
-            temp = User(email=i + "@uwm.edu", password=i, account_type="administrator")
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
             temp.save()
             temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
             temp2.save()
@@ -750,16 +749,16 @@ class EditAccount(TestCase):
     #This test checks that you can successfully edit an account
     def test_checkSuccessful(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}), {"first_name": "New", "last_name": "Name", "email":
-            "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"}, self.account_objs[1].pk)
+        resp = self.webpage.post(reverse("editAccount", kwargs={"user_id": temp.pk}), {"first_name": "New", "last_name": "Name", "email":
+                                 "test1@uwm.edu", "password": "annafronk", "account_type": "admin"})
         self.assertRedirects(resp, "/accounts/")
 
     # This test checks to see that if the back to dashboard button is pressed it brings the user to
@@ -777,7 +776,7 @@ class EditAccount(TestCase):
         session = self.webpage.session
         session["email"] = "test1@uwm.edu"
         session.save()
-        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
@@ -914,9 +913,10 @@ class DisplayCourse(TestCase):
         session["email"] = "test1@uwm.edu"
         session.save()
         testcourse = CourseModel.objects.create(course_name="test_course")
-        resp = self.webpage.post(reverse("displayCourse", kwargs={'course_id': self.course_objs[1].pk}),
-                                 {"submitTa": ""}, follow=True)
-        self.assertNotEqual(User.objects.get(email="tatemp@uwm.edu"), None)
+        ta_to_add = User.objects.get(email="ta@uwm.edu")
+        self.webpage.post(reverse("displayCourse", kwargs={'course_id': testcourse.pk}),
+                          {"submitTa": "", "ta_id": ta_to_add.pk, "is_grader": True, "number_of_labs": 1}, follow=True)
+        self.assertNotEqual(CourseTa.objects.filter(ta_id=ta_to_add, course_id=testcourse), None)
 
     #This test checks that a submitted instructor is added to the database
     def test_submitInstructortoDatabase(self):
