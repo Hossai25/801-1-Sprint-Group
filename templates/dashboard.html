@@ -70,7 +70,12 @@ Home
                 </tr>
                 {% for course in assistant_courses %}
                 <tr>
-                    <td>{{ course.get_course_name }}</td>
+                    <td>{{ course.get_course_name }} </td>
+                    <td class="ps-2">
+                    {% if course.ta_is_grader %}
+                        (Grader)
+                    {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
@@ -80,7 +85,8 @@ Home
                 </tr>
                 {% for section in assistant_sections %}
                 <tr>
-                    <td>{{ section.get_lab_name }}</td>
+                    <td>{{ section.get_course_name }}: </td>
+                    <td class="ps-2">{{ section.get_lab_name }}</td>
                 </tr>
                 {% endfor %}
             </table>

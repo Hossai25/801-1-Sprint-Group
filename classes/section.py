@@ -5,7 +5,7 @@ from classes import account, course
 
 
 def create_section(name: str, course_object: course.Course):
-    if LabModel.objects.filter(lab_name=name).exists():
+    if LabModel.objects.filter(lab_name=name, course_id=course_object.get_primary_key()).exists():
         return None
 
     new_section_model = LabModel.objects.create(
