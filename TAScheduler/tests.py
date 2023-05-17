@@ -662,70 +662,66 @@ class EditAccount(TestCase):
     #This test checks to make sure an error is thrown if an invalid first name is entered
     def test_editFirstNameFail(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
         temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}),
-                                 {"first_name": " ", "last_name": "Name", "email":
-                                     "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"},
-                                 self.account_objs[1].pk)
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': temp.pk}),
+                                 {"first_name": "", "last_name": "Name", "email":
+                                     "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"})
         self.assertContains(resp, "Error editing the account. Invalid input")
 
     # This test checks to make sure an error is thrown if an invalid last name is entered
     def test_editLastNameFail(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}),
-                                 {"first_name": "New", "last_name": " ", "email":
-                                     "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"},
-                                 self.account_objs[1].pk)
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': temp.pk}),
+                                 {"first_name": "NEw", "last_name": "", "email":
+                                     "test1@uwm.edu", "password": "annafronk", "account_type": "administrator"})
         self.assertContains(resp, "Error editing the account. Invalid input")
 
     # This test checks to make sure an error is thrown if an invalid password is entered
     def test_editPasswordFail(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="administrator")
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
         temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': self.account_objs[1].pk}),
+        resp = self.webpage.post(reverse("editAccount", kwargs={'user_id': temp.pk}),
                                  {"first_name": "New", "last_name": "Name", "email":
-                                     "test1@uwm.edu", "password": " ", "account_type": "administrator"},
-                                 self.account_objs[1].pk)
+                                     "test1@uwm.edu", "password": "", "account_type": "administrator"})
         self.assertContains(resp, "Error editing the account. Invalid input")
 
     #This test checks to see if the edited account is updated to the database
     def test_accountUpdatedInDatabase(self):
         session = self.webpage.session
-        session["email"] = "test1@uwm.edu"
-        session.save()
-        temp = User(email="instructor@uwm.edu", password="instructor", account_type="instructor")
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
         temp.save()
-        temp2 = PublicInfo(user_id=temp, first_name="first", last_name="last")
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
         temp2.save()
         temp3 = PrivateInfo(user_id=temp)
         temp3.save()
-        resp = self.webpage.post(reverse('editAccount', kwargs={'user_id': self.account_objs[1].pk}),
+        resp = self.webpage.post(reverse("editAccount", kwargs={"user_id": temp.pk}),
                                  {"first_name": "New", "last_name": "Name", "email":
-                                     "test1@uwm.edu", "password": "testpassword", "account_type": "administrator"},
-                                 self.account_objs[1].pk)
-        self.assertNotEqual(User.objects.get(email="test1@uwm.edu", password="testpassword", account_type="administrator"), None)
+                                     "test1@uwm.edu", "password": "newpassword", "account_type": "admin"})
+        self.assertEqual(User.objects.get(email='avfronk@uwm.edu').password, "newpassword")
 
 class DisplayCourse(TestCase):
     webpage = None
