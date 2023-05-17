@@ -79,7 +79,7 @@ class TestInstructorClassMethods(TestCase):
     def test_getCourses(self):
         test_instructor = Instructor(Account(self.user))
         filled_course = CourseModel.objects.create(course_name="filled", instructor_id=self.user)
-        empty_course = CourseModel.objects.create(course_name="empty")
+        CourseModel.objects.create(course_name="empty")
         courses_list = test_instructor.get_courses()
         for courses in courses_list:
             self.assertEqual(courses.get_primary_key(), filled_course.id)
@@ -124,6 +124,3 @@ class TestInstructorClassMethods(TestCase):
         empty_course = CourseModel.objects.create(course_name="empty")
         remove = test_instructor.remove_from_course(empty_course.id)
         self.assertFalse(remove)
-
-
-
