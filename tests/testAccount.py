@@ -16,7 +16,7 @@ class TestCreateAccount(TestCase):
     """tests whether the create_account function creates a new user, public info and private info object
     correctly when provided with a valid dictionary containing all required fields."""
 #=======
-from classes.account import create_account, delete_account
+from classes.account import create_account, delete_account, Account
 
 
 class TestCreateAccount(TestCase):
@@ -33,7 +33,8 @@ class TestCreateAccount(TestCase):
             'first_name': 'John',
             'last_name': 'Doe'
         }
-        create_account(data)
+        newAccount = create_account(data)
+        self.assertIsInstance(newAccount,Account)
 
     '''Tests whether the create_account function returns None when required fields are missing.'''
 
@@ -82,6 +83,46 @@ class TestCreateAccount(TestCase):
     # Test case 3: Invalid password
 
         self.assertEqual(account.valid_login(email_attempt, "wrongpassword"),False)
+
+    def test_editAccountReturnOnSuccess(self):
+        user_model = User.objects.create(email="1", password="1", account_type="ta")
+        PublicInfo.objects.create(first_name="1", last_name="1", office_hours="1", user_id=user_model)
+        PrivateInfo.objects.create(address="1", phone_number="1", user_id=user_model)
+        data = {
+            'first_name': '2',
+            'last_name': '2',
+            'address': '2',
+            'phone_number': '2',
+            'office_hours': '2'
+        }
+        result = account.edit_account(user_model.pk, data)
+        self.assertIsInstance(result, Account)
+
+    def test_editAccountReturnOnFailure(self):
+        data = {
+            'first_name': '2',
+            'last_name': '2',
+            'address': '2',
+            'phone_number': '2',
+            'office_hours': '2'
+        }
+        result = account.edit_account(1, data)
+        self.assertIsNone(result)
+
+    def test_editAccountModelsUpdate(self):
+        user_model = User.objects.create(email="1", password="1", account_type="ta")
+        PublicInfo.objects.create(first_name="1", last_name="1", office_hours="1", user_id=user_model)
+        PrivateInfo.objects.create(address="1", phone_number="1", user_id=user_model)
+        data = {
+            'first_name': '2',
+            'last_name': '2',
+            'address': '1',
+            'phone_number': '2',
+            'office_hours': '2'
+        }
+        result = account.edit_account(user_model.pk, data)
+        self.assertIsInstance(result, Account)
+
 
 #=======
 class TestDeleteAccount(TestCase):
