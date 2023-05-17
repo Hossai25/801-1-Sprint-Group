@@ -585,10 +585,6 @@ class DeleteCourse(TestCase):
         resp = self.webpage.get(reverse('deleteCourse', args=[tempcourse.pk]))
         self.assertNotEqual(User(email="delete@uwm.edu", password="delete", account_type="instructor"), None)
 
-    # This test checks to see that a TA that is connected to a course that is deleted still exists
-    def test_tastillexists(self):
-        pass
-
     # This test checks that a TA can't delete a course
     def test_tacantdeletecourse(self):
         session = self.webpage.session
@@ -733,6 +729,67 @@ class EditAccount(TestCase):
                                                    first_name=new_data["first_name"], last_name=new_data["last_name"],
                                                    office_hours=new_data["office_hours"]), PublicInfo.DoesNotExist)
         self.assertNotEqual(PrivateInfo.objects.get(user_id=temp, address=new_data["address"]), PrivateInfo.DoesNotExist)
+
+class EditSection(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
+        self.account_objs = []
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            self.account_objs.append(temp)
+
+    #This test checks that a successful edit section takes the user back to the display course page
+    def test_successfulEditSection(self):
+        session = self.webpage.session
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="admin")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        testsection = Lab.objects.create(lab_name="testlab", course_id=testcourse, ta_id=None)
+        resp = self.webpage.post(reverse("editSection", kwargs={"course_id": testcourse.pk, "section_id": testsection.pk}),
+                                 {"lab_name": "testsection"})
+        self.assertRedirects(resp, reverse('displayCourse', kwargs={'course_id': testcourse.id}))
+
+    #This test checks that the back to homepage button works on the edit section page
+    def test_toHomepage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            testcourse = CourseModel.objects.create(course_name="test_course")
+            testsection = Lab.objects.create(lab_name="testlab", course_id=testcourse, ta_id=None)
+            resp = self.webpage.get(reverse('editSection', kwargs={"course_id": testcourse.pk, "section_id": testsection.pk}))
+            self.assertContains(resp,
+                                '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
+
+    #This test checks that the cancel button appears on the screen
+    def test_displayCourseButton(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            testcourse = CourseModel.objects.create(course_name="test_course")
+            testsection = Lab.objects.create(lab_name="testlab", course_id=testcourse, ta_id=None)
+            resp = self.webpage.get(reverse('editSection', kwargs={"course_id": testcourse.pk, "section_id": testsection.pk}))
+            self.assertContains(resp,
+                            '<a class="btn btn-primary" href="%s">Cancel</a>' % reverse('displayCourse', kwargs={'course_id':testcourse.pk}),
+                            html=True)
 
 
 class DisplayCourse(TestCase):
