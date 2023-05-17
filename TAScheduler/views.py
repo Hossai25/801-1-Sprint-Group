@@ -29,21 +29,20 @@ class Courses(View):
     def get(self, request):
         courses = course.course_list()
         user = account.get_account(request.session["email"])
+        assistant_courses = []
+
         if user.get_account_type() == "ta":
             assistant = ta.account_to_ta(user.get_primary_key())
             assistant_courses = assistant.get_courses()
-            return render(request, "courses.html", {"email": request.session["email"],
-                                                    "account_type": request.session["account_type"],
-                                                    "user": request.session["user"],
-                                                    'courses': courses,
-                                                    "assistant_courses": assistant_courses,
-                                                    "back_href": reverse('dashboard')})
+
         if "account_type" not in request.session:
             request.session["account_type"] = ""
+
         return render(request, "courses.html", {"email": request.session["email"],
                                                 "account_type": request.session["account_type"],
                                                 "user": request.session["user"],
                                                 'courses': courses,
+                                                "assistant_courses": assistant_courses,
                                                 "back_href": reverse('dashboard')})
 
 
@@ -53,6 +52,7 @@ def deleteCourse(request, course_id):
 
 
 class CreateAccount(View):
+
     def get(self, request):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
@@ -61,31 +61,27 @@ class CreateAccount(View):
                                                       "user": request.session["user"],
                                                       "back_href": reverse('accounts')})
 
+    def render_error(self, request, error_message):
+        return render(request, "createAccount.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      "user": request.session["user"],
+                                                      "back_href": reverse('accounts'),
+                                                      "error_message": error_message})
+
     def post(self, request):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
 
         for key in ('email', 'password', 'account_type', 'first_name', 'last_name'):
             if key not in request.POST or request.POST[key] == '':
-                return render(request, "createAccount.html",
-                              {"email": request.session["email"], "account_type": request.session["account_type"],
-                               "user": request.session["user"],
-                               "back_href": reverse('accounts'),
-                               "error_message": "Error creating the account. A user with this email may already exist."})
+                return self.render_error(request, "Error creating the account. A user with this email may already "
+                                                  "exist.")
 
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", request.POST['email']):
-            return render(request, "createAccount.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "user": request.session["user"],
-                           "back_href": reverse('accounts'),
-                           "error_message": "Error creating the account. A user with this email may already exist."})
+            return self.render_error(request, "Error creating the account. A user with this email may already exist.")
         created_account = account.create_account(request.POST.dict())
         if created_account is None:
-            return render(request, "createAccount.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "user": request.session["user"],
-                           "back_href": reverse('accounts'),
-                           "error_message": "Error creating the account. A user with this email may already exist."})
+            return self.render_error(request, "Error creating the account. A user with this email may already exist.")
         return redirect('/accounts/', {"email": request.session["email"],
                                        "account_type": request.session["account_type"]})
 
@@ -100,24 +96,23 @@ class CreateCourse(View):
                                                      "user": request.session["user"],
                                                      "back_href": reverse('courses')})
 
+    def render_error(self, request, error_message):
+        return render(request, "createAccount.html", {"email": request.session["email"],
+                                                      "account_type": request.session["account_type"],
+                                                      "user": request.session["user"],
+                                                      "back_href": reverse('courses'),
+                                                      "error_message": error_message})
+
     def post(self, request):
         if "account_type" not in request.session:
             request.session["account_type"] = ""
         key = 'course_name'
         if key not in request.POST or request.POST[key] == '':
-            return render(request, "createCourse.html", {"email": request.session["email"],
-                                                         "account_type": request.session["account_type"],
-                                                         "user": request.session["user"],
-                                                         "back_href": reverse('courses'),
-                                                         "error_message": "Error creating the course."})
+            return self.render_error(request, "Error creating the course.")
 
         created_course = course.create_course(request.POST["course_name"])
         if created_course is None:
-            return render(request, "createCourse.html",
-                          {"email": request.session["email"], "account_type": request.session["account_type"],
-                           "user": request.session["user"],
-                           "back_href": reverse('courses'),
-                           "error_message": "Error creating the course."})
+            return self.render_error(request, "Error creating the course.")
         return redirect('/courses/', {"email": request.session["email"],
                                       "account_type": request.session["account_type"],
                                       "user": request.session["user"]})
@@ -266,6 +261,7 @@ def deleteSection(request, course_id, section_id):
 
 class EditAccount(View):
     error_invalidinput = "Error editing the account. Invalid input"
+
     def get(self, request, user_id):
         userView = account.get_account_by_id(user_id)
         current_user = account.get_account_by_id(request.session["user"])
@@ -302,7 +298,7 @@ class EditAccount(View):
                                                         "back_href": back_href,
                                                         "error_message": self.error_invalidinput})
 
-        edited_account = account.edit_account(user_id, request.POST.dict())
+        account.edit_account(user_id, request.POST.dict())
 
         if current_user.get_primary_key() == userView.get_primary_key():
             return redirect(reverse('dashboard'))
