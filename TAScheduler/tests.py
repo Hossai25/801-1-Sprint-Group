@@ -791,6 +791,122 @@ class EditSection(TestCase):
                             '<a class="btn btn-primary" href="%s">Cancel</a>' % reverse('displayCourse', kwargs={'course_id':testcourse.pk}),
                             html=True)
 
+    # This test checks to see if the edited section is updated to database
+    def test_updatedtodatabase(self):
+        session = self.webpage.session
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        testsection = Lab.objects.create(lab_name="testlab", course_id=testcourse, ta_id=None)
+        resp = self.webpage.post(reverse('editSection', kwargs={"course_id": testcourse.pk, "section_id": testsection.pk}))
+        self.assertNotEqual(Lab.objects.get(lab_name="testlab", course_id=testcourse, ta_id=None), Lab.DoesNotExist)
+
+
+class EditCourseTA(TestCase):
+    webpage = None
+    users = None
+
+    def setUp(self):
+        self.webpage = Client()
+        self.users = ["test1", "test2"]
+        set_default_session(self.webpage.session)
+        self.account_objs = []
+
+        # Fill test database with users
+        for i in self.users:
+            temp = User(email=i + "@uwm.edu", password=i, account_type="admin")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name=i, last_name=i)
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            self.account_objs.append(temp)
+
+    #This test checks to see if the edit course ta can be successfully done
+    def test_successfuledit(self):
+        session = self.webpage.session
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        temp_as_ta = CourseTa(ta_id=temp, is_grader=True, number_of_labs=1, course_id=testcourse)
+        temp_as_ta.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        resp = self.webpage.post(
+            reverse('editCourseTa', kwargs={"course_id": testcourse.pk, "user_id": temp.pk}),
+            {"is_grader": True, "number_of_labs": 2})
+        self.assertRedirects(resp, reverse('displayCourse', kwargs={'course_id': testcourse.id}))
+
+    #This test checks to see if the back to homepage button on the editCourseTa appears and works
+    def test_backtohomepage(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="ta")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            testcourse = CourseModel.objects.create(course_name="test_course")
+            temp_as_ta = CourseTa(ta_id=temp, is_grader=True, number_of_labs=1, course_id=testcourse)
+            temp_as_ta.save()
+            testcourse = CourseModel.objects.create(course_name="test_course")
+            resp = self.webpage.get(
+                reverse('editCourseTa', kwargs={"course_id": testcourse.pk, "user_id": temp.pk}))
+            self.assertContains(resp,
+                                '<a class="btn btn-primary" href="%s">Back to Dashboard</a>' % reverse('dashboard'),
+                                html=True)
+
+    #This test checks to see if the cancel button appears and works on the editCourseTa page
+    def test_cancelbutton(self):
+        session = self.webpage.session
+        for user_obj in User.objects.all():
+            login_to_session(user_obj, session)
+            temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="ta")
+            temp.save()
+            temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+            temp2.save()
+            temp3 = PrivateInfo(user_id=temp)
+            temp3.save()
+            testcourse = CourseModel.objects.create(course_name="test_course")
+            temp_as_ta = CourseTa(ta_id=temp, is_grader=True, number_of_labs=1, course_id=testcourse)
+            temp_as_ta.save()
+            resp = self.webpage.get(
+                reverse('editCourseTa', kwargs={"course_id": testcourse.pk, "user_id": temp.pk}))
+            self.assertContains(resp,
+                                '<a class="btn btn-primary" href="%s">Cancel</a>' % reverse('displayCourse', kwargs={'course_id': testcourse.pk}),
+                                html=True)
+
+    #This test checks to see if the edited ta is updated to database
+    def test_updatedtodatabase(self):
+        session = self.webpage.session
+        current_user = self.account_objs[0]
+        login_to_session(current_user, session)
+        temp = User(email="avfronk@uwm.edu", password="annafronk", account_type="ta")
+        temp.save()
+        temp2 = PublicInfo(user_id=temp, first_name="Anna", last_name="Fronk")
+        temp2.save()
+        temp3 = PrivateInfo(user_id=temp)
+        temp3.save()
+        testcourse = CourseModel.objects.create(course_name="test_course")
+        temp_as_ta = CourseTa(ta_id=temp, is_grader=True, number_of_labs=1, course_id=testcourse)
+        temp_as_ta.save()
+        resp = self.webpage.post(reverse('editCourseTa', kwargs={"course_id": testcourse.pk, "user_id": temp.pk}))
+        self.assertNotEqual(CourseTa.objects.get(course_id=testcourse.pk, ta_id=temp.pk), CourseTa.DoesNotExist)
+
+
 
 class DisplayCourse(TestCase):
     webpage = None
