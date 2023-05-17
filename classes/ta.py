@@ -1,5 +1,5 @@
 from TAScheduler.models import CourseTa as CourseTaModel, User as UserModel, Course as CourseModel, Lab as LabModel
-from classes import course, section
+from classes import course
 from classes.account import Account
 from classes.section import Section
 

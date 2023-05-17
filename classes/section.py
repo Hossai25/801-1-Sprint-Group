@@ -1,7 +1,7 @@
 from typing import Dict
 
 from TAScheduler.models import Lab as LabModel
-from classes import account, course
+from classes import course
 
 
 def create_section(name: str, course_object: course.Course):
