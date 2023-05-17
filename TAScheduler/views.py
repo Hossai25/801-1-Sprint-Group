@@ -229,6 +229,8 @@ class Dashboard(View):
         if user.get_account_type() == "ta":
             assistant = ta.account_to_ta(user.get_primary_key())
             assistant_courses = assistant.get_courses()
+            for course_obj in assistant_courses:
+                course_obj.ta_is_grader = assistant.get_grader_status(course_obj.get_primary_key())
             assistant_sections = assistant.get_sections()
             return render(request, "dashboard.html", {"email": request.session["email"],
                                                       "account_type": request.session["account_type"],
