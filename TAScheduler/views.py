@@ -338,7 +338,10 @@ class EditSection(View):
         course_obj.tas = ta.get_course_tas(course_id)
         for course_ta in course_obj.tas:
             course_ta.number_sections = course_ta.get_number_sections(course_id)
-            course_ta.current_number_sections = len(course_ta.get_sections())
+            course_ta.current_number_sections = 0
+            for ta_lab in course_ta.get_sections():
+                if ta_lab.course_model.pk == course_obj.get_primary_key():
+                    course_ta.current_number_sections += 1
         return render(request, "editSection.html", {"email": request.session["email"],
                                                     "account_type": request.session["account_type"],
                                                     "user": request.session["user"],
